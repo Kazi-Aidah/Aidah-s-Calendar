@@ -1,0 +1,2721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aidah's Calendar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Roboto:wght@400;500&family=Open+Sans:wght@400;600&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --base-font-size: 16px;
+            --ui-roundness: 8px;
+            --ui-roundness-lg: calc(var(--ui-roundness) * 1.5);
+            --ui-roundness-full: 9999px;
+
+            --event-item-border-thickness: 2px;
+            --event-item-roundness: 8px;
+
+            --body-bg: #F8E8F0;
+            --text-color: #4A4A4A;
+            --header-bg: #ffffff;
+            --primary-button-bg: #FFFFFF;
+            --primary-button-text: #E085B0;
+            --primary-button-border-color: var(--primary-button-text);
+            --secondary-button-bg: #F3E0E9;
+            --secondary-button-text: #8B4B66;
+            --accent-color: #E085B0;
+            --day-cell-border-color: #D4DDE3;
+            --main-container-bg: #ffffff;
+            --day-cell-bg: #ffffff;
+            --day-cell-hover-bg-color: #F8F0F5;
+            --current-day-bg: #FFEAF4;
+
+            --arrow-button-bg: transparent;
+            --arrow-button-hover-bg: rgba(0,0,0,0.05);
+            --arrow-button-text: #4B5563;
+            --header-border-color: #E5E7EB;
+
+            --day-cell-drag-bg: #e0f7fa;
+            --current-day-border-color: var(--accent-color);
+            --drag-over-border-color: var(--accent-color);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--body-bg);
+            color: var(--text-color);
+            transition: background-color 0.5s ease-in-out, color 0.5s ease-in-out;
+            font-size: var(--base-font-size);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-y: auto;
+        }
+        body::-webkit-scrollbar {
+            width: 8px;
+            background-color: transparent;
+        }
+        body::-webkit-scrollbar-thumb {
+            background-color: var(--accent-color);
+            border-radius: var(--ui-roundness);
+            border: 2px solid transparent;
+        }
+        body::-webkit-scrollbar-thumb:hover {
+            background-color: var(--primary-button-bg);
+        }
+        body {
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-color) transparent;
+        }
+
+        #main-container,
+        #main-container > div.flex.flex-col.md\:flex-row,
+        #main-container > div.flex.flex-col.md\:flex-row > div.flex.items-center,
+        #main-container > div.calendar-grid {
+            transition: background-color 0.5s ease-in-out, color 0.5s ease-in-out, border-color 0.5s ease-in-out, box-shadow 0.5s ease-in-out;
+        }
+
+        #main-container {
+            margin: auto;
+            max-height: 98vh;
+            overflow-y: auto;
+        }
+        #main-container::-webkit-scrollbar {
+            width: 8px;
+            background-color: transparent;
+        }
+        #main-container::-webkit-scrollbar-thumb {
+            background-color: var(--accent-color);
+            border-radius: var(--ui-roundness);
+            border: 2px solid transparent;
+        }
+        #main-container::-webkit-scrollbar-thumb:hover {
+            background-color: var(--primary-button-bg);
+        }
+        #main-container {
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-color) transparent;
+        }
+
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.75rem;
+        }
+        .day-cell {
+            min-height: 120px;
+            transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out, transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 3px solid var(--day-cell-border-color);
+            background-color: var(--day-cell-bg);
+            padding-bottom: 0.5rem;
+            border-radius: var(--ui-roundness);
+        }
+        .day-cell:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            background-color: var(--day-cell-hover-bg-color);
+        }
+        .current-day {
+            border: 3px solid var(--current-day-border-color);
+            background-color: var(--current-day-bg);
+        }
+        .day-cell.drag-over {
+            border: 3px dashed var(--drag-over-border-color);
+            background-color: var(--day-cell-drag-bg);
+        }
+
+        .event-item {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 0.4rem 0.6rem;
+            padding-right: calc(0.6rem + 1.5rem);
+            font-size: 0.75em;
+            margin-bottom: 0.25rem;
+            cursor: grab;
+            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            user-select: none;
+            border-width: var(--event-item-border-thickness);
+            border-style: solid;
+            border-radius: var(--event-item-roundness);
+            position: relative;
+        }
+        .event-item:hover {
+            filter: brightness(1.05);
+        }
+        .event-item.dragging {
+            opacity: 0.5;
+            border: 2px dashed var(--drag-over-border-color);
+        }
+        .event-item.drop-target-top {
+            border-top: 3px solid var(--accent-color);
+        }
+        .event-item.drop-target-bottom {
+            border-bottom: 3px solid var(--accent-color);
+        }
+
+
+        .event-item .main-content {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+        .event-item .text-content {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            flex-grow: 1;
+            overflow: hidden;
+            min-width: 0;
+        }
+        .event-item .text-content .time-title-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            flex-grow: 1;
+            min-width: 0;
+            align-items: baseline;
+        }
+        .event-item .text-content .time-title-wrapper .time-part {
+            flex-shrink: 0;
+            white-space: nowrap;
+            margin-right: 0.25rem;
+        }
+        .event-item .text-content .time-title-wrapper .title-part {
+            flex-grow: 1;
+            white-space: normal;
+            word-break: break-word;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .event-item .event-icon-container {
+            position: absolute;
+            top: 0.4rem;
+            right: 0.6rem;
+            z-index: 10;
+            font-size: 0.875rem;
+        }
+
+        .event-description {
+            font-size: 0.85em;
+            white-space: normal;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            line-height: 1.2;
+            margin-top: 0.2rem;
+            padding: 0 0.6rem 0.4rem 0;
+            width: 100%;
+            word-break: break-word;
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+        .modal-content {
+            background-color: var(--main-container-bg);
+            padding: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+            animation: fadeInScale 0.3s ease-out forwards;
+            max-height: 90vh;
+            overflow-y: hidden;
+            border-radius: var(--ui-roundness-lg);
+            transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out, border-color 0.3s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 0;
+        }
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        #settings-modal .modal-content {
+            max-width: 700px;
+        }
+
+        .modal-content-scrollable {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            padding-right: 0.5rem;
+        }
+        .modal-content-scrollable::-webkit-scrollbar {
+            width: 8px;
+            background-color: transparent;
+        }
+        .modal-content-scrollable::-webkit-scrollbar-thumb {
+            background-color: var(--accent-color);
+            border-radius: var(--ui-roundness);
+            border: 2px solid transparent;
+        }
+        .modal-content-scrollable::-webkit-scrollbar-thumb:hover {
+            background-color: var(--primary-button-bg);
+        }
+        .modal-content-scrollable {
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-color) transparent;
+        }
+
+        .modal-footer {
+            position: sticky;
+            bottom: 0;
+            background-color: var(--main-container-bg);
+            padding: 1.5rem 1.5rem 1.5rem 0;
+            box-shadow: 0 -5px 10px rgba(0,0,0,0.05);
+            z-index: 1000;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            border-bottom-left-radius: var(--ui-roundness-lg);
+            border-bottom-right-radius: var(--ui-roundness-lg);
+            transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+            gap: 0.5rem;
+            max-height: 250px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            padding: 0.5rem;
+            border-radius: var(--ui-roundness);
+        }
+        .icon-grid::-webkit-scrollbar {
+            width: 8px;
+            background-color: transparent;
+        }
+        .icon-grid::-webkit-scrollbar-thumb {
+            background-color: var(--accent-color);
+            border-radius: var(--ui-roundness);
+            border: 2px solid transparent;
+        }
+        .icon-grid::-webkit-scrollbar-thumb:hover {
+            background-color: var(--primary-button-bg);
+        }
+        .icon-grid {
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-color) transparent;
+        }
+
+
+        .icon-item {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 40px;
+            height: 40px;
+            background-color: var(--secondary-button-bg);
+            cursor: pointer;
+            font-size: 1.25em;
+            transition: background-color 0.2s, transform 0.1s, color 0.2s;
+            border-radius: var(--ui-roundness);
+            color: var(--secondary-button-text);
+        }
+        .icon-item.selected {
+            background-color: var(--primary-button-bg);
+            border: 2px solid var(--primary-button-text);
+            color: var(--primary-button-text);
+        }
+        .icon-item:hover {
+            background-color: var(--secondary-button-hover-bg);
+            transform: scale(1.05);
+        }
+
+        .color-palette {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .color-box {
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.2s, transform 0.1s;
+            border-radius: var(--ui-roundness);
+        }
+        .color-box.selected {
+            border-color: #3b82f6;
+            transform: scale(1.1);
+        }
+        .color-box:hover {
+            transform: scale(1.05);
+        }
+
+        .theme-box {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+            cursor: pointer;
+            border: 3px solid transparent;
+            border-radius: var(--ui-roundness);
+            transition: border-color 0.2s, transform 0.1s, box-shadow 0.2s;
+            text-align: center;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: var(--text-color);
+            background-color: var(--day-cell-bg);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .theme-box .color-preview {
+            width: 40px;
+            height: 20px;
+            border-radius: var(--ui-roundness);
+            margin-bottom: 0.25rem;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+
+        .theme-box.selected {
+            border-color: var(--accent-color);
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        .theme-box:hover {
+            transform: scale(1.02);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+        }
+
+        .custom-file-input {
+            width: 0.1px;
+            height: 0.1px;
+            opacity: 0;
+            overflow: hidden;
+            position: absolute;
+            z-index: -1;
+        }
+        .custom-file-input + label {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+            border-radius: var(--ui-roundness);
+            background-color: var(--secondary-button-bg);
+            color: var(--secondary-button-text);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 3px solid var(--secondary-button-text);
+            width: 100%;
+            justify-content: center;
+        }
+        .custom-file-input + label:hover {
+            background-color: var(--secondary-button-text);
+            color: var(--secondary-button-bg);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+        .custom-file-input:focus + label {
+            outline: 2px solid var(--accent-color);
+            outline-offset: 2px;
+        }
+
+        .themed-button {
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--ui-roundness);
+            font-weight: 600;
+            background-color: var(--primary-button-bg);
+            color: var(--primary-button-text);
+            border: 3px solid var(--primary-button-border-color);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .themed-button:hover {
+            background-color: var(--primary-button-text);
+            color: var(--primary-button-bg);
+            border-color: var(--primary-button-border-color);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+        .themed-button.secondary {
+            background-color: var(--secondary-button-bg);
+            color: var(--secondary-button-text);
+            border: 3px solid var(--secondary-button-text);
+        }
+        .themed-button.secondary:hover {
+            background-color: var(--secondary-button-text);
+            color: var(--secondary-button-bg);
+            border-color: var(--secondary-button-text);
+        }
+
+        input[type="text"], input[type="time"], input[type="date"], textarea {
+            border-radius: var(--ui-roundness);
+            color: var(--text-color);
+            background-color: var(--day-cell-bg);
+            padding: 0.75rem;
+            border: 3px solid var(--day-cell-border-color);
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+        }
+        input[type="text"]:focus, input[type="time"]:focus, input[type="date"]:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(var(--accent-color-rgb), 0.3);
+        }
+        #iconSearchInput {
+            border: 3px solid var(--day-cell-border-color);
+        }
+
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 10px;
+            background: var(--secondary-button-bg);
+            outline: none;
+            opacity: 0.9;
+            transition: opacity .2s, background-color 0.2s;
+            border-radius: var(--ui-roundness);
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+        input[type="range"]:hover {
+            opacity: 1;
+            background-color: var(--secondary-button-bg);
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: var(--ui-roundness-full);
+            background: var(--accent-color);
+            cursor: grab;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+            border: 3px solid var(--primary-button-text);
+        }
+        input[type="range"]::-webkit-slider-thumb:hover {
+            background-color: var(--primary-button-bg);
+        }
+        input[type="range"]::-webkit-slider-thumb:active {
+            transform: scale(1.1);
+            cursor: grabbing;
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: var(--ui-roundness-full);
+            background: var(--accent-color);
+            cursor: grab;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+            border: 3px solid var(--primary-button-text);
+        }
+        input[type="range"]::-moz-range-thumb:hover {
+            background-color: var(--primary-button-bg);
+        }
+        input[type="range"]::-moz-range:active {
+            transform: scale(1.1);
+            cursor: grabbing;
+        }
+
+
+        input[type="color"] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            width: 40px;
+            height: 40px;
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            border-radius: var(--ui-roundness);
+        }
+        input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+            border-radius: var(--ui-roundness);
+        }
+        input[type="color"]::-webkit-color-swatch {
+            border: 1px solid #ccc;
+            border-radius: var(--ui-roundness);
+        }
+        input[type="color"]::-moz-color-swatch-wrapper {
+            padding: 0;
+            border-radius: var(--ui-roundness);
+        }
+        input[type="color"]::-moz-color-swatch {
+            border: 1px solid #ccc;
+            border-radius: var(--ui-roundness);
+        }
+        .color-input-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+        .color-input-group label {
+            flex-grow: 1;
+            font-size: 0.9em;
+        }
+
+        #darkModeToggle {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            width: 38px;
+            height: 22px;
+            background-color: var(--secondary-button-bg);
+            border-radius: var(--ui-roundness);
+            position: relative;
+            cursor: pointer;
+            outline: none;
+            transition: background-color 0.2s ease;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        #darkModeToggle::before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 18px;
+            height: 18px;
+            background-color: #ffffff;
+            border-radius: var(--ui-roundness-full);
+            transition: transform 0.2s ease, background-color 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        #darkModeToggle:checked {
+            background-color: var(--accent-color);
+            border-radius: var(--ui-roundness);
+        }
+
+        #darkModeToggle:checked::before {
+            transform: translateX(16px);
+            background-color: #ffffff;
+            border-radius: var(--ui-roundness);
+        }
+
+        #darkModeToggle + label {
+            margin-left: 0.5rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            border-radius: var(--ui-roundness);
+        }
+
+        #adMobPlaceholder {
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .special-theme-box {
+            position: relative;
+        }
+
+        .special-theme-lock-overlay {
+            position: absolute;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--ui-roundness);
+            color: white;
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .special-theme-box.unlocked .special-theme-lock-overlay {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .special-theme-box.unlocked {
+             border-color: var(--accent-color) !important;
+        }
+
+        /* Custom styles for settings headings */
+        .h4-settings {
+            font-size: calc(var(--base-font-size) * 1.125); /* Example: 1.125 times base font size */
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body class="p-4">
+
+    <div class="bg-white shadow-2xl p-6 w-full max-w-6xl overflow-hidden transform transition-all duration-300"
+         id="main-container" style="border-radius: var(--ui-roundness-lg); background-color: var(--main-container-bg);">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-6 border-b pb-4"
+             style="border-color: var(--header-border-color);">
+            <div class="flex items-center space-x-2 mb-4 md:mb-0">
+                <button id="prevMonth" class="p-3 transition duration-200 ease-in-out"
+                        style="border-radius: var(--ui-roundness); background-color: var(--arrow-button-bg); color: var(--arrow-button-text);">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <h2 id="currentMonthYear" class="font-extrabold text-3xl tracking-tight"
+                    style="color: var(--text-color);"></h2>
+                <button id="nextMonth" class="p-3 transition duration-200 ease-in-out"
+                        style="border-radius: var(--ui-roundness); background-color: var(--arrow-button-bg); color: var(--arrow-button-text);">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            <div class="flex space-x-3">
+                <button id="todayButton" class="themed-button">
+                    Today
+                </button>
+                <button id="settingsButton" class="themed-button secondary">
+                    <i class="fas fa-cog"></i> Settings
+                </button>
+            </div>
+        </div>
+
+        <div class="calendar-grid text-center font-bold text-sm uppercase tracking-wide mb-2"
+             style="color: var(--text-color);">
+            <div class="p-2">Sun</div>
+            <div class="p-2">Mon</div>
+            <div class="p-2">Tue</div>
+            <div class="p-2">Wed</div>
+            <div class="p-2">Thu</div>
+            <div class="p-2">Fri</div>
+            <div class="p-2">Sat</div>
+        </div>
+
+        <div id="calendar" class="calendar-grid">
+            </div>
+    </div>
+
+    <div id="event-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3 id="modal-title" class="text-2xl font-bold mb-4" style="color: var(--text-color);">Add New Event</h3>
+            <div class="modal-content-scrollable">
+                <div class="mb-4">
+                    <label for="eventTitle" class="block text-sm font-medium text-gray-700 mb-1" style="color: var(--text-color);">Event Title</label>
+                    <input type="text" id="eventTitle" class="w-full p-3 focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200">
+                </div>
+
+                <div class="mb-4 flex space-x-4">
+                    <div class="w-1/2">
+                        <label for="eventTime" class="block text-sm font-medium text-gray-700 mb-1" style="color: var(--text-color);">Time (Optional)</label>
+                        <input type="time" id="eventTime" class="w-full p-3 focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200">
+                    </div>
+                    <div class="w-1/2">
+                        <label for="eventDate" class="block text-sm font-medium text-gray-700 mb-1" style="color: var(--text-color);">Date</label>
+                        <input type="date" id="eventDate" class="w-full p-3 focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200">
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="eventDescription" class="block text-sm font-medium text-gray-700 mb-1" style="color: var(--text-color);">Description (Optional)</label>
+                    <textarea id="eventDescription" class="w-full p-3 focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200 h-24 resize-y"></textarea>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2" style="color: var(--text-color);">Event Color</label>
+                    <div id="colorPalette" class="color-palette">
+                        </div>
+                    <input type="hidden" id="eventColor">
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2" style="color: var(--text-color);">Choose Icon</label>
+                    <input type="text" id="iconSearchInput" class="w-full p-3 focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200 mb-3" placeholder="Search icons...">
+                    <div id="iconGrid" class="icon-grid">
+                        </div>
+                    <input type="hidden" id="eventIcon">
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button id="deleteEvent" class="themed-button secondary hidden">Delete</button>
+                <button id="cancelEvent" class="themed-button secondary">Cancel</button>
+                <button id="saveEvent" class="themed-button">Save Event</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="settings-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3 class="text-2xl font-bold mb-4" style="color: var(--text-color);">Settings</h3>
+
+            <div class="modal-content-scrollable">
+                <div class="mb-6">
+                    <h4 class="h4-settings">Custom Font Upload</h4>
+                    <input type="file" id="customFontUpload" accept=".ttf,.otf,.woff,.woff2" class="custom-file-input">
+                    <label for="customFontUpload">
+                        <i class="fas fa-upload"></i>
+                        <span>Upload Font File</span>
+                    </label>
+                    <div id="currentCustomFontDisplay" class="mt-2 text-sm text-gray-600" style="color: var(--text-color);">
+                        <span class="font-semibold">Current:</span> <span id="customFontNameDisplay">Inter (Default)</span>
+                    </div>
+                    <button id="resetCustomFont" class="themed-button secondary mt-2">Reset to Default</button>
+                </div>
+
+                <div class="mb-6">
+                    <h4 class="h4-settings">UI Roundness</h4>
+                    <input type="range" id="uiRoundness" min="0" max="24" value="8" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                    <span id="uiRoundnessValue" class="block text-sm text-gray-600 mt-2 text-right" style="color: var(--text-color);">8px</span>
+                </div>
+
+                <div class="mb-6">
+                    <h4 class="h4-settings">Event Roundness</h4>
+                    <input type="range" id="eventRoundness" min="0" max="24" value="8" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                    <span id="eventRoundnessValue" class="block text-sm text-gray-600 mt-2 text-right" style="color: var(--text-color);">8px</span>
+                </div>
+
+                <div class="mb-6">
+                    <h4 class="h4-settings">Event Border Thickness</h4>
+                    <input type="range" id="eventBorderThickness" min="0" max="5" value="2" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                    <span id="eventBorderThicknessValue" class="block text-sm text-gray-600 mt-2 text-right" style="color: var(--text-color);">2px</span>
+                </div>
+
+                <div class="mb-6">
+                    <h4 class="h4-settings">Base Font Size</h4>
+                    <input type="range" id="fontSize" min="12" max="36" value="16" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                    <span id="fontSizeValue" class="block text-sm text-gray-600 mt-2 text-right" style="color: var(--text-color);">16px</span>
+                </div>
+
+                <div class="mb-6">
+                    <h4 class="h4-settings">Theme Colors</h4>
+                    <div class="flex items-center mb-4">
+                        <input type="checkbox" id="darkModeToggle" class="mr-2">
+                        <label for="darkModeToggle" class="text-gray-700" style="color: var(--text-color);">Dark Mode</label>
+                    </div>
+
+                    <div class="mb-4">
+                        <h4 class="h4-settings">Pre-made Themes</h4>
+                        <div id="premadeThemeBoxes" class="flex flex-wrap gap-3 mt-2 justify-center">
+                            </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h4 class="h4-settings">Special Themes (Watch ad to unlock)</h4>
+                        <div id="specialThemeBoxes" class="flex flex-wrap gap-3 mt-2 justify-center">
+                            </div>
+                    </div>
+
+                    <div id="customColorPickersContainer" class="relative">
+                        <div id="colorPickersOverlay" class="absolute inset-0 bg-gray-200 bg-opacity-80 flex flex-col items-center justify-center p-4 rounded-lg z-10 hidden" style="border-radius: var(--ui-roundness);">
+                            <p class="text-center font-medium mb-4" style="color: var(--text-color);">Unlock custom themes by watching an ad!</p>
+                            <button id="watchAdButton" class="themed-button">
+                                <i class="fas fa-play-circle mr-2"></i> Watch Ad
+                            </button>
+                            <div id="adLoadingSpinner" class="hidden mt-4">
+                                <i class="fas fa-spinner fa-spin text-accent-color text-2xl"></i>
+                            </div>
+                        </div>
+
+                        <div class="color-input-group">
+                            <label for="themeBodyBg">Background Color</label>
+                            <input type="color" id="themeBodyBg">
+                        </div>
+                        <div class="color-input-group">
+                            <label for="themeTextColor">Main Text Color</label>
+                            <input type="color" id="themeTextColor">
+                        </div>
+                         <div class="color-input-group">
+                            <label for="themeHeaderBg">Header Background</label>
+                            <input type="color" id="themeHeaderBg">
+                        </div>
+                        <div class="color-input-group">
+                            <label for="themeMainContainerBg">Main Container Background</label>
+                            <input type="color" id="themeMainContainerBg">
+                        </div>
+                        <div class="color-input-group">
+                            <label for="themeDayCellBg">Day Cell Background</label>
+                            <input type="color" id="themeDayCellBg">
+                        </div>
+                        <div class="color-input-group">
+                            <label for="themeDayCellHoverBg">Day Cell Hover Background</label>
+                            <input type="color" id="themeDayCellHoverBg">
+                        </div>
+                         <div class="color-input-group">
+                            <label for="themeCurrentDayBg">Today's Day Cell Background</label>
+                            <input type="color" id="themeCurrentDayBg">
+                        </div>
+                        <div class="color-input-group">
+                            <label for="themePrimaryButtonBg">Primary Button Background</label>
+                            <input type="color" id="themePrimaryButtonBg">
+                        </div>
+                        <div class="color-input-group">
+                            <label for="themePrimaryButtonText">Primary Button Text</label>
+                            <input type="color" id="themePrimaryButtonText">
+                        </div>
+                         <div class="color-input-group">
+                            <label for="themeSecondaryButtonBg">Secondary Button Background</label>
+                            <input type="color" id="themeSecondaryButtonBg">
+                        </div>
+                        <div class="color-input-group">
+                            <label for="themeSecondaryButtonText">Secondary Button Text</label>
+                            <input type="color" id="themeSecondaryButtonText">
+                        </div>
+                        <div class="color-input-group">
+                            <label for="themeAccentColor">Accent Color (Borders, Sliders)</label>
+                            <input type="color" id="themeAccentColor">
+                        </div>
+                        <div class="color-input-group">
+                            <label for="themeDayCellBorderColor">Day Cell Border Color</label>
+                            <input type="color" id="themeDayCellBorderColor">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button id="cancelSettings" class="themed-button secondary">Cancel</button>
+                <button id="saveSettings" class="themed-button">Save Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="adMobPlaceholder" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[1001] hidden">
+        <div class="bg-white p-8 rounded-lg shadow-2xl text-center flex flex-col items-center justify-center" style="max-width: 90%; width: 400px; height: 250px; border-radius: var(--ui-roundness-lg);">
+            <i class="fas fa-video fa-3x text-red-500 mb-4 animate-pulse"></i>
+            <p class="text-xl font-semibold mb-2" style="color: var(--text-color);">Loading Your Ad...</p>
+            <p class="text-sm text-gray-600" style="color: var(--text-color);">Please wait a moment.</p>
+        </div>
+    </div>
+
+    <script>
+        let currentDate = new Date();
+        let events = [];
+        let editingEventId = null;
+        let currentCustomFontName = null;
+        let draggedEventId = null;
+
+        const DEFAULT_FONT_FAMILY = 'Inter, sans-serif';
+
+        class CapacitorPreferences {
+            async set({ key, value }) {
+                try {
+                    localStorage.setItem(key, value);
+                    return Promise.resolve();
+                } catch (e) {
+                    console.error('Error setting preference:', e);
+                    return Promise.reject(e);
+                }
+            }
+
+            async get({ key }) {
+                try {
+                    const value = localStorage.getItem(key);
+                    return Promise.resolve({ value });
+                } catch (e) {
+                    console.error('Error getting preference:', e);
+                    return Promise.reject(e);
+                }
+            }
+
+            async remove({ key }) {
+                try {
+                    localStorage.removeItem(key);
+                    return Promise.resolve();
+                } catch (e) {
+                    console.error('Error removing preference:', e);
+                    return Promise.reject(e);
+                }
+            }
+
+            async clear() {
+                try {
+                    localStorage.clear();
+                    return Promise.resolve();
+                } catch (e) {
+                    console.error('Error clearing preferences:', e);
+                    return Promise.reject(e);
+                }
+            }
+        }
+        const Preferences = new CapacitorPreferences();
+
+        const adjustColor = (hex, lum) => {
+            if (!hex || typeof hex !== 'string') return hex;
+            hex = String(hex).replace(/[^0-9a-f]/gi, '');
+            if (hex.length < 6) {
+                hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+            }
+            lum = lum || 0;
+
+            let rgb = "#", c, i;
+            for (i = 0; i < 3; i++) {
+                c = parseInt(hex.substr(i*2,2), 16);
+                c = Math.round(Math.min(Math.max(0, c + (c * lum)), 255)).toString(16);
+                rgb += ("00"+c).substr(c.length);
+            }
+            return rgb;
+        };
+
+        const DEFAULT_LIGHT_THEME = {
+            name: "Default Light",
+            bodyBg: '#F8E8F0',
+            mainText: '#4A4A4A',
+            headerBg: '#FFFFFF',
+            primaryButtonBg: '#FFFFFF',
+            primaryButtonText: '#E085B0',
+            primaryButtonBorderColor: '#E085B0',
+            secondaryButtonBg: '#F3E0E9',
+            secondaryButtonText: '#8B4B66',
+            accentColor: '#E085B0',
+            dayCellBorder: '#D4DDE3',
+            mainContainerBg: '#FFFFFF',
+            dayCellBg: '#FFFFFF',
+            dayCellHoverBg: '#F8F0F5',
+            currentDayBg: '#FFEAF4',
+            arrowButtonBg: 'transparent',
+            arrowButtonHoverBg: 'rgba(0,0,0,0.05)',
+            arrowButtonText: '#4B5563',
+            headerBorderColor: '#E5E7EB'
+        };
+
+        const DEFAULT_DARK_THEME = {
+            name: "Default Dark",
+            bodyBg: '#2C2C34',
+            mainText: '#E0E0E0',
+            headerBg: '#3A3A45',
+            mainContainerBg: '#3A3A45',
+            dayCellBg: '#4A4A50',
+            dayCellHoverBg: '#5A5A60',
+            currentDayBg: '#6A6A70',
+            primaryButtonBg: '#E085B0',
+            primaryButtonText: '#FFFFFF',
+            primaryButtonBorderColor: '#E085B0',
+            secondaryButtonBg: '#5A5A60',
+            secondaryButtonText: '#C0C0C0',
+            accentColor: '#FFADD9',
+            dayCellBorder: '#5A5A60',
+            arrowButtonBg: 'transparent',
+            arrowButtonHoverBg: 'rgba(255,255,255,0.1)',
+            arrowButtonText: '#E0E0E0',
+            headerBorderColor: 'rgba(255,255,255,0.15)'
+        };
+
+        const PASTEL_THEMES = {
+            blue: {
+                light: {
+                    name: "Blue", bodyBg: '#E0F2F7', mainText: '#3F51B5', headerBg: '#FFFFFF', mainContainerBg: '#FFFFFF',
+                    dayCellBg: '#FFFFFF', dayCellHoverBg: '#CFECF5', currentDayBg: '#B3E5FC',
+                    primaryButtonBg: '#FFFFFF', primaryButtonText: '#42A5F5', primaryButtonBorderColor: '#42A5F5',
+                    secondaryButtonBg: '#BBDEFB',
+                    secondaryButtonText: '#2196F3', accentColor: '#42A5F5', dayCellBorder: '#90CAF9',
+                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#2196F3', headerBorderColor: '#90CAF9'
+                },
+                dark: {
+                    name: "Blue (Dark)", bodyBg: '#2B3E50', mainText: '#ADD8E6', headerBg: '#3A4B5C', mainContainerBg: '#3A4B5C',
+                    dayCellBg: '#4A5B6C', dayCellHoverBg: '#5A6B7C', currentDayBg: '#6A7B8C',
+                    primaryButtonBg: '#42A5F5', primaryButtonText: '#FFFFFF', primaryButtonBorderColor: '#42A5F5',
+                    secondaryButtonBg: '#506780',
+                    secondaryButtonText: '#90CAF9', accentColor: '#81D4FA', dayCellBorder: '#3A4B5C',
+                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(255,255,255,0.1)', arrowButtonText: '#ADD8E6', headerBorderColor: 'rgba(255,255,255,0.15)'
+                }
+            },
+            green: {
+                light: {
+                    name: "Green", bodyBg: '#E8F5E9', mainText: '#388E3C', headerBg: '#FFFFFF', mainContainerBg: '#FFFFFF',
+                    dayCellBg: '#FFFFFF', dayCellHoverBg: '#D9F1DB', currentDayBg: '#C8E6C9',
+                    primaryButtonBg: '#FFFFFF', primaryButtonText: '#81C784', primaryButtonBorderColor: '#81C784',
+                    secondaryButtonBg: '#C5E1A5',
+                    secondaryButtonText: '#66BB6A', accentColor: '#81C784', dayCellBorder: '#A1CF90',
+                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#66BB6A', headerBorderColor: '#A1CF90'
+                },
+                dark: {
+                    name: "Green (Dark)", bodyBg: '#3E503A', mainText: '#C8E6C9', headerBg: '#4B5C4A', mainContainerBg: '#4B5C4A',
+                    dayCellBg: '#5C6D5B', dayCellHoverBg: '#6D7E6C', currentDayBg: '#7E8F7D',
+                    primaryButtonBg: '#81C784', primaryButtonText: '#FFFFFF', primaryButtonBorderColor: '#81C784',
+                    secondaryButtonBg: '#607760',
+                    secondaryButtonText: '#A5D6A7', accentColor: '#A5D6A7', dayCellBorder: '#4B5C4A',
+                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(255,255,255,0.1)', arrowButtonText: '#C8E6C9', headerBorderColor: 'rgba(255,255,255,0.15)'
+                }
+            },
+            yellow: {
+                light: {
+                    name: "Yellow", bodyBg: '#FFFDE7', mainText: '#c78800', headerBg: '#FFFFFF', mainContainerBg: '#FFFFFF',
+                    dayCellBg: '#FFFFFF', dayCellHoverBg: '#fff9c4', currentDayBg: '#fff9c4',
+                    primaryButtonBg: '#FFFFFF', primaryButtonText: '#d39831', primaryButtonBorderColor: '#d39831',
+                    secondaryButtonBg: '#fff59d',
+                    secondaryButtonText: '#e0a906', accentColor: '#d07916', dayCellBorder: '#FFD375',
+                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#FFCA28', headerBorderColor: '#FFF176'
+                },
+                dark: {
+                    name: "Yellow (Dark)", bodyBg: '#504F3D', mainText: '#FFEE58', headerBg: '#5E5D4B', mainContainerBg: '#5E5D4B',
+                    dayCellBg: '#6F6E5C', dayCellHoverBg: '#807F6D', currentDayBg: '#91907E',
+                    primaryButtonBg: '#FFD700', primaryButtonText: '#4A4A4A', primaryButtonBorderColor: '#FFD700',
+                    secondaryButtonBg: '#706F5D',
+                    secondaryButtonText: '#FFF59D', accentColor: '#FFEE58', dayCellBorder: '#5E5D4B',
+                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(255,255,255,0.1)', arrowButtonText: '#FFEE58', headerBorderColor: 'rgba(255,255,255,0.15)'
+                }
+            },
+            purple: {
+                light: {
+                    name: "Purple", bodyBg: '#F3E5F5', mainText: '#7B1FA2', headerBg: '#FFFFFF', mainContainerBg: '#FFFFFF',
+                    dayCellBg: '#FFFFFF', dayCellHoverBg: '#ECCFF0', currentDayBg: '#E1BEE7',
+                    primaryButtonBg: '#FFFFFF', primaryButtonText: '#BA68C8', primaryButtonBorderColor: '#BA68C8',
+                    secondaryButtonBg: '#E1BEE7',
+                    secondaryButtonText: '#9C27B0', accentColor: '#BA68C8', dayCellBorder: '#D1C4E9',
+                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#9C27B0', headerBorderColor: '#D1C4E9'
+                },
+                dark: {
+                    name: "Purple (Dark)", bodyBg: '#3F2C45', mainText: '#E1BEE7', headerBg: '#4D3A52', mainContainerBg: '#4D3A52',
+                    dayCellBg: '#5B4861', dayCellHoverBg: '#6A5771', currentDayBg: '#796680',
+                    primaryButtonBg: '#BA68C8', primaryButtonText: '#FFFFFF', primaryButtonBorderColor: '#BA68C8',
+                    secondaryButtonBg: '#6B5A75',
+                    secondaryButtonText: '#CE93D8', accentColor: '#CE93D8', dayCellBorder: '#4D3A52',
+                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(255,255,255,0.1)', arrowButtonText: '#E1BEE7', headerBorderColor: 'rgba(255,255,255,0.15)'
+                }
+            },
+            pink: {
+                light: {
+                    name: "Pink", bodyBg: '#FCE4EC', mainText: '#C2185B', headerBg: '#FFFFFF', mainContainerBg: '#FFFFFF',
+                    dayCellBg: '#FFFFFF', dayCellHoverBg: '#F8D1DF', currentDayBg: '#F8BBD0',
+                    primaryButtonBg: '#FFFFFF', primaryButtonText: '#E91E63', primaryButtonBorderColor: '#E91E63',
+                    secondaryButtonBg: '#F8BBD0',
+                    secondaryButtonText: '#EC407A', accentColor: '#E91E63', dayCellBorder: '#F06292',
+                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#EC407A', headerBorderColor: '#F06292'
+                },
+                dark: {
+                    name: "Pink (Dark)", bodyBg: '#452C34', mainText: '#F8BBD0', headerBg: '#523A40', mainContainerBg: '#523A40',
+                    dayCellBg: '#61484F', dayCellHoverBg: '#71575D', currentDayBg: '#80666C',
+                    primaryButtonBg: '#E91E63', primaryButtonText: '#FFFFFF', primaryButtonBorderColor: '#E91E63',
+                    secondaryButtonBg: '#755A63',
+                    secondaryButtonText: '#F48FB1', accentColor: '#F48FB1', dayCellBorder: '#523A40',
+                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(255,255,255,0.1)', arrowButtonText: '#F8BBD0', headerBorderColor: 'rgba(255,255,255,0.15)'
+                }
+            },
+            pureBlack: {
+                light: {
+                    name: "Pure Black", bodyBg: '#000000', mainText: '#FFFFFF', headerBg: '#000000', mainContainerBg: '#000000',
+                    dayCellBg: '#111111', dayCellHoverBg: '#222222', currentDayBg: '#333333',
+                    primaryButtonBg: '#FFFFFF', primaryButtonText: '#000000', primaryButtonBorderColor: '#000000',
+                    secondaryButtonBg: '#333333',
+                    secondaryButtonText: '#CCCCCC', accentColor: '#CCCCCC', dayCellBorder: '#2A2A2A',
+                    arrowButtonBg: 'transparent',
+                    arrowButtonHoverBg: 'rgba(255,255,255,0.1)',
+                    arrowButtonText: '#BBBBBB', headerBorderColor: '#2A2A2A'
+                },
+                dark: {
+                    name: "Pure Black (Dark)", bodyBg: '#000000', mainText: '#FFFFFF', headerBg: '#000000', mainContainerBg: '#000000',
+                    dayCellBg: '#0A0A0A', dayCellHoverBg: '#1A1A1A', currentDayBg: '#2A2A2A',
+                    primaryButtonBg: '#FFFFFF', primaryButtonText: '#000000', primaryButtonBorderColor: '#000000',
+                    secondaryButtonBg: '#1A1A1A',
+                    secondaryButtonText: '#AAAAAA', accentColor: '#AAAAAA', dayCellBorder: '#1A1A1A',
+                    arrowButtonBg: 'transparent',
+                    arrowButtonHoverBg: 'rgba(255,255,255,0.1)',
+                    arrowButtonText: '#E0E0E0', headerBorderColor: '#1A1A1A'
+                }
+            }
+        };
+
+        const SPECIAL_THEMES = {
+            dracula: {
+                defaultIsDark: true,
+                light: {
+                    name: "Dracula", bodyBg: '#F8F8F2', mainText: '#282A36', headerBg: '#F8F8F2', mainContainerBg: '#F8F8F2',
+                    dayCellBg: '#FFFFFF', dayCellHoverBg: '#EAEAEA', currentDayBg: '#F0F0F0',
+                    primaryButtonBg: '#FF79C6', primaryButtonText: '#FFFFFF', primaryButtonBorderColor: '#FF79C6',
+                    secondaryButtonBg: '#BD93F9', secondaryButtonText: '#FFFFFF', accentColor: '#FF79C6', dayCellBorder: '#EAEAEA',
+                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#44475A', headerBorderColor: '#EAEAEA'
+                },
+                dark: {
+                    name: "Dracula", bodyBg: '#282A36', mainText: '#F8F8F2', headerBg: '#3A3A4A', mainContainerBg: '#3A3A4A',
+                    dayCellBg: '#44475A', dayCellHoverBg: '#505364', currentDayBg: '#6272A4',
+                    primaryButtonBg: '#FF79C6', primaryButtonText: '#FFFFFF', primaryButtonBorderColor: '#FF79C6',
+                    secondaryButtonBg: '#6272A4', secondaryButtonText: '#F8F8F2', accentColor: '#FF79C6', dayCellBorder: '#44475A',
+                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(255,255,255,0.1)', arrowButtonText: '#F8F8F2', headerBorderColor: '#44475A'
+                }
+            },
+            nord: {
+                defaultIsDark: true,
+                light: {
+                    name: "Nord", bodyBg: '#ECEFF4', mainText: '#2E3440', headerBg: '#FFFFFF', mainContainerBg: '#FFFFFF',
+                    dayCellBg: '#D8DEE9', dayCellHoverBg: '#E5E9F0', currentDayBg: '#BF616A',
+                    primaryButtonBg: '#88C0D0', primaryButtonText: '#FFFFFF', primaryButtonBorderColor: '#88C0D0',
+                    secondaryButtonBg: '#E5E9F0', secondaryButtonText: '#4C566A', accentColor: '#88C0D0', dayCellBorder: '#D8DEE9',
+                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#4C566A', headerBorderColor: '#D8DEE9'
+                },
+                dark: {
+                    name: "Nord", bodyBg: '#2E3440', mainText: '#ECEFF4', headerBg: '#3B4252', mainContainerBg: '#3B4252',
+                    dayCellBg: '#4C566A', dayCellHoverBg: '#5E6B7A', currentDayBg: '#81A1C1',
+                    primaryButtonBg: '#88C0D0', primaryButtonText: '#FFFFFF', primaryButtonBorderColor: '#88C0D0',
+                    secondaryButtonBg: '#4C566A', secondaryButtonText: '#ECEFF4', accentColor: '#88C0D0', dayCellBorder: '#4C566A',
+                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(255,255,255,0.1)', arrowButtonText: '#ECEFF4', headerBorderColor: '#4C566A'
+                }
+            },
+            oneDark: {
+                defaultIsDark: true,
+                light: {
+                    name: "One Dark", bodyBg: '#FBFBFB', mainText: '#383A42', headerBg: '#FFFFFF', mainContainerBg: '#FFFFFF',
+                    dayCellBg: '#EAEAEA', dayCellHoverBg: '#DBDBDB', currentDayBg: '#C0C0C0',
+                    primaryButtonBg: '#61AFEF', primaryButtonText: '#FFFFFF', primaryButtonBorderColor: '#61AFEF',
+                    secondaryButtonBg: '#98C379', secondaryButtonText: '#FFFFFF', accentColor: '#E06C75', dayCellBorder: '#DBDBDB',
+                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#4B5563', headerBorderColor: '#DBDBDB'
+                },
+                dark: {
+                    name: "One Dark", bodyBg: '#282C34', mainText: '#ABB2BF', headerBg: '#333842', mainContainerBg: '#333842',
+                    dayCellBg: '#3E4451', dayCellHoverBg: '#4B5262', currentDayBg: '#5C6777',
+                    primaryButtonBg: '#61AFEF', primaryButtonText: '#FFFFFF', primaryButtonBorderColor: '#61AFEF',
+                    secondaryButtonBg: '#ABB2BF', secondaryButtonText: '#282C34', accentColor: '#E06C75', dayCellBorder: '#3E4451',
+                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(255,255,255,0.1)', arrowButtonText: '#ABB2BF', headerBorderColor: '#3E4451'
+                }
+            },
+            serikaDark: {
+                defaultIsDark: true,
+                light: {
+                    name: "Serika Dark", bodyBg: '#F0F0F0', mainText: '#363636', headerBg: '#FFFFFF', mainContainerBg: '#FFFFFF',
+                    dayCellBg: '#EAEAEA', dayCellHoverBg: '#DBDBDB', currentDayBg: '#C7C7C7',
+                    primaryButtonBg: '#F5C77F', primaryButtonText: '#363636', primaryButtonBorderColor: '#F5C77F',
+                    secondaryButtonBg: '#E0E0E0', secondaryButtonText: '#5A5A5A', accentColor: '#F5C77F', dayCellBorder: '#C7C7C7',
+                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#5A5A5A', headerBorderColor: '#C7C7C7'
+                },
+                dark: {
+                    name: "Serika Dark", bodyBg: '#2C2C2C', mainText: '#D0D0D0', headerBg: '#3A3A3A', mainContainerBg: '#3A3A3A',
+                    dayCellBg: '#4A4A4A', dayCellHoverBg: '#5A5A5A', currentDayBg: '#6A6A6A',
+                    primaryButtonBg: '#F5C77F', primaryButtonText: '#363636', primaryButtonBorderColor: '#F5C77F',
+                    secondaryButtonBg: '#5A5A5A', secondaryButtonText: '#D0D0D0', accentColor: '#F5C77F', dayCellBorder: '#4A4A4A',
+                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(255,255,255,0.1)', arrowButtonText: '#D0D0D0', headerBorderColor: '#4A4A4A'
+                }
+            },
+            superuser: {
+                defaultIsDark: true,
+                light: {
+                    name: "Super user", bodyBg: '#EFEFEF', mainText: '#1C1C1C', headerBg: '#FFFFFF', mainContainerBg: '#FFFFFF',
+                    dayCellBg: '#EAEAEA', dayCellHoverBg: '#DBDBDB', currentDayBg: '#C7C7C7',
+                    primaryButtonBg: '#00FF00', primaryButtonText: '#1C1C1C', primaryButtonBorderColor: '#00FF00',
+                    secondaryButtonBg: '#333333', secondaryButtonText: '#EFEFEF', accentColor: '#00FF00', dayCellBorder: '#DBDBDB',
+                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#1C1C1C', headerBorderColor: '#DBDBDB'
+                },
+                dark: {
+                    name: "Super user", bodyBg: '#000000', mainText: '#00FF00', headerBg: '#111111', mainContainerBg: '#111111',
+                    dayCellBg: '#222222', dayCellHoverBg: '#333333', currentDayBg: '#444444',
+                    primaryButtonBg: '#00FF00', primaryButtonText: '#000000', primaryButtonBorderColor: '#00FF00',
+                    secondaryButtonBg: '#444444', secondaryButtonText: '#00FF00', accentColor: '#00FF00', dayCellBorder: '#222222',
+                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(255,255,255,0.1)', arrowButtonText: '#00FF00', headerBorderColor: '#222222'
+                }
+            },
+            stealth: {
+                defaultIsDark: true,
+                light: {
+                    name: "Stealth", bodyBg: '#F5F5F5', mainText: '#424242', headerBg: '#FFFFFF', mainContainerBg: '#FFFFFF',
+                    dayCellBg: '#E0E0E0', dayCellHoverBg: '#D0D0D0', currentDayBg: '#C0C0C0',
+                    primaryButtonBg: '#9E9E9E', primaryButtonText: '#FFFFFF', primaryButtonBorderColor: '#9E9E9E',
+                    secondaryButtonBg: '#BDBDBD', secondaryButtonText: '#424242', accentColor: '#757575', dayCellBorder: '#D0D0D0',
+                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#424242', headerBorderColor: '#D0D0D0'
+                },
+                dark: {
+                    name: "Stealth", bodyBg: '#212121', mainText: '#BDBDBD', headerBg: '#2C2C2C', mainContainerBg: '#2C2C2C',
+                    dayCellBg: '#363636', dayCellHoverBg: '#424242', currentDayBg: '#525252',
+                    primaryButtonBg: '#9E9E9E', primaryButtonText: '#212121', primaryButtonBorderColor: '#9E9E9E',
+                    secondaryButtonBg: '#424242', secondaryButtonText: '#BDBDBD', accentColor: '#9E9E9E', dayCellBorder: '#363636',
+                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(255,255,255,0.1)', arrowButtonText: '#BDBDBD', headerBorderColor: '#363636'
+                }
+            },
+            taro: {
+                defaultIsDark: true,
+                light: {
+                    name: "Taro", bodyBg: '#F5F0FF', mainText: '#5A2C85', headerBg: '#FFFFFF', mainContainerBg: '#FFFFFF',
+                    dayCellBg: '#E1BEE7', dayCellHoverBg: '#CFADDF', currentDayBg: '#BA68C8',
+                    primaryButtonBg: '#FFEB3B', primaryButtonText: '#5A2C85', primaryButtonBorderColor: '#FFEB3B',
+                    secondaryButtonBg: '#CE93D8', secondaryButtonText: '#9C27B0', accentColor: '#BA68C8', dayCellBorder: '#D1C4E9',
+                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#9C27B0', headerBorderColor: '#D1C4E9'
+                },
+                dark: {
+                    name: "Taro", bodyBg: '#3A2B5E', mainText: '#FDF9E2', headerBg: '#47396B', mainContainerBg: '#47396B',
+                    dayCellBg: '#544679', dayCellHoverBg: '#615486', currentDayBg: '#706294',
+                    primaryButtonBg: '#FFEB3B', primaryButtonText: '#3A2B5E', primaryButtonBorderColor: '#FFEB3B',
+                    secondaryButtonBg: '#615486', secondaryButtonText: '#FDF9E2', accentColor: '#BA68C8', dayCellBorder: '#544679',
+                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(255,255,255,0.1)', arrowButtonText: '#FDF9E2', headerBorderColor: '#544679'
+                }
+            },
+            horizon: {
+                defaultIsDark: true,
+                light: {
+                    name: "Horizon", bodyBg: '#F8F8F8', mainText: '#333333', headerBg: '#FFFFFF', mainContainerBg: '#FFFFFF',
+                    dayCellBg: '#F0F0F0', dayCellHoverBg: '#E0E0E0', currentDayBg: '#D0D0D0',
+                    primaryButtonBg: '#DA4453', primaryButtonText: '#FFFFFF', primaryButtonBorderColor: '#DA4453',
+                    secondaryButtonBg: '#FF6F61', secondaryButtonText: '#FFFFFF', accentColor: '#DA4453', dayCellBorder: '#E0E0E0',
+                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#333333', headerBorderColor: '#E0E0E0'
+                },
+                dark: {
+                    name: "Horizon", bodyBg: '#1C1E26', mainText: '#F9F0DA', headerBg: '#2A2C34', mainContainerBg: '#2A2C34',
+                    dayCellBg: '#383A42', dayCellHoverBg: '#464850', currentDayBg: '#54565E',
+                    primaryButtonBg: '#DA4453', primaryButtonText: '#FFFFFF', primaryButtonBorderColor: '#DA4453',
+                    secondaryButtonBg: '#FF6F61', secondaryButtonText: '#F9F0DA', accentColor: '#DA4453', dayCellBorder: '#383A42',
+                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(255,255,255,0.1)', arrowButtonText: '#F9F0DA', headerBorderColor: '#383A42'
+                }
+            },
+            sweden: {
+                defaultIsDark: false,
+                light: {
+                    name: "Sweden", bodyBg: '#E0F2F7', mainText: '#004B8E', headerBg: '#FFFFFF', mainContainerBg: '#FFFFFF',
+                    dayCellBg: '#B3E5FC', dayCellHoverBg: '#81D4FA', currentDayBg: '#4FC3F7',
+                    primaryButtonBg: '#FFD700', primaryButtonText: '#004B8E', primaryButtonBorderColor: '#FFD700',
+                    secondaryButtonBg: '#BBDEFB', secondaryButtonText: '#1976D2', accentColor: '#FFD700', dayCellBorder: '#90CAF9',
+                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#1976D2', headerBorderColor: '#90CAF9'
+                },
+                dark: {
+                    name: "Sweden", bodyBg: '#002B4B', mainText: '#ADD8E6', headerBg: '#003A63', mainContainerBg: '#003A63',
+                    dayCellBg: '#004D8C', dayCellHoverBg: '#005CA8', currentDayBg: '#006CD0',
+                    primaryButtonBg: '#FFD700', primaryButtonText: '#002B4B', primaryButtonBorderColor: '#FFD700',
+                    secondaryButtonBg: '#004D8C', secondaryButtonText: '#ADD8E6', accentColor: '#FFD700', dayCellBorder: '#004D8C',
+                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(255,255,255,0.1)', arrowButtonText: '#ADD8E6', headerBorderColor: '#004D8C'
+                }
+            },
+            catppuccinLatte: {
+                defaultIsDark: false,
+                light: {
+                    name: "Cat Latte", bodyBg: '#EFF1F5', mainText: '#4C4F69', headerBg: '#FFFFFF', mainContainerBg: '#FFFFFF',
+                    dayCellBg: '#E6E9EF', dayCellHoverBg: '#DCE0EE', currentDayBg: '#CCD0DA',
+                    primaryButtonBg: '#DC8A78', primaryButtonText: '#4C4F69', primaryButtonBorderColor: '#DC8A78',
+                    secondaryButtonBg: '#D2D4E3', secondaryButtonText: '#6C6F85', accentColor: '#DC8A78', dayCellBorder: '#DCE0EE',
+                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#6C6F85', headerBorderColor: '#DCE0EE'
+                },
+                dark: {
+                    name: "Catppuccin Mocha", bodyBg: '#24273A', mainText: '#CAD3F5', headerBg: '#363A4F', mainContainerBg: '#363A4F',
+                    dayCellBg: '#494D64', dayCellHoverBg: '#5B6078', currentDayBg: '#6E738D',
+                    primaryButtonBg: '#F28C8C', primaryButtonText: '#24273A', primaryButtonBorderColor: '#F28C8C',
+                    secondaryButtonBg: '#5B6078', secondaryButtonText: '#CAD3F5', accentColor: '#F28C8C', dayCellBorder: '#494D64',
+                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(255,255,255,0.1)', arrowButtonText: '#CAD3F5', headerBorderColor: '#494D64'
+                }
+            }
+        };
+
+        let currentBaseThemeKey = null;
+        let isDarkModeActive = false;
+        let currentBaseTheme = null;
+        let areCustomColorPickersLocked = true;
+        let unlockedSpecialThemesKeys = new Set();
+
+        const saveEvents = async () => {
+            await Preferences.set({ key: 'calendarEvents', value: JSON.stringify(events) });
+        };
+
+        const loadEvents = async () => {
+            const { value } = await Preferences.get({ key: 'calendarEvents' });
+            if (value) {
+                events = JSON.parse(value);
+            }
+        };
+
+        const saveSettings = async (fontName, fontData, baseThemeKey, isDarkMode, uiRoundness, fontSize, eventRoundness, eventBorderThickness, customThemeColors = null, customColorPickersLocked = true, unlockedSpecialThemes = []) => {
+            const settings = {
+                customFontName: fontName,
+                customFontData: fontData,
+                baseThemeKey: baseThemeKey,
+                isDarkMode: isDarkMode,
+                uiRoundness: uiRoundness,
+                fontSize: fontSize,
+                eventRoundness: eventRoundness,
+                eventBorderThickness: eventBorderThickness,
+                customThemeColors: customThemeColors,
+                customColorPickersLocked: customColorPickersLocked,
+                unlockedSpecialThemes: Array.from(unlockedSpecialThemes)
+            };
+            await Preferences.set({ key: 'calendarSettings', value: JSON.stringify(settings) });
+        };
+
+        let calendarEl, currentMonthYearEl, prevMonthButton, nextMonthButton, todayButton, settingsButton,
+            eventModal, modalTitle, eventTitleInput, eventTimeInput, eventDateInput, eventDescriptionInput,
+            eventColorInput, eventIconInput, colorPaletteEl, iconGridEl, saveEventButton, deleteEventButton, cancelEventButton,
+            settingsModal, customFontUploadInput, customFontNameDisplay, resetCustomFontButton,
+            uiRoundnessInput, uiRoundnessValueDisplay, fontSizeInput, fontSizeValueDisplay, darkModeToggle,
+            eventRoundnessInput, eventRoundnessValueDisplay, eventBorderThicknessInput, eventBorderThicknessValueDisplay,
+            themeBodyBgInput, themeTextColorInput, themeHeaderBgInput, themeMainContainerBgInput,
+            themeDayCellBgInput, themeDayCellHoverBgInput, themeCurrentDayBgInput,
+            themePrimaryButtonBgInput, themePrimaryButtonTextInput, themeSecondaryButtonBgInput,
+            themeSecondaryButtonTextInput, themeAccentColorInput, themeDayCellBorderColorInput,
+            saveSettingsButton, cancelSettingsButton, premadeThemeBoxesEl, iconSearchInput,
+            adMobPlaceholder, customColorPickersContainer, colorPickersOverlay, watchAdButton, adLoadingSpinner,
+            specialThemeBoxesEl;
+
+        const loadSettings = async () => {
+            const { value: storedSettings } = await Preferences.get({ key: 'calendarSettings' });
+            const defaultRoundness = 8;
+            const defaultFontSize = 16;
+            const defaultEventBorderThickness = 2;
+            let currentUiRoundness = defaultRoundness;
+            let currentFontSize = defaultFontSize;
+            let currentEventRoundness = defaultRoundness;
+            let currentEventBorderThickness = defaultEventBorderThickness;
+
+
+            let loadedCustomFontName = null;
+            let loadedCustomFontData = null;
+            let loadedBaseThemeKey = 'blue';
+            let loadedIsDarkMode = false;
+            let loadedCustomThemeColors = null;
+            let loadedCustomColorPickersLocked = true;
+            let loadedUnlockedSpecialThemes = [];
+
+            if (storedSettings) {
+                const settings = JSON.parse(storedSettings);
+                loadedCustomFontName = settings.customFontName;
+                loadedCustomFontData = settings.customFontData;
+
+                loadedBaseThemeKey = settings.baseThemeKey !== undefined ? settings.baseThemeKey : 'blue';
+                loadedIsDarkMode = settings.isDarkMode !== undefined ? settings.isDarkMode : false;
+
+                currentUiRoundness = settings.uiRoundness !== undefined ? settings.uiRoundness : defaultRoundness;
+                currentFontSize = settings.fontSize !== undefined ? settings.fontSize : defaultFontSize;
+                currentEventRoundness = settings.eventRoundness !== undefined ? settings.eventRoundness : currentUiRoundness;
+                currentEventBorderThickness = settings.eventBorderThickness !== undefined ? settings.eventBorderThickness : defaultEventBorderThickness;
+
+                loadedCustomThemeColors = settings.customThemeColors || null;
+                loadedCustomColorPickersLocked = settings.customColorPickersLocked === false ? false : true;
+                loadedUnlockedSpecialThemes = settings.unlockedSpecialThemes || [];
+            }
+
+            if (loadedCustomFontData && loadedCustomFontName) {
+                injectCustomFont(loadedCustomFontName, loadedCustomFontData);
+            }
+
+            currentCustomFontName = loadedCustomFontName;
+            currentBaseThemeKey = loadedBaseThemeKey;
+            isDarkModeActive = loadedIsDarkMode;
+            areCustomColorPickersLocked = loadedCustomColorPickersLocked;
+            unlockedSpecialThemesKeys = new Set(loadedUnlockedSpecialThemes);
+
+            if (currentBaseThemeKey === null) {
+                currentBaseTheme = loadedCustomThemeColors || { ...DEFAULT_LIGHT_THEME };
+            } else {
+                currentBaseTheme = null;
+            }
+
+
+            return {
+                currentCustomFontName: loadedCustomFontName,
+                customFontData: loadedCustomFontData,
+                currentBaseThemeKey: loadedBaseThemeKey,
+                isDarkModeActive: loadedIsDarkMode,
+                currentUiRoundness: currentUiRoundness,
+                currentFontSize: currentFontSize,
+                currentEventRoundness: currentEventRoundness,
+                currentEventBorderThickness: currentEventBorderThickness,
+                customThemeColors: loadedCustomThemeColors,
+                customColorPickersLocked: loadedCustomColorPickersLocked,
+                unlockedSpecialThemes: loadedUnlockedSpecialThemes
+            };
+        };
+
+        const eventColors = [
+            { name: 'red', primary: '#FFCDD2', text: '#C62828' },
+            { name: 'orange', primary: '#FFE0B2', text: '#EF6C00' },
+            { name: 'dandelion', primary: '#FFF9C4', text: '#FBC02D' },
+            { name: 'pale yellow', primary: '#FFFDE7', text: '#F9A825' },
+            { name: 'lime green', primary: '#DCEDC8', text: '#689F38' },
+            { name: 'green', primary: '#C8E6C9', text: '#2E7D32' },
+            { name: 'bluergreen', primary: '#a0dece', text: '#2e7d32' },
+            { name: 'cyan', primary: '#86ebd2', text: '#2e7d7c' },
+            { name: 'aqua', primary: '#B2EBF2', text: '#0097A7' },
+            { name: 'sky blue', primary: '#B3E5FC', text: '#0277BD' },
+            { name: 'blue', primary: '#93c3ed', text: '#1976D2' },
+            { name: 'indigo', primary: '#C5CAE9', text: '#303F9F' },
+            { name: 'violet', primary: '#E1BEE7', text: '#7B1FA2' },
+            { name: 'magenta', primary: '#ffc4fa', text: '#D800B8' },
+            { name: 'rose pink', primary: '#F8BBD0', text: '#C2185B' },
+            { name: 'pink', primary: '#FCE4EC', text: '#E91E63' },
+            { name: 'brown', primary: '#D7CCC8', text: '#5D4037' },
+            { name: 'brown', primary: '#bfa59b', text: '#5D4037' },
+            { name: 'grey', primary: '#E0E0E0', text: '#616161' },
+            { name: 'white', primary: '#FFFFFF', text: '#212121' }
+        ];
+
+        const initColorPalette = () => {
+            colorPaletteEl.innerHTML = '';
+            eventColors.forEach(color => {
+                const colorBox = document.createElement('div');
+                colorBox.classList.add('color-box');
+                colorBox.style.backgroundColor = color.primary;
+                colorBox.dataset.color = color.name;
+                colorBox.dataset.primary = color.primary;
+                colorBox.dataset.textColor = color.text;
+                colorBox.addEventListener('click', () => {
+                    document.querySelectorAll('.color-box').forEach(box => box.classList.remove('selected'));
+                    colorBox.classList.add('selected');
+                    eventColorInput.value = JSON.stringify({ primary: color.primary, text: color.text });
+                });
+                colorPaletteEl.appendChild(colorBox);
+            });
+            if (eventColors.length > 0) {
+                const initialSelectedColor = eventColorInput.value;
+                let foundInitialSelection = false;
+                if (initialSelectedColor) {
+                    try {
+                        const parsedColor = JSON.parse(initialSelectedColor);
+                        const colorBox = document.querySelector(`#colorPalette .color-box[data-primary="${parsedColor.primary}"]`);
+                        if (colorBox) {
+                            colorBox.classList.add('selected');
+                            foundInitialSelection = true;
+                        }
+                    } catch (e) {
+                        console.error("Failed to parse initial event color:", initialSelectedColor, e);
+                    }
+                }
+                if (!foundInitialSelection) {
+                    colorPaletteEl.querySelector('.color-box').classList.add('selected');
+                    eventColorInput.value = JSON.stringify({ primary: eventColors[0].primary, text: eventColors[0].text });
+                }
+            }
+        };
+
+        const allEventIcons = [
+            'fas fa-star', 'far fa-star', 'fas fa-heart', 'far fa-heart', 'fas fa-bell', 'far fa-bell',
+            'fas fa-bookmark', 'far fa-bookmark', 'fas fa-flag', 'far fa-flag', 'fas fa-calendar-alt', 'far fa-calendar-alt',
+            'fas fa-compass', 'far fa-compass', 'fas fa-lightbulb', 'far fa-lightbulb', 'fas fa-comment', 'far fa-comment',
+            'fas fa-folder', 'far fa-folder', 'far fa-circle', 'fas fa-circle', 'far fa-square', 'fas fa-square', 'fas fa-file', 'far fa-file', 'fas fa-image', 'far fa-image',
+            'fas fa-play-circle', 'far fa-play-circle', 'fas fa-question-circle', 'far fa-question-circle',
+            'fas fa-smile', 'far fa-smile', 'fas fa-meh', 'far fa-meh', 'fas fa-frown', 'far fa-frown',
+            'fas fa-paper-plane', 'far fa-paper-plane', 'fas fa-envelope', 'far fa-envelope', 'fab fa-youtube', 'fab fa-instagram', 'fab fa-facebook', 'fab fa-tiktok', 'fab fa-whatsapp', 'fab fa-telegram', 'fab fa-twitter', 'fab fa-linkedin',
+            'fab fa-github', 'fab fa-google', 'fab fa-apple', 'fab fa-windows', 'fab fa-android', 'fab fa-linux',
+            'fas fa-sun', 'far fa-sun', 'fas fa-moon', 'far fa-moon', 'fas fa-grin', 'far fa-grin',
+            'fas fa-surprise', 'far fa-surprise', 'fas fa-tired', 'far fa-tired', 'fas fa-sad-cry', 'far fa-sad-cry', 'far fa-face-laugh-beam', 'fas fa-clock', 'far fa-clock', 'far fa-hourglass', 'fas fa-lemon', 'far fa-lemon',
+            'fas fa-futbol', 'far fa-futbol', 'fas fa-hand-peace', 'far fa-hand-peace',
+            'fas fa-snowflake', 'far fa-snowflake', 'fas fa-thumbs-up', 'far fa-thumbs-up',
+            'fas fa-thumbs-down', 'far fa-thumbs-down', 'fas fa-check-circle', 'far fa-check-circle',
+            'fas fa-times-circle', 'far fa-times-circle', 'fas fa-edit', 'far fa-edit',
+            'fas fa-trash', 'far fa-trash-alt', 'fas fa-plus-circle', 'far fa-plus-circle',
+            'fas fa-minus-circle', 'far fa-minus-circle', 'fas fa-info-circle', 'far fa-info-circle',
+            'fas fa-briefcase', 'fas fa-home', 'fas fa-gift', 'fas fa-plane', 'fas fa-utensils',
+            'fas fa-dumbbell', 'fas fa-graduation-cap', 'fas fa-film', 'fas fa-book', 'fas fa-music',
+            'fas fa-shopping-cart', 'fas fa-phone', 'fas fa-laptop', 'fas fa-coffee', 'fas fa-gamepad',
+            'fas fa-cloud', 'fas fa-tree', 'fas fa-car', 'fas fa-train', 'fas fa-building',
+            'fas fa-pizza-slice', 'fas fa-palette', 'fas fa-brush', 'fas fa-microchip',
+            'fas fa-chart-line', 'fas fa-globe', 'fas fa-paint-brush',
+            'fas fa-lock', 'fas fa-unlock', 'fas fa-key', 'fas fa-wifi', 'fas fa-plug',
+            'fas fa-cube', 'fas fa-flask', 'fas fa-bug', 'fas fa-code', 'fas fa-terminal',
+            'fas fa-database', 'fas fa-server', 'fas fa-cloud-upload-alt', 'fas fa-cloud-download-alt',
+            'fas fa-chart-pie', 'fas fa-chart-bar', 'fas fa-receipt', 'fas fa-credit-card',
+            'fas fa-dollar-sign', 'fas fa-euro-sign', 'fas fa-pound-sign', 'fas fa-yen-sign',
+            'fas fa-handshake', 'fas fa-gavel', 'fas fa-balance-scale', 'fas fa-shield-alt',
+            'fas fa-user-friends', 'fas fa-users', 'fas fa-user-circle', 'far fa-user-circle',
+            'fas fa-trophy', 'fas fa-medal', 'fas fa-award', 'fas fa-crown',
+            'fas fa-rocket', 'fas fa-space-shuttle', 'fas fa-earth-americas', 'fas fa-map-marker-alt',
+            'fas fa-bus', 'fas fa-bicycle', 'fas fa-motorcycle', 'fas fa-ship',
+            'fas fa-camera', 'fas fa-video', 'fas fa-microphone', 'fas fa-headphones',
+            'fas fa-desktop', 'fas fa-tablet-alt', 'fas fa-mobile-alt', 'fas fa-gamepad',
+            'fas fa-cogs', 'fas fa-tools', 'fas fa-wrench', 'fas fa-hammer',
+            'fas fa-shopping-bag', 'fas fa-store', 'fas fa-warehouse', 'fas fa-truck',
+            'fas fa-hospital', 'fas fa-clinic-medical', 'fas fa-stethoscope', 'fas fa-syringe',
+            'fas fa-first-aid', 'fas fa-briefcase-medical',
+            'fas fa-dog', 'fas fa-cat', 'fas fa-paw',
+            'fas fa-fish', 'fas fa-carrot', 'fas fa-egg', 'fas fa-apple-alt', 'fas fa-mountain', 'fas fa-water', 'fas fa-fire',
+            'fas fa-anchor', 'fas fa-life-ring', 'fas fa-umbrella', 'fas fa-wind',
+            'fas fa-poo', 'fas fa-ghost', 'fas fa-spider', 'fas fa-skull',
+            'fas fa-robot', 'fas fa-microchip', 'fas fa-atom', 'fas fa-dna',
+            'fas fa-satellite', 'fas fa-globe-americas', 'fas fa-flask', 'fas fa-magnet',
+            'fas fa-bug', 'fas fa-seedling', 'fas fa-leaf', 'fas fa-concierge-bell', 'fas fa-hotel', 'fas fa-bed',
+            'fas fa-person-walking', 'fas fa-running', 'fas fa-biking', 'fas fa-swimmer',
+            'fas fa-chart-line', 'fas fa-mug-hot', 'fas fa-pizza-slice', 'fas fa-plane-departure', 'fas fa-school', 'fas fa-hospital-user', 'far fa-closed-captioning', 'fab fa-money-bill', 'fas fa-'
+        ];
+
+        const initIconGrid = (filterText = '') => {
+            iconGridEl.innerHTML = '';
+            const filteredIcons = allEventIcons.filter(iconClass =>
+                iconClass.toLowerCase().includes(filterText.toLowerCase())
+            );
+
+            filteredIcons.forEach(iconClass => {
+                const iconItem = document.createElement('div');
+                iconItem.classList.add('icon-item');
+                iconItem.innerHTML = `<i class="${iconClass}"></i>`;
+                iconItem.dataset.icon = iconClass;
+                iconItem.addEventListener('click', () => {
+                    document.querySelectorAll('.icon-item').forEach(item => item.classList.remove('selected'));
+                    iconItem.classList.add('selected');
+                    eventIconInput.value = iconClass;
+                });
+                iconGridEl.appendChild(iconItem);
+            });
+            const currentSelectedIcon = eventIconInput.value;
+            if (!currentSelectedIcon || !document.querySelector(`#iconGrid .icon-item[data-icon="${currentSelectedIcon}"]`)) {
+                if (filteredIcons.length > 0) {
+                    iconGridEl.querySelector('.icon-item').classList.add('selected');
+                    eventIconInput.value = filteredIcons[0];
+                } else {
+                    eventIconInput.value = '';
+                }
+            }
+        };
+
+        const applyFont = (fontFamily) => {
+            document.body.style.fontFamily = fontFamily;
+        };
+
+        const getEffectiveTheme = (baseThemeKey, isDarkMode) => {
+            let themeToApply;
+
+            if (baseThemeKey && PASTEL_THEMES[baseThemeKey]) {
+                themeToApply = { ...(isDarkMode ? PASTEL_THEMES[baseThemeKey].dark : PASTEL_THEMES[baseThemeKey].light) };
+            } else if (baseThemeKey && SPECIAL_THEMES[baseThemeKey]) {
+                themeToApply = { ...(isDarkMode ? SPECIAL_THEMES[baseThemeKey].dark : SPECIAL_THEMES[baseThemeKey].light) };
+            } else { 
+                // When a custom theme is selected (baseThemeKey is null),
+                // the user's picked colors are the final colors.
+                // No further dynamic adjustment based on isDarkMode is needed here,
+                // as the user is explicitly setting the colors they want for their custom theme.
+                themeToApply = { ...currentBaseTheme };
+            }
+
+            // This block handles the specific 'pureBlack' theme logic,
+            // which should override other theme settings if it's explicitly chosen
+            // or if the custom theme's body background is pure black.
+            if (baseThemeKey === 'pureBlack' || (baseThemeKey === null && themeToApply.bodyBg === '#000000')) {
+                themeToApply.bodyBg = '#000000';
+                themeToApply.mainText = '#FFFFFF';
+                themeToApply.headerBg = '#000000';
+                themeToApply.mainContainerBg = '#000000';
+                themeToApply.dayCellBg = '#0A0A0A';
+                themeToApply.dayCellHoverBg = '#1A1A1A';
+                themeToApply.currentDayBg = '#2A2A2A';
+                themeToApply.primaryButtonBg = '#FFFFFF';
+                themeToApply.primaryButtonText = '#000000';
+                themeToApply.primaryButtonBorderColor = '#000000';
+                themeToApply.secondaryButtonBg = '#1A1A1A';
+                themeToApply.secondaryButtonText = '#AAAAAA';
+                themeToApply.accentColor = '#AAAAAA';
+                themeToApply.dayCellBorder = '#1A1A1A';
+                themeToApply.arrowButtonBg = 'transparent';
+                themeToApply.arrowButtonHoverBg = 'rgba(255,255,255,0.1)';
+                themeToApply.arrowButtonText = '#E0E0E0';
+                themeToApply.headerBorderColor = '#1A1A1A';
+            }
+
+            return themeToApply;
+        };
+
+
+        const applyTheme = (effectiveTheme, inputs) => {
+            document.documentElement.style.setProperty('--body-bg', effectiveTheme.bodyBg);
+            document.documentElement.style.setProperty('--text-color', effectiveTheme.mainText);
+            document.documentElement.style.setProperty('--header-bg', effectiveTheme.headerBg);
+            document.documentElement.style.setProperty('--main-container-bg', effectiveTheme.mainContainerBg);
+            document.documentElement.style.setProperty('--day-cell-bg', effectiveTheme.dayCellBg);
+            document.documentElement.style.setProperty('--day-cell-hover-bg-color', effectiveTheme.dayCellHoverBg);
+            document.documentElement.style.setProperty('--current-day-bg', effectiveTheme.currentDayBg);
+
+            document.documentElement.style.setProperty('--primary-button-bg', effectiveTheme.primaryButtonBg);
+            document.documentElement.style.setProperty('--primary-button-text', effectiveTheme.primaryButtonText);
+            document.documentElement.style.setProperty('--primary-button-border-color', effectiveTheme.primaryButtonBorderColor);
+
+            document.documentElement.style.setProperty('--secondary-button-bg', effectiveTheme.secondaryButtonBg);
+            document.documentElement.style.setProperty('--secondary-button-text', effectiveTheme.secondaryButtonText);
+
+            document.documentElement.style.setProperty('--accent-color', effectiveTheme.accentColor);
+            document.documentElement.style.setProperty('--day-cell-border-color', effectiveTheme.dayCellBorder);
+
+            document.documentElement.style.setProperty('--arrow-button-bg', effectiveTheme.arrowButtonBg);
+            document.documentElement.style.setProperty('--arrow-button-hover-bg', effectiveTheme.arrowButtonHoverBg);
+            document.documentElement.style.setProperty('--arrow-button-text', effectiveTheme.arrowButtonText);
+            document.documentElement.style.setProperty('--header-border-color', effectiveTheme.headerBorderColor);
+
+            if (inputs && inputs.themeBodyBgInput) {
+                // The source for the color pickers should be the effectiveTheme itself,
+                // ensuring the pickers reflect the currently applied visual theme.
+                const sourceThemeForPickers = effectiveTheme; // Use the already calculated effectiveTheme
+
+                if (sourceThemeForPickers) {
+                    inputs.themeBodyBgInput.value = sourceThemeForPickers.bodyBg;
+                    inputs.themeTextColorInput.value = sourceThemeForPickers.mainText;
+                    inputs.themeHeaderBgInput.value = sourceThemeForPickers.headerBg;
+                    inputs.themeMainContainerBgInput.value = sourceThemeForPickers.mainContainerBg;
+                    inputs.themeDayCellBgInput.value = sourceThemeForPickers.dayCellBg;
+                    inputs.themeDayCellHoverBgInput.value = sourceThemeForPickers.dayCellHoverBg;
+                    inputs.themeCurrentDayBgInput.value = sourceThemeForPickers.currentDayBg;
+                    inputs.themePrimaryButtonBgInput.value = sourceThemeForPickers.primaryButtonBg;
+                    inputs.themePrimaryButtonTextInput.value = sourceThemeForPickers.primaryButtonText;
+                    inputs.themeSecondaryButtonBgInput.value = sourceThemeForPickers.secondaryButtonBg;
+                    inputs.themeSecondaryButtonTextInput.value = sourceThemeForPickers.secondaryButtonText;
+                    inputs.themeAccentColorInput.value = sourceThemeForPickers.accentColor;
+                    inputs.themeDayCellBorderColorInput.value = sourceThemeForPickers.dayCellBorder;
+                }
+            }
+
+
+            document.documentElement.style.setProperty('--day-cell-drag-bg', effectiveTheme.dayCellHoverBg);
+
+            const accentHex = effectiveTheme.accentColor.replace('#', '');
+            const r = parseInt(accentHex.substring(0, 2), 16);
+            const g = parseInt(accentHex.substring(2, 4), 16);
+            const b = parseInt(accentHex.substring(4, 6), 16);
+            document.documentElement.style.setProperty('--accent-color-rgb', `${r}, ${g}, ${b}`);
+
+            renderCalendar();
+        };
+
+        const injectCustomFont = (fontName, fontData) => {
+            const styleId = 'custom-uploaded-font-style';
+            let styleTag = document.getElementById(styleId);
+            if (!styleTag) {
+                styleTag = document.createElement('style');
+                styleTag.id = styleId;
+                document.head.appendChild(styleTag);
+            }
+            styleTag.textContent = `
+                @font-face {
+                    font-family: "${fontName}";
+                    src: url("${fontData}") format("woff2"),
+                         url("${fontData}") format("woff"),
+                         url("${fontData}") format("truetype"),
+                         url("${fontData}") format("opentype");
+                    font-weight: normal;
+                    font-style: normal;
+                }
+            `;
+        };
+
+        const handleFontUpload = async (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onloadend = async () => {
+                const fontData = reader.result;
+                const fontName = `CustomUploadedFont-${Date.now()}`;
+                injectCustomFont(fontName, fontData);
+                applyFont(fontName);
+                currentCustomFontName = fontName;
+                customFontNameDisplay.textContent = file.name;
+
+                await saveSettings(fontName, fontData, currentBaseThemeKey, isDarkModeActive,
+                             uiRoundnessInput.value, fontSizeInput.value,
+                             eventRoundnessInput.value, eventBorderThicknessInput.value, currentBaseTheme, areCustomColorPickersLocked, unlockedSpecialThemesKeys);
+            };
+            reader.readAsDataURL(file);
+        };
+
+        const resetCustomFont = async () => {
+            const styleTag = document.getElementById('custom-uploaded-font-style');
+            if (styleTag) {
+                styleTag.remove();
+            }
+            applyFont(DEFAULT_FONT_FAMILY);
+            customFontNameDisplay.textContent = 'Inter (Default)';
+            currentCustomFontName = null;
+
+            await saveSettings(null, null, currentBaseThemeKey, isDarkModeActive,
+                         uiRoundnessInput.value, fontSizeInput.value,
+                         eventRoundnessInput.value, eventBorderThicknessInput.value, currentBaseTheme, areCustomColorPickersLocked, unlockedSpecialThemesKeys);
+        };
+
+        const initPremadeThemeBoxes = () => {
+            premadeThemeBoxesEl.innerHTML = '';
+            const themeKeysOrdered = ['blue', 'green', 'yellow', 'purple', 'pink', 'pureBlack'];
+
+            themeKeysOrdered.forEach(key => {
+                const theme = PASTEL_THEMES[key].light;
+                const themeBox = document.createElement('div');
+                themeBox.classList.add('theme-box');
+                themeBox.dataset.themeKey = key;
+
+                const colorPreview = document.createElement('div');
+                colorPreview.classList.add('color-preview');
+                if (key === 'yellow') {
+                    colorPreview.style.backgroundColor = '#FFD700';
+                } else {
+                    colorPreview.style.backgroundColor = theme.accentColor;
+                }
+                themeBox.appendChild(colorPreview);
+
+                const themeName = document.createElement('span');
+                themeName.textContent = theme.name.replace(' (Dark)', '');
+                themeBox.appendChild(themeName);
+
+                themeBox.addEventListener('click', async () => {
+                    document.querySelectorAll('.theme-box').forEach(box => box.classList.remove('selected'));
+                    themeBox.classList.add('selected');
+
+                    currentBaseThemeKey = key;
+                    currentBaseTheme = null;
+
+                    applyTheme(getEffectiveTheme(currentBaseThemeKey, isDarkModeActive), {
+                        themeBodyBgInput, themeTextColorInput, themeHeaderBgInput, themeMainContainerBgInput,
+                        themeDayCellBgInput, themeDayCellHoverBgInput, themeCurrentDayBgInput,
+                        themePrimaryButtonBgInput, themePrimaryButtonTextInput,
+                        themeSecondaryButtonBgInput, themeSecondaryButtonTextInput,
+                        themeAccentColorInput, themeDayCellBorderColorInput
+                    });
+
+                    await saveSettings(currentCustomFontName, null, currentBaseThemeKey, isDarkModeActive,
+                                 uiRoundnessInput.value, fontSizeInput.value,
+                                 eventRoundnessInput.value, eventBorderThicknessInput.value, null, areCustomColorPickersLocked, unlockedSpecialThemesKeys);
+                });
+                premadeThemeBoxesEl.appendChild(themeBox);
+            });
+        };
+
+        const initSpecialThemeBoxes = () => {
+            specialThemeBoxesEl.innerHTML = '';
+            const specialThemeKeysOrdered = Object.keys(SPECIAL_THEMES);
+
+            specialThemeKeysOrdered.forEach(key => {
+                const theme = SPECIAL_THEMES[key].light;
+                const themeBox = document.createElement('div');
+                themeBox.classList.add('theme-box', 'special-theme-box');
+                themeBox.dataset.themeKey = key;
+
+                if (unlockedSpecialThemesKeys.has(key)) {
+                    themeBox.classList.add('unlocked');
+                }
+
+                const colorPreview = document.createElement('div');
+                colorPreview.classList.add('color-preview');
+                colorPreview.style.backgroundColor = theme.accentColor;
+                themeBox.appendChild(colorPreview);
+
+                const themeName = document.createElement('span');
+                themeName.textContent = theme.name;
+                themeBox.appendChild(themeName);
+
+                const lockOverlay = document.createElement('div');
+                lockOverlay.classList.add('special-theme-lock-overlay');
+                lockOverlay.innerHTML = '<i class="fas fa-lock"></i>';
+                themeBox.appendChild(lockOverlay);
+
+
+                themeBox.addEventListener('click', async () => {
+                    const isLocked = !unlockedSpecialThemesKeys.has(key);
+                    const selectedSpecialTheme = SPECIAL_THEMES[key];
+
+                    if (isLocked) {
+                        showAdMobPlaceholder();
+                        watchAdButton.classList.add('hidden');
+                        adLoadingSpinner.classList.remove('hidden');
+
+                        setTimeout(async () => {
+                            adMobPlaceholder.classList.add('hidden');
+                            adLoadingSpinner.classList.add('hidden');
+
+                            unlockedSpecialThemesKeys.add(key);
+                            themeBox.classList.add('unlocked');
+
+                            document.querySelectorAll('.theme-box').forEach(box => box.classList.remove('selected'));
+                            themeBox.classList.add('selected');
+
+                            currentBaseThemeKey = key;
+                            currentBaseTheme = null;
+
+                            isDarkModeActive = selectedSpecialTheme.defaultIsDark;
+                            darkModeToggle.checked = isDarkModeActive;
+
+                            applyTheme(getEffectiveTheme(currentBaseThemeKey, isDarkModeActive), {
+                                themeBodyBgInput, themeTextColorInput, themeHeaderBgInput, themeMainContainerBgInput,
+                                themeDayCellBgInput, themeDayCellHoverBgInput, themeCurrentDayBgInput,
+                                themePrimaryButtonBgInput, themePrimaryButtonTextInput,
+                                themeSecondaryButtonBgInput, themeSecondaryButtonTextInput,
+                                themeAccentColorInput, themeDayCellBorderColorInput
+                            });
+
+                            await saveSettings(currentCustomFontName, null, currentBaseThemeKey, isDarkModeActive,
+                                         uiRoundnessInput.value, fontSizeInput.value,
+                                         eventRoundnessInput.value, eventBorderThicknessInput.value, null, areCustomColorPickersLocked, unlockedSpecialThemesKeys);
+                        }, 3000);
+                    } else {
+                        document.querySelectorAll('.theme-box').forEach(box => box.classList.remove('selected'));
+                        themeBox.classList.add('selected');
+
+                        currentBaseThemeKey = key;
+                        currentBaseTheme = null;
+
+                        isDarkModeActive = selectedSpecialTheme.defaultIsDark;
+                        darkModeToggle.checked = isDarkModeActive;
+
+                        applyTheme(getEffectiveTheme(currentBaseThemeKey, isDarkModeActive), {
+                            themeBodyBgInput, themeTextColorInput, themeHeaderBgInput, themeMainContainerBgInput,
+                            themeDayCellBgInput, themeDayCellHoverBgInput, themeCurrentDayBgInput,
+                            themePrimaryButtonBgInput, themePrimaryButtonTextInput,
+                            themeSecondaryButtonBgInput, themeSecondaryButtonTextInput,
+                            themeAccentColorInput, themeDayCellBorderColorInput
+                        });
+
+                        await saveSettings(currentCustomFontName, null, currentBaseThemeKey, isDarkModeActive,
+                                     uiRoundnessInput.value, fontSizeInput.value,
+                                     eventRoundnessInput.value, eventBorderThicknessInput.value, null, areCustomColorPickersLocked, unlockedSpecialThemesKeys);
+                    }
+                });
+                specialThemeBoxesEl.appendChild(themeBox);
+            });
+        };
+
+
+        const renderCalendar = () => {
+            calendarEl.innerHTML = '';
+
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+
+            currentMonthYearEl.textContent = new Date(year, month).toLocaleString('en-US', {
+                month: 'long',
+                year: 'numeric'
+            });
+
+            const firstDayOfMonth = new Date(year, month, 1).getDay();
+            const numDaysInMonth = new Date(year, month + 1, 0).getDate();
+
+            for (let i = 0; i < firstDayOfMonth; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.classList.add('day-cell', 'p-2');
+                emptyCell.style.backgroundColor = `var(--body-bg)`;
+                emptyCell.style.borderColor = `var(--day-cell-border-color)`;
+                emptyCell.style.color = `var(--text-color)`;
+                emptyCell.style.opacity = '0.4';
+                calendarEl.appendChild(emptyCell);
+            }
+
+            for (let day = 1; day <= numDaysInMonth; day++) {
+                const dayCell = document.createElement('div');
+                dayCell.classList.add('day-cell', 'p-2');
+                const fullDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                dayCell.dataset.date = fullDate;
+
+                const dayNumber = document.createElement('div');
+                dayNumber.classList.add('text-right', 'font-bold', 'text-lg', 'mb-2');
+                dayNumber.textContent = day;
+                dayNumber.style.color = `var(--text-color)`;
+                dayCell.appendChild(dayNumber);
+
+                const today = new Date();
+                if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                    dayCell.classList.add('current-day');
+                }
+
+                const dayEvents = events.filter(event => {
+                    const eventDate = new Date(event.date);
+                    return eventDate.getDate() === day &&
+                           eventDate.getMonth() === month &&
+                           eventDate.getFullYear() === year;
+                });
+
+                dayEvents.sort((a, b) => {
+                    if (a.time && b.time) {
+                        return a.time.localeCompare(b.time);
+                    }
+                    if (a.time) return -1;
+                    if (b.time) return 1;
+                    return 0;
+                });
+
+                dayEvents.forEach(event => {
+                    const eventItem = document.createElement('div');
+                    let eventColor = { primary: '#FFCDD2', text: '#C62828' };
+                    try {
+                        const parsedColor = JSON.parse(event.color);
+                        const foundColor = eventColors.find(c => c.primary === parsedColor.primary || c.name === parsedColor.name);
+                        if (foundColor) {
+                            eventColor = foundColor;
+                        } else {
+                            eventColor = parsedColor;
+                        }
+
+                    } catch (e) {
+                        console.error("Failed to parse event color:", event.color, e);
+                    }
+
+                    eventItem.classList.add('event-item');
+                    eventItem.style.backgroundColor = eventColor.primary;
+                    eventItem.style.color = eventColor.text;
+                    eventItem.dataset.id = event.id;
+                    eventItem.title = `${event.title} ${event.time ? '(' + event.time + ')' : ''}${event.description ? ' - ' + event.description : ''}`;
+                    eventItem.setAttribute('draggable', 'true');
+
+                    eventItem.style.borderColor = eventColor.text;
+
+                    const mainContentDiv = document.createElement('div');
+                    mainContentDiv.classList.add('main-content');
+
+                    const textContentSpan = document.createElement('span');
+                    textContentSpan.classList.add('text-content');
+
+                    const timeTitleWrapper = document.createElement('span');
+                    timeTitleWrapper.classList.add('time-title-wrapper');
+
+                    if (event.time) {
+                        const timePart = document.createElement('span');
+                        timePart.classList.add('font-semibold', 'time-part');
+                        timePart.textContent = event.time;
+                        timeTitleWrapper.appendChild(timePart);
+                    }
+                    const titlePart = document.createElement('span');
+                    titlePart.classList.add('title-part');
+                    titlePart.textContent = event.title;
+                    timeTitleWrapper.appendChild(titlePart);
+
+                    textContentSpan.appendChild(timeTitleWrapper);
+                    mainContentDiv.appendChild(textContentSpan);
+
+                    if (event.icon) {
+                        const iconContainer = document.createElement('span');
+                        iconContainer.classList.add('event-icon-container');
+                        iconContainer.innerHTML = `<i class="${event.icon}"></i> `;
+                        eventItem.appendChild(iconContainer);
+                    }
+                    eventItem.appendChild(mainContentDiv);
+
+
+                    if (event.description) {
+                        const eventDescriptionEl = document.createElement('div');
+                        eventDescriptionEl.classList.add('event-description');
+                        eventDescriptionEl.style.color = adjustColor(eventColor.text, 0.15);
+                        eventDescriptionEl.textContent = event.description;
+                        eventItem.appendChild(eventDescriptionEl);
+                    }
+
+                    eventItem.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        openEventModal(event.id);
+                    });
+
+                    eventItem.addEventListener('dragstart', (e) => {
+                        draggedEventId = event.id;
+                        e.dataTransfer.setData('text/plain', event.id);
+                        setTimeout(() => {
+                            eventItem.classList.add('dragging');
+                        }, 0);
+                    });
+
+                    eventItem.addEventListener('dragend', () => {
+                        draggedEventId = null;
+                        eventItem.classList.remove('dragging');
+                        document.querySelectorAll('.event-item').forEach(item => item.classList.remove('drop-target-top', 'drop-target-bottom'));
+                        document.querySelectorAll('.day-cell').forEach(cell => cell.classList.remove('drag-over'));
+                    });
+
+                    eventItem.addEventListener('dragover', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const rect = eventItem.getBoundingClientRect();
+                        const y = e.clientY - rect.top;
+                        if (y < rect.height / 2) {
+                            eventItem.classList.add('drop-target-top');
+                            eventItem.classList.remove('drop-target-bottom');
+                        } else {
+                            eventItem.classList.add('drop-target-bottom');
+                            eventItem.classList.remove('drop-target-top');
+                        }
+                    });
+
+                    eventItem.addEventListener('dragleave', (e) => {
+                        e.stopPropagation();
+                        eventItem.classList.remove('drop-target-top', 'drop-target-bottom');
+                    });
+
+                    eventItem.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        eventItem.classList.remove('drop-target-top', 'drop-target-bottom');
+
+                        const droppedEventId = e.dataTransfer.getData('text/plain');
+                        if (!droppedEventId || droppedEventId === event.id) return;
+
+                        const draggedEventIndex = events.findIndex(ev => ev.id === droppedEventId);
+                        const targetEventIndex = events.findIndex(ev => ev.id === event.id);
+
+                        if (draggedEventIndex === -1 || targetEventIndex === -1) return;
+
+                        const draggedEvent = events[draggedEventIndex];
+                        if (draggedEvent.date !== event.date) {
+                            draggedEvent.date = event.date;
+                            events.sort((a, b) => {
+                                const dateA = new Date(a.date);
+                                const dateB = new Date(b.date);
+                                if (dateA.getTime() === dateB.getTime()) {
+                                    if (a.time && b.time) return a.time.localeCompare(b.time);
+                                    if (a.time) return -1;
+                                    if (b.time) return 1;
+                                    return 0;
+                                }
+                                return dateA.getTime() - dateB.getTime();
+                            });
+                        } else {
+                            const draggedEventItem = events.splice(draggedEventIndex, 1)[0];
+                            const rect = eventItem.getBoundingClientRect();
+                            const y = e.clientY - rect.top;
+
+                            let newIndex = targetEventIndex;
+                            if (draggedEventIndex < targetEventIndex) {
+                                newIndex = events.findIndex(ev => ev.id === event.id);
+                                if (y > rect.height / 2) {
+                                    newIndex++;
+                                }
+                            } else {
+                                newIndex = events.findIndex(ev => ev.id === event.id);
+                                if (y > rect.height / 2) {
+                                    newIndex++;
+                                }
+                            }
+                            events.splice(newIndex, 0, draggedEventItem);
+                        }
+                        saveEvents();
+                        renderCalendar();
+                    });
+
+                    dayCell.appendChild(eventItem);
+                });
+
+                dayCell.addEventListener('click', () => {
+                    openEventModal(null, dayCell.dataset.date);
+                });
+
+                dayCell.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    dayCell.classList.add('drag-over');
+                });
+
+                dayCell.addEventListener('dragleave', () => {
+                    dayCell.classList.remove('drag-over');
+                });
+
+                dayCell.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    if (e.target.classList.contains('event-item') || e.target.closest('.event-item')) {
+                        dayCell.classList.remove('drag-over');
+                        return;
+                    }
+
+                    dayCell.classList.remove('drag-over');
+
+                    const droppedEventId = e.dataTransfer.getData('text/plain');
+                    const newDate = dayCell.dataset.date;
+
+                    if (droppedEventId) {
+                        const eventIndex = events.findIndex(event => event.id === droppedEventId);
+                        if (eventIndex !== -1) {
+                            events[eventIndex].date = newDate;
+                            events.sort((a, b) => {
+                                const dateA = new Date(a.date);
+                                const dateB = new Date(b.date);
+                                if (dateA.getTime() === dateB.getTime()) {
+                                    if (a.time && b.time) return a.time.localeCompare(b.time);
+                                    if (a.time) return -1;
+                                    if (b.time) return 1;
+                                    return 0;
+                                }
+                                return dateA.getTime() - dateB.getTime();
+                            });
+                            saveEvents();
+                            renderCalendar();
+                        }
+                    }
+                });
+
+                calendarEl.appendChild(dayCell);
+            }
+        };
+
+        const openEventModal = (eventId = null, date = null) => {
+            eventModal.classList.remove('hidden');
+            editingEventId = eventId;
+
+            eventTitleInput.value = '';
+            eventTimeInput.value = '';
+            eventDescriptionInput.value = '';
+            eventDateInput.value = '';
+            eventColorInput.value = '';
+            eventIconInput.value = '';
+            iconSearchInput.value = '';
+            document.querySelectorAll('#colorPalette .color-box').forEach(box => box.classList.remove('selected'));
+            document.querySelectorAll('#iconGrid .icon-item').forEach(item => item.classList.remove('selected'));
+
+            if (eventId) {
+                modalTitle.textContent = 'Edit Event';
+                saveEventButton.textContent = 'Update Event';
+                deleteEventButton.classList.remove('hidden');
+
+                const event = events.find(e => e.id === eventId);
+                if (event) {
+                    eventTitleInput.value = event.title;
+                    eventTimeInput.value = event.time || '';
+                    eventDateInput.value = event.date;
+                    eventDescriptionInput.value = event.description || '';
+
+                    let selectedColorPrimary = '#FFCDD2';
+                    try {
+                        const eventColor = JSON.parse(event.color);
+                        selectedColorPrimary = eventColor.primary;
+                    } catch (e) {
+                        console.error("Failed to parse event color:", event.color, e);
+                    }
+                    const colorBox = document.querySelector(`#colorPalette .color-box[data-primary="${selectedColorPrimary}"]`);
+                    if (colorBox) {
+                        colorBox.classList.add('selected');
+                        eventColorInput.value = event.color;
+                    } else {
+                        initColorPalette();
+                        const defaultColor = eventColors[0];
+                        eventColorInput.value = JSON.stringify({ primary: defaultColor.primary, text: defaultColor.text });
+                        const defaultColorBox = document.querySelector(`#colorPalette .color-box[data-primary="${defaultColor.primary}"]`);
+                        if(defaultColorBox) defaultColorBox.classList.add('selected');
+                    }
+
+                    initIconGrid();
+                    const iconItem = document.querySelector(`#iconGrid .icon-item[data-icon="${event.icon}"]`);
+                    if (iconItem) {
+                        iconItem.classList.add('selected');
+                        eventIconInput.value = event.icon;
+                    } else if (allEventIcons.length > 0) {
+                        iconGridEl.querySelector('.icon-item').classList.add('selected');
+                        eventIconInput.value = allEventIcons[0];
+                    } else {
+                        eventIconInput.value = '';
+                    }
+                }
+            } else {
+                modalTitle.textContent = 'Add New Event';
+                saveEventButton.textContent = 'Save Event';
+                deleteEventButton.classList.add('hidden');
+                eventDateInput.value = date;
+
+                initColorPalette();
+                initIconGrid();
+            }
+        };
+
+        const closeEventModal = () => {
+            eventModal.classList.add('hidden');
+            editingEventId = null;
+        };
+
+        const getCustomThemeColorsFromInputs = () => {
+            return {
+                bodyBg: themeBodyBgInput.value,
+                mainText: themeTextColorInput.value,
+                headerBg: themeHeaderBgInput.value,
+                mainContainerBg: themeMainContainerBgInput.value,
+                dayCellBg: themeDayCellBgInput.value,
+                dayCellHoverBg: themeDayCellHoverBgInput.value,
+                currentDayBg: themeCurrentDayBgInput.value,
+                primaryButtonBg: themePrimaryButtonBgInput.value,
+                primaryButtonText: themePrimaryButtonTextInput.value,
+                primaryButtonBorderColor: themePrimaryButtonTextInput.value,
+                secondaryButtonBg: themeSecondaryButtonBgInput.value,
+                secondaryButtonText: themeSecondaryButtonTextInput.value,
+                accentColor: themeAccentColorInput.value,
+                dayCellBorder: themeDayCellBorderColorInput.value,
+                arrowButtonBg: getComputedStyle(document.documentElement).getPropertyValue('--arrow-button-bg'),
+                arrowButtonHoverBg: getComputedStyle(document.documentElement).getPropertyValue('--arrow-button-hover-bg'),
+                arrowButtonText: getComputedStyle(document.documentElement).getPropertyValue('--arrow-button-text'),
+                headerBorderColor: getComputedStyle(document.documentElement).getPropertyValue('--header-border-color')
+            };
+        };
+
+        const setCustomColorPickerState = (locked) => {
+            const inputs = [
+                themeBodyBgInput, themeTextColorInput, themeHeaderBgInput, themeMainContainerBgInput,
+                themeDayCellBgInput, themeDayCellHoverBgInput, themeCurrentDayBgInput,
+                themePrimaryButtonBgInput, themePrimaryButtonTextInput,
+                themeSecondaryButtonBgInput, themeSecondaryButtonTextInput,
+                themeAccentColorInput, themeDayCellBorderColorInput
+            ];
+
+            inputs.forEach(input => {
+                input.disabled = locked;
+            });
+
+            if (locked) {
+                colorPickersOverlay.classList.remove('hidden');
+                watchAdButton.classList.remove('hidden');
+                adLoadingSpinner.classList.add('hidden');
+            } else {
+                colorPickersOverlay.classList.add('hidden');
+            }
+        };
+
+        const openSettingsModal = async () => {
+            settingsModal.classList.remove('hidden');
+
+            const loadedSettings = await loadSettings();
+
+            if (loadedSettings.currentBaseThemeKey === null) {
+                currentBaseTheme = loadedSettings.customThemeColors || { ...DEFAULT_LIGHT_THEME };
+            } else {
+                currentBaseTheme = null;
+            }
+
+            // Pass the input elements to applyTheme so it can populate them correctly
+            applyTheme(getEffectiveTheme(loadedSettings.currentBaseThemeKey, loadedSettings.isDarkModeActive), {
+                themeBodyBgInput, themeTextColorInput, themeHeaderBgInput, themeMainContainerBgInput,
+                themeDayCellBgInput, themeDayCellHoverBgInput, themeCurrentDayBgInput,
+                themePrimaryButtonBgInput, themePrimaryButtonTextInput,
+                themeSecondaryButtonBgInput, themeSecondaryButtonTextInput,
+                themeAccentColorInput, themeDayCellBorderColorInput
+            });
+
+            uiRoundnessInput.value = loadedSettings.currentUiRoundness;
+            uiRoundnessValueDisplay.textContent = `${loadedSettings.currentUiRoundness}px`;
+            uiRoundnessValueDisplay.style.fontSize = `${14 + (parseInt(loadedSettings.currentUiRoundness) / 24) * 8}px`; // Apply initial font size
+            
+            fontSizeInput.value = loadedSettings.currentFontSize;
+            fontSizeValueDisplay.textContent = `${loadedSettings.currentFontSize}px`;
+
+            eventRoundnessInput.value = loadedSettings.currentEventRoundness;
+            eventRoundnessValueDisplay.textContent = `${loadedSettings.currentEventRoundness}px`;
+            eventRoundnessValueDisplay.style.fontSize = `${14 + (parseInt(loadedSettings.currentEventRoundness) / 24) * 8}px`; // Apply initial font size
+            
+            eventBorderThicknessInput.value = loadedSettings.currentEventBorderThickness;
+            eventBorderThicknessValueDisplay.textContent = `${loadedSettings.currentEventBorderThickness}px`;
+            eventBorderThicknessValueDisplay.style.fontSize = `${14 + (parseInt(loadedSettings.currentEventBorderThickness) / 5) * 4}px`; // Apply initial font size
+
+
+            darkModeToggle.checked = loadedSettings.isDarkModeActive;
+            isDarkModeActive = loadedSettings.isDarkModeActive;
+            areCustomColorPickersLocked = loadedSettings.customColorPickersLocked;
+            setCustomColorPickerState(areCustomColorPickersLocked);
+
+            document.querySelectorAll('.theme-box').forEach(box => {
+                if (box.dataset.themeKey === currentBaseThemeKey) {
+                    box.classList.add('selected');
+                } else {
+                    box.classList.remove('selected');
+                }
+            });
+        };
+
+        const closeSettingsModal = () => {
+            settingsModal.classList.add('hidden');
+        };
+
+        const generateUniqueId = () => {
+            return '_' + Math.random().toString(36).substr(2, 9);
+        };
+
+        const handleSaveEvent = async () => {
+            const title = eventTitleInput.value.trim();
+            const time = eventTimeInput.value.trim();
+            const description = eventDescriptionInput.value.trim();
+            const date = eventDateInput.value;
+            const color = eventColorInput.value;
+            const icon = eventIconInput.value;
+
+            if (!title || !date) {
+                const messageBox = document.createElement('div');
+                messageBox.innerHTML = `
+                    <div class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-[1000]">
+                        <div class="bg-white p-6 rounded-lg shadow-xl text-center">
+                            <p class="text-lg font-semibold mb-4" style="color: var(--text-color);">Please enter event title and date.</p>
+                            <button class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 themed-button" onclick="this.parentNode.parentNode.remove()">OK</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(messageBox);
+                return;
+            }
+
+            if (editingEventId) {
+                const eventIndex = events.findIndex(e => e.id === editingEventId);
+                if (eventIndex !== -1) {
+                    events[eventIndex] = {
+                        id: editingEventId,
+                        title,
+                        time,
+                        date,
+                        description,
+                        color,
+                        icon
+                    };
+                }
+            } else {
+                const newEvent = {
+                    id: generateUniqueId(),
+                    title,
+                    time,
+                    date,
+                    description,
+                    color,
+                    icon
+                };
+                events.push(newEvent);
+            }
+            await saveEvents();
+            renderCalendar();
+            closeEventModal();
+        };
+
+        const handleDeleteEvent = () => {
+            if (editingEventId) {
+                const confirmBox = document.createElement('div');
+                confirmBox.innerHTML = `
+                    <div class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-[1000]">
+                        <div class="bg-white p-6 rounded-lg shadow-xl text-center">
+                            <p class="text-lg font-semibold mb-4" style="color: var(--text-color);">Are you sure you want to delete this event?</p>
+                            <div class="flex justify-center space-x-4">
+                                <button class="themed-button" id="confirmDeleteYes">Yes</button>
+                                <button class="themed-button secondary" id="confirmDeleteNo">No</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(confirmBox);
+
+                document.getElementById('confirmDeleteYes').onclick = async () => {
+                    events = events.filter(e => e.id !== editingEventId);
+                    await saveEvents();
+                    renderCalendar();
+                    closeEventModal();
+                    confirmBox.remove();
+                };
+                document.getElementById('confirmDeleteNo').onclick = () => {
+                    confirmBox.remove();
+                };
+            }
+        };
+
+        const handleSaveSettings = async () => {
+            const uiRoundness = uiRoundnessInput.value;
+            const fontSize = fontSizeInput.value;
+            const eventRoundness = eventRoundnessInput.value;
+            const eventBorderThickness = eventBorderThicknessInput.value;
+            const isDarkMode = darkModeToggle.checked;
+
+            let customThemeColorsToSave = null;
+            if (currentBaseThemeKey === null) {
+                customThemeColorsToSave = getCustomThemeColorsFromInputs();
+                currentBaseTheme = customThemeColorsToSave;
+            }
+
+            applyTheme(getEffectiveTheme(currentBaseThemeKey, isDarkMode), {
+                themeBodyBgInput, themeTextColorInput, themeHeaderBgInput, themeMainContainerBgInput,
+                themeDayCellBgInput, themeDayCellHoverBgInput, themeCurrentDayBgInput,
+                themePrimaryButtonBgInput, themePrimaryButtonTextInput,
+                themeSecondaryButtonBgInput, themeSecondaryButtonTextInput,
+                themeAccentColorInput, themeDayCellBorderColorInput
+            });
+
+            document.documentElement.style.setProperty('--ui-roundness', `${uiRoundness}px`);
+            document.documentElement.style.setProperty('--ui-roundness-lg', `${uiRoundness * 1.5}px`);
+            document.getElementById('main-container').style.borderRadius = `${uiRoundness * 1.5}px`;
+            document.querySelector('#event-modal .modal-content').style.borderRadius = `${uiRoundness * 1.5}px`;
+            document.querySelector('#settings-modal .modal-content').style.borderRadius = `${uiRoundness * 1.5}px`;
+
+            document.documentElement.style.setProperty('--base-font-size', `${fontSize}px`);
+            document.documentElement.style.setProperty('--event-item-roundness', `${eventRoundness}px`);
+            document.documentElement.style.setProperty('--event-item-border-thickness', `${eventBorderThickness}px`);
+
+            const fontToSave = currentCustomFontName || null;
+            let fontDataToSave = null;
+            if (fontToSave) {
+                const storedSettingsValue = (await Preferences.get({ key: 'calendarSettings' })).value;
+                if (storedSettingsValue) {
+                    fontDataToSave = JSON.parse(storedSettingsValue).customFontData;
+                }
+            }
+
+            await saveSettings(fontToSave, fontDataToSave, currentBaseThemeKey, isDarkMode, uiRoundness, fontSize, eventRoundness, eventBorderThickness, customThemeColorsToSave, areCustomColorPickersLocked, unlockedSpecialThemesKeys);
+            closeSettingsModal();
+        };
+
+        const showAdMobPlaceholder = () => {
+            adMobPlaceholder.classList.remove('hidden');
+        };
+
+        const handleWatchAd = async () => {
+            watchAdButton.classList.add('hidden');
+            adLoadingSpinner.classList.remove('hidden');
+            showAdMobPlaceholder();
+
+            setTimeout(async () => {
+                adMobPlaceholder.classList.add('hidden');
+                adLoadingSpinner.classList.add('hidden');
+                areCustomColorPickersLocked = false;
+                setCustomColorPickerState(false);
+                await saveSettings(currentCustomFontName, null, currentBaseThemeKey, isDarkModeActive,
+                                 uiRoundnessInput.value, fontSizeInput.value,
+                                 eventRoundnessInput.value, eventBorderThicknessInput.value, currentBaseTheme, false, unlockedSpecialThemesKeys);
+            }, 3000);
+        };
+
+
+        window.onload = async () => {
+            calendarEl = document.getElementById('calendar');
+            currentMonthYearEl = document.getElementById('currentMonthYear');
+            prevMonthButton = document.getElementById('prevMonth');
+            nextMonthButton = document.getElementById('nextMonth');
+            todayButton = document.getElementById('todayButton');
+            settingsButton = document.getElementById('settingsButton');
+
+            eventModal = document.getElementById('event-modal');
+            modalTitle = document.getElementById('modal-title');
+            eventTitleInput = document.getElementById('eventTitle');
+            eventTimeInput = document.getElementById('eventTime');
+            eventDateInput = document.getElementById('eventDate');
+            eventDescriptionInput = document.getElementById('eventDescription');
+            eventColorInput = document.getElementById('eventColor');
+            iconGridEl = document.getElementById('iconGrid');
+            eventIconInput = document.getElementById('eventIcon');
+            colorPaletteEl = document.getElementById('colorPalette');
+            saveEventButton = document.getElementById('saveEvent');
+            deleteEventButton = document.getElementById('deleteEvent');
+            cancelEventButton = document.getElementById('cancelEvent');
+            iconSearchInput = document.getElementById('iconSearchInput');
+
+            settingsModal = document.getElementById('settings-modal');
+            customFontUploadInput = document.getElementById('customFontUpload');
+            customFontNameDisplay = document.getElementById('customFontNameDisplay');
+            resetCustomFontButton = document.getElementById('resetCustomFont');
+            premadeThemeBoxesEl = document.getElementById('premadeThemeBoxes');
+            specialThemeBoxesEl = document.getElementById('specialThemeBoxes');
+
+            uiRoundnessInput = document.getElementById('uiRoundness');
+            uiRoundnessValueDisplay = document.getElementById('uiRoundnessValue');
+            fontSizeInput = document.getElementById('fontSize');
+            fontSizeValueDisplay = document.getElementById('fontSizeValue');
+            darkModeToggle = document.getElementById('darkModeToggle');
+
+            eventRoundnessInput = document.getElementById('eventRoundness');
+            eventRoundnessValueDisplay = document.getElementById('eventRoundnessValue');
+            eventBorderThicknessInput = document.getElementById('eventBorderThickness');
+            eventBorderThicknessValueDisplay = document.getElementById('eventBorderThicknessValue');
+
+
+            themeBodyBgInput = document.getElementById('themeBodyBg');
+            themeTextColorInput = document.getElementById('themeTextColor');
+            themeHeaderBgInput = document.getElementById('themeHeaderBg');
+            themeMainContainerBgInput = document.getElementById('themeMainContainerBg');
+            themeDayCellBgInput = document.getElementById('themeDayCellBg');
+            themeDayCellHoverBgInput = document.getElementById('themeDayCellHoverBg');
+            themeCurrentDayBgInput = document.getElementById('themeCurrentDayBg');
+            themePrimaryButtonBgInput = document.getElementById('themePrimaryButtonBg');
+            themePrimaryButtonTextInput = document.getElementById('themePrimaryButtonText');
+            themeSecondaryButtonBgInput = document.getElementById('themeSecondaryButtonBg');
+            themeSecondaryButtonTextInput = document.getElementById('themeSecondaryButtonText');
+            themeAccentColorInput = document.getElementById('themeAccentColor');
+            themeDayCellBorderColorInput = document.getElementById('themeDayCellBorderColor');
+
+            saveSettingsButton = document.getElementById('saveSettings');
+            cancelSettingsButton = document.getElementById('cancelSettings');
+
+            adMobPlaceholder = document.getElementById('adMobPlaceholder');
+            customColorPickersContainer = document.getElementById('customColorPickersContainer');
+            colorPickersOverlay = document.getElementById('colorPickersOverlay');
+            watchAdButton = document.getElementById('watchAdButton');
+            adLoadingSpinner = document.getElementById('adLoadingSpinner');
+
+
+            document.querySelector('.w-full.max-w-6xl.overflow-hidden').id = 'main-container';
+
+            const loadedSettings = await loadSettings();
+
+            if (loadedSettings.customFontData && loadedSettings.currentCustomFontName) {
+                injectCustomFont(loadedSettings.currentCustomFontName, loadedSettings.customFontData);
+                applyFont(loadedSettings.currentCustomFontName);
+                customFontNameDisplay.textContent = loadedSettings.currentCustomFontName;
+            } else {
+                applyFont(DEFAULT_FONT_FAMILY);
+                customFontNameDisplay.textContent = 'Inter (Default)';
+            }
+            currentCustomFontName = loadedSettings.currentCustomFontName;
+
+            darkModeToggle.checked = loadedSettings.isDarkModeActive;
+            isDarkModeActive = loadedSettings.isDarkModeActive;
+            areCustomColorPickersLocked = loadedSettings.customColorPickersLocked;
+            setCustomColorPickerState(areCustomColorPickersLocked);
+
+            currentBaseThemeKey = loadedSettings.currentBaseThemeKey;
+            if (currentBaseThemeKey === null) {
+                currentBaseTheme = loadedSettings.customThemeColors || { ...DEFAULT_LIGHT_THEME };
+            } else {
+                currentBaseTheme = null;
+            }
+
+
+            initPremadeThemeBoxes();
+            initSpecialThemeBoxes();
+
+            uiRoundnessInput.value = loadedSettings.currentUiRoundness;
+            uiRoundnessValueDisplay.textContent = `${loadedSettings.currentUiRoundness}px`;
+            document.documentElement.style.setProperty('--ui-roundness', `${loadedSettings.currentUiRoundness}px`);
+            document.documentElement.style.setProperty('--ui-roundness-lg', `${loadedSettings.currentUiRoundness * 1.5}px`);
+            const mainContainer = document.getElementById('main-container');
+            if (mainContainer) {
+                mainContainer.style.borderRadius = `${loadedSettings.currentUiRoundness * 1.5}px`;
+            }
+            const eventModalContent = document.querySelector('#event-modal .modal-content');
+            if (eventModalContent) eventModalContent.style.borderRadius = `${loadedSettings.currentUiRoundness * 1.5}px`;
+            const settingsModalContent = document.querySelector('#settings-modal .modal-content');
+            if (settingsModalContent) settingsModalContent.style.borderRadius = `${loadedSettings.currentUiRoundness * 1.5}px`;
+
+            fontSizeInput.value = loadedSettings.currentFontSize;
+            fontSizeValueDisplay.textContent = `${loadedSettings.currentFontSize}px`;
+            document.documentElement.style.setProperty('--base-font-size', `${loadedSettings.currentFontSize}px`);
+
+            eventRoundnessInput.value = loadedSettings.currentEventRoundness;
+            eventRoundnessValueDisplay.textContent = `${loadedSettings.currentEventRoundness}px`;
+            document.documentElement.style.setProperty('--event-item-roundness', `${loadedSettings.currentEventRoundness}px`);
+
+            eventBorderThicknessInput.value = loadedSettings.currentEventBorderThickness;
+            eventBorderThicknessValueDisplay.textContent = `${loadedSettings.currentEventBorderThickness}px`;
+            document.documentElement.style.setProperty('--event-item-border-thickness', `${loadedSettings.currentEventBorderThickness}px`);
+
+
+            applyTheme(getEffectiveTheme(currentBaseThemeKey, isDarkModeActive), {
+                themeBodyBgInput, themeTextColorInput, themeHeaderBgInput, themeMainContainerBgInput,
+                themeDayCellBgInput, themeDayCellHoverBgInput, themeCurrentDayBgInput,
+                themePrimaryButtonBgInput, themePrimaryButtonTextInput,
+                themeSecondaryButtonBgInput, themeSecondaryButtonTextInput,
+                themeAccentColorInput, themeDayCellBorderColorInput
+            });
+
+            await loadEvents();
+            initColorPalette();
+            initIconGrid();
+            renderCalendar();
+
+            prevMonthButton.addEventListener('click', () => {
+                currentDate.setMonth(currentDate.getMonth() - 1);
+                renderCalendar();
+            });
+
+            nextMonthButton.addEventListener('click', () => {
+                currentDate.setMonth(currentDate.getMonth() + 1);
+                renderCalendar();
+            });
+
+            todayButton.addEventListener('click', () => {
+                currentDate = new Date();
+                renderCalendar();
+            });
+
+            settingsButton.addEventListener('click', openSettingsModal);
+            saveEventButton.addEventListener('click', handleSaveEvent);
+            deleteEventButton.addEventListener('click', handleDeleteEvent);
+            cancelEventButton.addEventListener('click', closeEventModal);
+            saveSettingsButton.addEventListener('click', handleSaveSettings);
+            cancelSettingsButton.addEventListener('click', closeSettingsModal);
+            customFontUploadInput.addEventListener('change', handleFontUpload);
+            resetCustomFontButton.addEventListener('click', resetCustomFont);
+
+            iconSearchInput.addEventListener('input', (e) => {
+                initIconGrid(e.target.value);
+            });
+
+            uiRoundnessInput.addEventListener('input', (e) => {
+                const value = e.target.value;
+                uiRoundnessValueDisplay.textContent = `${value}px`;
+                uiRoundnessValueDisplay.style.fontSize = `${14 + (parseInt(value) / 24) * 8}px`; // Scale font size
+                document.documentElement.style.setProperty('--ui-roundness', `${value}px`);
+                document.documentElement.style.setProperty('--ui-roundness-lg', `${value * 1.5}px`);
+                document.getElementById('main-container').style.borderRadius = `${value * 1.5}px`;
+                document.querySelector('#event-modal .modal-content').style.borderRadius = `${value * 1.5}px`;
+                document.querySelector('#settings-modal .modal-content').style.borderRadius = `${value * 1.5}px`;
+            });
+
+            eventRoundnessInput.addEventListener('input', (e) => {
+                const value = e.target.value;
+                eventRoundnessValueDisplay.textContent = `${value}px`;
+                eventRoundnessValueDisplay.style.fontSize = `${14 + (parseInt(value) / 24) * 8}px`; // Scale font size
+                document.documentElement.style.setProperty('--event-item-roundness', `${value}px`);
+            });
+
+            eventBorderThicknessInput.addEventListener('input', (e) => {
+                const value = e.target.value;
+                eventBorderThicknessValueDisplay.textContent = `${value}px`;
+                eventBorderThicknessValueDisplay.style.fontSize = `${14 + (parseInt(value) / 5) * 4}px`; // Scale font size
+                document.documentElement.style.setProperty('--event-item-border-thickness', `${value}px`);
+            });
+
+            fontSizeInput.addEventListener('input', (e) => {
+                const value = e.target.value;
+                fontSizeValueDisplay.textContent = `${value}px`;
+                document.documentElement.style.setProperty('--base-font-size', `${value}px`);
+            });
+
+            darkModeToggle.addEventListener('change', async () => {
+                isDarkModeActive = darkModeToggle.checked;
+                applyTheme(getEffectiveTheme(currentBaseThemeKey, isDarkModeActive), {
+                    themeBodyBgInput, themeTextColorInput, themeHeaderBgInput, themeMainContainerBgInput,
+                    themeDayCellBgInput, themeDayCellHoverBgInput, themeCurrentDayBgInput,
+                    themePrimaryButtonBgInput, themePrimaryButtonTextInput,
+                    themeSecondaryButtonBgInput, themeSecondaryButtonTextInput,
+                    themeAccentColorInput, themeDayCellBorderColorInput
+                });
+                await saveSettings(currentCustomFontName, null, currentBaseThemeKey, isDarkModeActive,
+                             uiRoundnessInput.value, fontSizeInput.value,
+                             eventRoundnessInput.value, eventBorderThicknessInput.value, currentBaseTheme, areCustomColorPickersLocked, unlockedSpecialThemesKeys);
+            });
+
+            const updateThemeAndApply = async () => {
+                currentBaseThemeKey = null;
+                currentBaseTheme = getCustomThemeColorsFromInputs();
+
+                applyTheme(getEffectiveTheme(currentBaseThemeKey, isDarkModeActive), {
+                    themeBodyBgInput, themeTextColorInput, themeHeaderBgInput, themeMainContainerBgInput,
+                    themeDayCellBgInput, themeDayCellHoverBgInput, themeCurrentDayBgInput,
+                    themePrimaryButtonBgInput, themePrimaryButtonTextInput,
+                    themeSecondaryButtonBgInput, themeSecondaryButtonTextInput,
+                    themeAccentColorInput, themeDayCellBorderColorInput
+                });
+            };
+
+            themeBodyBgInput.addEventListener('input', updateThemeAndApply);
+            themeTextColorInput.addEventListener('input', updateThemeAndApply);
+            themeHeaderBgInput.addEventListener('input', updateThemeAndApply);
+            themeMainContainerBgInput.addEventListener('input', updateThemeAndApply);
+            themeDayCellBgInput.addEventListener('input', updateThemeAndApply);
+            themeDayCellHoverBgInput.addEventListener('input', updateThemeAndApply);
+            themeCurrentDayBgInput.addEventListener('input', updateThemeAndApply);
+            themePrimaryButtonBgInput.addEventListener('input', updateThemeAndApply);
+            themePrimaryButtonTextInput.addEventListener('input', updateThemeAndApply);
+            themeSecondaryButtonBgInput.addEventListener('input', updateThemeAndApply);
+            themeSecondaryButtonTextInput.addEventListener('input', updateThemeAndApply);
+            themeAccentColorInput.addEventListener('input', updateThemeAndApply);
+            themeDayCellBorderColorInput.addEventListener('input', updateThemeAndApply);
+
+            watchAdButton.addEventListener('click', handleWatchAd);
+
+            eventModal.addEventListener('click', (e) => {
+                if (e.target === eventModal) {
+                    closeEventModal();
+                }
+            });
+
+            settingsModal.addEventListener('click', (e) => {
+                if (e.target === settingsModal) {
+                    closeSettingsModal();
+                }
+            });
+
+            const isAndroid = /Android/i.test(navigator.userAgent);
+            if (isAndroid && screen.orientation && screen.orientation.lock) {
+                try {
+                    screen.orientation.lock('landscape').then(() => {
+                        console.log("Screen orientation locked to landscape.");
+                    }).catch((err) => {
+                        console.warn("Could not lock screen orientation:", err);
+                    });
+                } catch (err) {
+                    console.error("Error accessing screen.orientation.lock:", err);
+                }
+            } else if (isAndroid) {
+                console.log("Screen orientation lock API not available or not supported on this Android device.");
+            }
+        };
+    </script>
+</body>
+</html>
