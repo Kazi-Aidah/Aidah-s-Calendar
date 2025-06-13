@@ -12,6 +12,7 @@ A fully customizable, responsive monthly calendar with advanced event management
     * **Edit Events:** Modify existing event details.
     * **Delete Events:** Remove events from the calendar.
     * **Drag-and-Drop:** Move events between different dates on the calendar or reorder them within the same day by dragging and dropping.
+    * **Drag to Order Events:** For Events with NO TIME inputs, you can drag them above or below other Events!
 6. 🎨 **Customization Options (Settings Modal):**
 ![Image](https://github.com/user-attachments/assets/a89e7553-a869-47f7-8546-b344f76c7b32)
     * **Custom Font Upload:** Users can upload their own font files (`.ttf`, `.otf`, `.woff`, `.woff2`) to personalize the calendar's typography :D
