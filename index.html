@@ -13,10 +13,10 @@
             --ui-roundness: 8px;
             --ui-roundness-lg: calc(var(--ui-roundness) * 1.5);
             --ui-roundness-full: 9999px;
-            --event-item-border-thickness: 2px;
-            --event-item-roundness: 6px;
-            --day-cell-min-width: 175px;
-            --body-bg: #f0f2f5;
+            --event-item-border-thickness: 3px;
+            --event-item-roundness: 8px;
+            --day-cell-min-width: 140px;
+            --body-bg: #F8E8F0;
             --text-color: #4A4A4A;
             --header-bg: #ffffff;
             --primary-button-bg: #FFFFFF;
@@ -50,14 +50,14 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #111;
-            color: #4A4A4A;
+            background-color: var(--body-bg);
+            color: var(--text-color);
             transition: background-color 0.5s ease-in-out, color 0.5s ease-in-out;
             font-size: var(--base-font-size);
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            height: 100vh;
+            justify-content: center;
         }
 
         #watchAdButton {
@@ -114,276 +114,87 @@
             -webkit-overflow-scrolling: touch;
             padding-bottom: 0.5rem;
             margin-bottom: -0.5rem;
-            position: relative;
-            scrollbar-width: thin;
-            scrollbar-color: var(--accent-color) transparent;
         }
-
         .calendar-scroll-container::-webkit-scrollbar {
             width: 8px;
             height: 8px;
             background-color: transparent;
         }
-
         .calendar-scroll-container::-webkit-scrollbar-thumb {
             background-color: var(--accent-color);
             border-radius: var(--ui-roundness);
             border: 2px solid transparent;
         }
-
         .calendar-scroll-container::-webkit-scrollbar-thumb:hover {
             background-color: var(--primary-button-bg);
         }
-
-        .calendar-grid, .weekday-header {
-            display: grid;
-            grid-template-columns: repeat(7, minmax(var(--day-cell-min-width), 1fr));
-            gap: 8px;
-            padding: 8px;
-            width: 100%;
+        .calendar-scroll-container {
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-color) transparent;
         }
 
         .calendar-grid {
-            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(7, minmax(var(--day-cell-min-width), 1fr));
+            gap: 0.75rem;
+            min-width: calc(7 * var(--day-cell-min-width) + 6 * 0.75rem);
+            flex-shrink: 0;
         }
-
-        .weekday-header {
-            margin-bottom: 4px;
-            background-color: var(--main-container-bg);
-        }
-
-        .weekday-header > div {
-            text-align: center;
-            font-weight: bold;
-            text-transform: uppercase;
-            font-size: 0.875rem;
-            letter-spacing: 0.05em;
-            color: var(--text-color);
-            padding: 2px 0;
-        }
-
         .day-cell {
-            min-width: var(--day-cell-min-width);
-            width: 100%;
             min-height: 120px;
-            height: 100%;
+            transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out, transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
             border: 3px solid var(--day-cell-border-color);
             background-color: var(--day-cell-bg);
+            padding-bottom: 0.5rem;
             border-radius: var(--ui-roundness);
-            transition: background-color 0.2s ease;
-            position: relative;
-            cursor: default;
-            padding: 8px;
-            overflow: visible;
-            display: flex;
-            flex-direction: column;
         }
-
-        .day-number {
-            position: absolute;
-            top: 8px;
-            left: 12px;
-            font-weight: bold;
-            font-size: 1.1rem;
-            color: var(--text-color);
-            z-index: 3;
-            padding-bottom: 20px;
-        }
-
-        .events-container {
-            padding-top: 32px;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
         .day-cell:hover {
-            background-color: var(--day-cell-hover-bg);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            background-color: var(--day-cell-hover-bg-color);
         }
-
-        .day-cell.selected-range,
-        .day-cell.selecting {
-            background-color: var(--current-day-bg);
-            border-color: var(--current-day-border-color);
-        }
-
         .current-day {
             border: 3px solid var(--current-day-border-color);
             background-color: var(--current-day-bg);
         }
-
         .day-cell.drag-over {
             border: 3px dashed var(--drag-over-border-color);
             background-color: var(--day-cell-drag-bg);
         }
 
         .event-item {
-            margin: 2px 0;
-            padding: 4px 8px;
-            border-radius: var(--event-item-roundness);
-            border-width: var(--event-item-border-thickness);
-            border-style: solid;
-            font-size: 0.9em;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            transition: transform 0.2s ease-out, opacity 0.2s ease-out;
-        }
-
-        .event-item.no-transition {
-            transition: none !important;
-        }
-
-        /* Base spacing for all events */
-        .day-cell .event-item {
-            margin: 2px 0;
-        }
-
-        /* Multiday events positioning */
-        .day-cell .event-item.multi-day {
-            position: absolute;
-            left: 0;
-            right: 0;
-            z-index: 2;
-            margin: 0;
-        }
-
-        /* Position multiday events below day number */
-        .day-cell .event-item.multi-day:not(.has-description) {
-            top: 32px; /* Standard height below day number */
-            height: 28px; /* Standard height */
-        }
-
-        /* Taller multiday events (with description) */
-        .day-cell .event-item.multi-day.has-description {
-            top: 32px; /* Same starting position */
-            height: auto; /* Height grows with content */
-            min-height: 56px; /* Minimum height for description */
-        }
-
-        /* Events container padding - accounts for tallest possible multiday event */
-        .day-cell:has(.event-item.multi-day) .events-container {
-            padding-top: 90px; /* Enough space for multiday with description */
-        }
-
-        /* Normal events spacing - consistent whether after multiday or not */
-        .day-cell .event-item:not(.multi-day) {
-            margin-top: 4px;
-            position: relative; /* Ensure they stack below multiday */
-            z-index: 1;
-        }
-
-        .event-item.multi-day {
-            border-radius: 0;
-            border-left: none;
-            border-right: none;
-            padding: 0.5em 8px;
-            background-color: var(--accent-color);
-            color: white;
-        }
-
-        .event-item.multi-day.event-start,
-        .event-item.multi-day.event-end {
-            min-height: 2.5em;
-        }
-
-        .event-item.multi-day.event-middle {
-            height: 2.5em;
-            min-height: 2.5em;
-            border-radius: 0;
-            border-left: none;
-            border-right: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Hide title in all middle cells by default */
-        .event-item.multi-day.event-middle .title-part {
-            color: transparent;
-            user-select: none;
-        }
-
-        /* Show title only in the 4th column's middle cell */
-        .calendar-grid > .day-cell:nth-child(4) .event-item.multi-day.event-middle .title-part {
-            color: inherit;
-            user-select: auto;
-        }
-
-        .event-item.multi-day.event-start:has(.event-description),
-        .event-item.multi-day.event-end:has(.event-description) {
-            min-height: 4em;
-        }
-
-        .event-item.multi-day .event-content {
             display: flex;
             flex-direction: column;
-            gap: 0.25em;
-            width: 100%;
+            align-items: flex-start;
+            padding: 0.4rem 0.6rem;
+            padding-right: calc(0.6rem + 1.5rem);
+            font-size: 0.75em;
+            margin-bottom: 0.25rem;
+            cursor: grab;
+            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
             overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            user-select: none;
+            border-width: var(--event-item-border-thickness);
+            border-style: solid;
+            border-radius: var(--event-item-roundness);
+            position: relative;
         }
-
-        .event-item.multi-day .event-description {
-            font-size: 0.85em;
-            opacity: 0.9;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            line-height: 1.2;
-        }
-
-        .event-item.multi-day .event-icon-container {
-            margin-right: 4px;
-            display: inline-flex;
-            align-items: center;
-            padding-top: 4px;
-        }
-
-        .event-item.multi-day .time-title-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .event-item.multi-day.event-end {
-            border-top-right-radius: var(--event-item-roundness);
-            border-bottom-right-radius: var(--event-item-roundness);
-            border-bottom-left-radius: var(--event-item-roundness);
-            border-top-left-radius: 0;
-            border-right: var(--event-item-border-thickness) solid;
-            width: calc(100% + 16px);
-        }
-
-        .event-item.multi-day.event-start {
-            border-top-left-radius: var(--event-item-roundness);
-            border-bottom-left-radius: var(--event-item-roundness);
-            border-bottom-right-radius: var(--event-item-roundness);
-            border-top-right-radius: 0;
-            border-left: var(--event-item-border-thickness) solid;
-            width: calc(100% + 16px);
-        }
-
-        .event-item.multi-day.event-middle {
-            border-radius: 0;
-            border-left: none;
-            border-right: none;
-        }
-
         .event-item:hover {
             filter: brightness(1.05);
         }
-
         .event-item.dragging {
             opacity: 0.5;
             border: 2px dashed var(--drag-over-border-color);
         }
-
         .event-item.drop-target-top {
             border-top: 3px solid var(--accent-color);
         }
-
         .event-item.drop-target-bottom {
             border-bottom: 3px solid var(--accent-color);
         }
@@ -493,326 +304,29 @@
             inset: 0;
             background-image:
                 radial-gradient(circle at 10% 20%, var(--event-item-text-color-rgba-25) 1px, transparent 2px),
-                radial-gradient(circle at 30% 40%, var(--event-item-text-color-rgba-25) 1.5px, transparent 3px),
-                radial-gradient(circle at 50% 60%, var(--event-item-text-color-rgba-25) 2px, transparent 4px),
-                radial-gradient(circle at 70% 80%, var(--event-item-text-color-rgba-25) 1.8px, transparent 3.6px),
-                radial-gradient(circle at 90% 10%, var(--event-item-text-color-rgba-25) 2.2px, transparent 4.4px);
-            background-size: 100px 100px;
-            animation: glisten 3s ease-in-out infinite;
+                radial-gradient(circle at 70% 80%, var(--event-item-text-color-rgba-25) 1.2px, transparent 2.2px),
+                radial-gradient(circle at 40% 60%, var(--event-item-text-color-rgba-25) 0.8px, transparent 1.8px),
+                radial-gradient(circle at 90% 30%, var(--event-item-text-color-rgba-25) 1.1px, transparent 2.1px),
+                radial-gradient(circle at 25% 70%, var(--event-item-text-color-rgba-25) 0.9px, transparent 1.9px),
+                radial-gradient(circle at 60% 10%, var(--event-item-text-color-rgba-25) 1.3px, transparent 2.3px);
+            background-size: 50px 50px;
+            animation: twinkle 2s ease-in-out infinite alternate, twinkle-scale 3s ease-in-out infinite;
+            animation-delay: 0s, 1s;
             pointer-events: none;
         }
 
-        @keyframes glisten {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 0.8; }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.5; }
+            70% { opacity: 1; }
         }
 
-        .event-item.rainbow-border {
-            border-image: linear-gradient(
-                45deg,
-                #ff0000,
-                #ff7f00,
-                #ffff00,
-                #00ff00,
-                #0000ff,
-                #4b0082,
-                #8b00ff
-            ) 1;
-            animation: rainbow-border 3s linear infinite;
-        }
-
-        @keyframes rainbow-border {
-            0% { border-image-source: linear-gradient(45deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff); }
-            100% { border-image-source: linear-gradient(405deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff); }
-        }
-
-        .event-item.pulse {
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        .event-item.shake {
-            animation: shake 0.5s ease-in-out infinite;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-2px); }
-            75% { transform: translateX(2px); }
-        }
-
-        .event-item.bounce {
-            animation: bounce 1s ease-in-out infinite;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-3px); }
-        }
-
-        .event-item.rotate {
-            animation: rotate 2s linear infinite;
-        }
-
-        @keyframes rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .event-item.fade {
-            animation: fade 2s ease-in-out infinite;
-        }
-
-        @keyframes fade {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .event-item.slide {
-            animation: slide 2s ease-in-out infinite;
-        }
-
-        @keyframes slide {
-            0%, 100% { transform: translateX(0); }
-            50% { transform: translateX(5px); }
-        }
-
-        .event-item.zoom {
-            animation: zoom 2s ease-in-out infinite;
-        }
-
-        @keyframes zoom {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-
-        .event-item.flip {
-            animation: flip 2s ease-in-out infinite;
-            transform-style: preserve-3d;
-        }
-
-        @keyframes flip {
-            0% { transform: rotateY(0deg); }
-            100% { transform: rotateY(360deg); }
-        }
-
-        .event-item.wave {
-            animation: wave 2s ease-in-out infinite;
-        }
-
-        @keyframes wave {
-            0%, 100% { transform: skewX(0deg); }
-            50% { transform: skewX(5deg); }
-        }
-
-        .event-item.swing {
-            animation: swing 2s ease-in-out infinite;
-            transform-origin: top center;
-        }
-
-        @keyframes swing {
-            0%, 100% { transform: rotate(0deg); }
-            50% { transform: rotate(5deg); }
-        }
-
-        .event-item.wobble {
-            animation: wobble 2s ease-in-out infinite;
-        }
-
-        @keyframes wobble {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-3px) rotate(-2deg); }
-            75% { transform: translateX(3px) rotate(2deg); }
-        }
-
-        .event-item.tada {
-            animation: tada 2s ease-in-out infinite;
-        }
-
-        @keyframes tada {
+        @keyframes twinkle-scale {
             0% { transform: scale(1); }
-            10%, 20% { transform: scale(0.9) rotate(-3deg); }
-            30%, 50%, 70%, 90% { transform: scale(1.1) rotate(3deg); }
-            40%, 60%, 80% { transform: scale(1.1) rotate(-3deg); }
-            100% { transform: scale(1) rotate(0); }
-        }
-
-        .event-item.jello {
-            animation: jello 2s ease-in-out infinite;
-            transform-origin: center;
-        }
-
-        @keyframes jello {
-            0%, 100% { transform: scale3d(1, 1, 1); }
-            30% { transform: scale3d(1.25, 0.75, 1); }
-            40% { transform: scale3d(0.75, 1.25, 1); }
-            50% { transform: scale3d(1.15, 0.85, 1); }
-            65% { transform: scale3d(0.95, 1.05, 1); }
-            75% { transform: scale3d(1.05, 0.95, 1); }
-        }
-
-        .event-item.rubber-band {
-            animation: rubber-band 2s ease-in-out infinite;
-        }
-
-        @keyframes rubber-band {
-            0% { transform: scale(1); }
-            30% { transform: scaleX(1.25) scaleY(0.75); }
-            40% { transform: scaleX(0.75) scaleY(1.25); }
-            50% { transform: scaleX(1.15) scaleY(0.85); }
-            65% { transform: scaleX(0.95) scaleY(1.05); }
-            75% { transform: scaleX(1.05) scaleY(0.95); }
+            40% { transform: scale(0.95); }
+            60% { transform: scale(1); }
             100% { transform: scale(1); }
         }
 
-        .event-item.heartbeat {
-            animation: heartbeat 2s ease-in-out infinite;
-        }
-
-        @keyframes heartbeat {
-            0% { transform: scale(1); }
-            14% { transform: scale(1.3); }
-            28% { transform: scale(1); }
-            42% { transform: scale(1.3); }
-            70% { transform: scale(1); }
-        }
-
-        .event-item.flash {
-            animation: flash 2s ease-in-out infinite;
-        }
-
-        @keyframes flash {
-            0%, 50%, 100% { opacity: 1; }
-            25%, 75% { opacity: 0; }
-        }
-
-        .event-item.shake-x {
-            animation: shake-x 2s ease-in-out infinite;
-        }
-
-        @keyframes shake-x {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
-            20%, 40%, 60%, 80% { transform: translateX(2px); }
-        }
-
-        .event-item.shake-y {
-            animation: shake-y 2s ease-in-out infinite;
-        }
-
-        @keyframes shake-y {
-            0%, 100% { transform: translateY(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateY(-2px); }
-            20%, 40%, 60%, 80% { transform: translateY(2px); }
-        }
-
-        .event-item.head-shake {
-            animation: head-shake 2s ease-in-out infinite;
-        }
-
-        @keyframes head-shake {
-            0% { transform: translateX(0); }
-            6.5% { transform: translateX(-2px) rotateY(-9deg); }
-            18.5% { transform: translateX(2px) rotateY(7deg); }
-            31.5% { transform: translateX(-1px) rotateY(-5deg); }
-            43.5% { transform: translateX(1px) rotateY(3deg); }
-            50% { transform: translateX(0); }
-        }
-
-        .event-item.swing-x {
-            animation: swing-x 2s ease-in-out infinite;
-            transform-origin: center;
-        }
-
-        @keyframes swing-x {
-            20% { transform: rotate3d(0, 0, 1, 15deg); }
-            40% { transform: rotate3d(0, 0, 1, -10deg); }
-            60% { transform: rotate3d(0, 0, 1, 5deg); }
-            80% { transform: rotate3d(0, 0, 1, -5deg); }
-            100% { transform: rotate3d(0, 0, 1, 0deg); }
-        }
-
-        .event-item.swing-y {
-            animation: swing-y 2s ease-in-out infinite;
-            transform-origin: center;
-        }
-
-        @keyframes swing-y {
-            20% { transform: rotate3d(1, 0, 0, 15deg); }
-            40% { transform: rotate3d(1, 0, 0, -10deg); }
-            60% { transform: rotate3d(1, 0, 0, 5deg); }
-            80% { transform: rotate3d(1, 0, 0, -5deg); }
-            100% { transform: rotate3d(1, 0, 0, 0deg); }
-        }
-
-        .event-item.swing-z {
-            animation: swing-z 2s ease-in-out infinite;
-            transform-origin: center;
-        }
-
-        @keyframes swing-z {
-            20% { transform: rotate3d(0, 1, 0, 15deg); }
-            40% { transform: rotate3d(0, 1, 0, -10deg); }
-            60% { transform: rotate3d(0, 1, 0, 5deg); }
-            80% { transform: rotate3d(0, 1, 0, -5deg); }
-            100% { transform: rotate3d(0, 1, 0, 0deg); }
-        }
-
-        .event-item.swing-xy {
-            animation: swing-xy 2s ease-in-out infinite;
-            transform-origin: center;
-        }
-
-        @keyframes swing-xy {
-            20% { transform: rotate3d(1, 1, 0, 15deg); }
-            40% { transform: rotate3d(1, 1, 0, -10deg); }
-            60% { transform: rotate3d(1, 1, 0, 5deg); }
-            80% { transform: rotate3d(1, 1, 0, -5deg); }
-            100% { transform: rotate3d(1, 1, 0, 0deg); }
-        }
-
-        .event-item.swing-xz {
-            animation: swing-xz 2s ease-in-out infinite;
-            transform-origin: center;
-        }
-
-        @keyframes swing-xz {
-            20% { transform: rotate3d(1, 0, 1, 15deg); }
-            40% { transform: rotate3d(1, 0, 1, -10deg); }
-            60% { transform: rotate3d(1, 0, 1, 5deg); }
-            80% { transform: rotate3d(1, 0, 1, -5deg); }
-            100% { transform: rotate3d(1, 0, 1, 0deg); }
-        }
-
-        .event-item.swing-yz {
-            animation: swing-yz 2s ease-in-out infinite;
-            transform-origin: center;
-        }
-
-        @keyframes swing-yz {
-            20% { transform: rotate3d(0, 1, 1, 15deg); }
-            40% { transform: rotate3d(0, 1, 1, -10deg); }
-            60% { transform: rotate3d(0, 1, 1, 5deg); }
-            80% { transform: rotate3d(0, 1, 1, -5deg); }
-            100% { transform: rotate3d(0, 1, 1, 0deg); }
-        }
-
-        .event-item.swing-xyz {
-            animation: swing-xyz 2s ease-in-out infinite;
-            transform-origin: center;
-        }
-
-        @keyframes swing-xyz {
-            20% { transform: rotate3d(1, 1, 1, 15deg); }
-            40% { transform: rotate3d(1, 1, 1, -10deg); }
-            60% { transform: rotate3d(1, 1, 1, 5deg); }
-            80% { transform: rotate3d(1, 1, 1, -5deg); }
-            100% { transform: rotate3d(1, 1, 1, 0deg); }
-        }
 
         .event-item.gradient-effect::after {
             content: '';
@@ -868,99 +382,6 @@
             }
         }
 
-        .event-item.rainbow-vertical::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(
-                to bottom,
-                #ff0000,
-                #ff7f00,
-                #ffff00,
-                #00ff00,
-                #0000ff,
-                #4b0082,
-                #8b00ff,
-                #ff0000
-            );
-            background-size: 100% 700%;
-            animation: rainbow-vertical 10s linear infinite;
-            mix-blend-mode: overlay;
-            opacity: 0.7;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        @keyframes rainbow-vertical {
-            0% { background-position: 0% 0%; }
-            100% { background-position: 0% 700%; }
-        }
-
-        .event-item.svg-stars::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff'%3E%3Cpath d='M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z'/%3E%3C/svg%3E");
-            background-size: 20px 20px;
-            background-repeat: repeat;
-            opacity: 10%;
-            animation: 
-                stars-drift 30s linear infinite,
-                stars-twinkle 5s ease-in-out infinite alternate;
-            pointer-events: none;
-            z-index: 2;
-        }
-
-        @keyframes stars-drift {
-            0% {
-                background-position: 0% 0%;
-                transform: scale(1) rotate(0deg) translate(-5%, -5%);
-            }
-            100% {
-                background-position: 200% 200%;
-                transform: scale(1.05) rotate(2deg) translate(5%, 5%);
-            }
-        }
-
-        @keyframes stars-twinkle {
-            0%   { opacity: 0.1; filter: blur(0px); }
-            50%  { opacity: 0.3; filter: blur(0.3px); }
-            100% { opacity: 0.2; filter: blur(0.1px); }
-        }
-
-
-        .event-item.inner-glow::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(
-                circle at center,
-                var(--event-item-text-color-rgba-25) 0%,
-                transparent 60%
-            );
-            animation: inner-glow-pulse 3.5s ease-in-out infinite;
-            pointer-events: none;
-            z-index: 0;
-            border-radius: inherit;
-        }
-
-        @keyframes inner-glow-pulse {
-            0%, 100% {
-                opacity: 0.7;
-                transform: scale(0.94);
-                filter: blur(2px);
-            }
-            50% {
-                opacity: 0.4;
-                transform: scale(1.06);
-                filter: blur(1px);
-            }
-        }
-
-
-        .event-item {
-            transition: filter 0.5s ease, transform 0.5s ease;
-        }
 
         .event-item .main-content {
             display: flex;
@@ -981,14 +402,14 @@
             flex-grow: 1;
             min-width: 0;
             align-items: baseline;
-            gap: 0.25rem;
         }
         .event-item .text-content .time-title-wrapper .time-part {
             flex-shrink: 0;
             white-space: nowrap;
+            margin-right: 0.25rem;
         }
         .event-item .text-content .time-title-wrapper .title-part {
-            flex-grow: 8;
+            flex-grow: 1;
             white-space: normal;
             word-break: break-word;
             overflow: hidden;
@@ -998,7 +419,7 @@
         .event-item .event-icon-container {
             position: absolute;
             top: 0.1rem;
-            right: 0.2rem;
+            right: 0.6rem;
             z-index: 10;
             font-size: 1.25rem;
         }
@@ -1625,294 +1046,6 @@
             box-shadow: 0 0 0 2px rgba(var(--accent-color-rgb), 0.3);
         }
 
-        .event-item.multi-day.event-start:not(:has(.event-description)) {
-            border-top-right-radius: 0;
-            border-bottom-right-radius: 0;
-            border-bottom-left-radius: var(--event-item-roundness);
-            border-top-left-radius: var(--event-item-roundness);
-        }
-
-        .event-item.multi-day.event-end:not(:has(.event-description)) {
-            border-top-right-radius: var(--event-item-roundness);
-            border-bottom-right-radius: var(--event-item-roundness);
-            border-bottom-left-radius: 0;
-            border-top-left-radius: 0;
-        }
-
-        .day-cell:has(.event-item.multi-day:not(.has-description)) .event-item.multi-day.has-description {
-            top: 80px !important;
-        }
-
-        .event-content {
-          position: relative;
-        }
-        .event-icon-container {
-          position: absolute;
-          top: 0.1rem;
-          right: 0.6rem;
-          z-index: 10;
-          font-size: 1.25rem;
-          display: flex;
-          align-items: center;
-          height: 1.5em;
-        }
-        .time-title-wrapper {
-          padding-right: 2em;
-          display: block;
-          white-space: normal;
-          word-break: break-word;
-        }
-        .title-part {
-          display: block;
-          white-space: normal;
-          word-break: break-word;
-        }
-
-        .event-content {
-          position: relative;
-        }
-        .event-icon-container {
-          float: right;
-          margin-left: 0.5em;
-          margin-bottom: 0.1em;
-          height: 1.5em;
-          width: 1.5em;
-          display: block;
-          position: static;
-        }
-        .time-title-wrapper {
-          display: block;
-          white-space: normal;
-          word-break: break-word;
-          overflow: hidden;
-        }
-        .title-part {
-          display: inline;
-          white-space: normal;
-          word-break: break-word;
-        }
-        .time-title-wrapper::after {
-          content: '';
-          display: table;
-          clear: both;
-        }
-
-        .event-content {
-          position: relative;
-        }
-        .event-icon-container {
-          position: absolute;
-          top: 0.1em;
-          right: 0.6em;
-          height: 1.5em;
-          width: 1.5em;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        .time-title-wrapper {
-          padding-right: 2em;
-          display: block;
-          white-space: normal;
-          word-break: break-word;
-          overflow: hidden;
-        }
-        .title-part {
-          display: inline;
-          white-space: normal;
-          word-break: break-word;
-        }
-        .time-part {
-          white-space: nowrap;
-          display: inline;
-        }
-
-        .event-icon-container {
-          position: absolute;
-          top: 0.1em;
-          right: 0.2em;
-          height: 1.3em;
-          width: 1.3em;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        .time-title-wrapper {
-          padding-right: 1.4em;
-          display: block;
-          white-space: normal;
-          word-break: break-word;
-          overflow: hidden;
-        }
-
-        .glow-box {
-            width: 200px;
-            height: 200px;
-            background: #222;
-            border-radius: 12px;
-            box-shadow: inset 0 0 15px rgba(0, 255, 255, 0.3);
-            animation: innerGlowPulse 2s infinite ease-in-out;
-        }
-
-        @keyframes innerGlowPulse {
-            0% {
-                box-shadow: inset 0 0 10px rgba(0, 255, 255, 0.2);
-            }
-            50% {
-                box-shadow: inset 0 0 25px rgba(0, 255, 255, 0.6);
-            }
-            100% {
-                box-shadow: inset 0 0 10px rgba(0, 255, 255, 0.2);
-            }
-        }
-
-        .event-item.multi-day.event-middle {
-            height: 24px; /* Fixed height for middle segments */
-            min-height: 24px; /* Prevent content from expanding height */
-            padding: 0; /* Remove any internal spacing */
-            margin: 0; /* Remove any external spacing */
-            border-radius: 0;
-            border-left: none;
-            border-right: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Hide title in all middle cells by default */
-        .event-item.multi-day.event-middle .title-part {
-            color: transparent;
-            user-select: none;
-        }
-
-        /* Show title only in the 4th column's middle cell */
-        .calendar-grid > .day-cell:nth-child(4) .event-item.multi-day.event-middle .title-part {
-            color: inherit;
-            user-select: auto;
-        }
-
-        /* Ensure the container padding still accommodates the tallest multiday parts */
-        .day-cell:has(.event-item.multi-day) .events-container {
-            padding-top: 90px; /* Match your existing value */
-        }
-
-        .event-item.multi-day.event-start:has(.event-description),
-        .event-item.multi-day.event-end:has(.event-description) {
-            min-height: 4em;
-        }
-
-
-        /* Visually join the middle segments of multiday events */
-        .event-item.multi-day.event-middle {
-            border-radius: 0 !important;
-            border-left: none !important;
-            border-right: none !important;
-            margin-left: -1px;
-            margin-right: -1px;
-            z-index: 2;
-        }
-
-        
-
-        /* Start and end segments keep their rounded corners and borders */
-        .event-item.multi-day.event-start {
-            border-top-left-radius: var(--event-item-roundness);
-            border-bottom-left-radius: var(--event-item-roundness);
-            border-left: var(--event-item-border-thickness) solid;
-            margin-left: 0;
-        }
-        .event-item.multi-day.event-end {
-            border-top-right-radius: var(--event-item-roundness);
-            border-bottom-right-radius: var(--event-item-roundness);
-            border-right: var(--event-item-border-thickness) solid;
-            margin-right: 0;
-        }
-
-        /* Make middle nameless multiday events the same height as normal events */
-        .event-item.multi-day.event-middle {
-            height: 28px;
-            min-height: 0;
-            max-height: 28px;
-            padding: 0;
-            margin: 0;
-            overflow: hidden;
-            border-radius: 0 !important;
-            border-left: none !important;
-            border-right: none !important;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Only the space between middle segments and first normal event */
-        .day-cell .event-item.multi-day.event-middle + .event-item:not(.multi-day) {
-            margin-top: 8px; /* Your special spacing value */
-        }
-
-        /* Reset for all other cases to prevent unintended effects */
-        .day-cell .event-item:not(.multi-day) {
-            margin-top: 4px; /* Default spacing */
-        }
-
-        /* Force middle nameless multiday events to match normal event height */
-        .event-item.multi-day.event-middle {
-            height: 28px !important;
-            min-height: 0 !important;
-            max-height: 28px !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            overflow: hidden !important;
-            border-radius: 0 !important;
-            border-left: none !important;
-            border-right: none !important;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* --- FORCE OVERRIDE --- */
-        .calendar-grid {
-            gap: 8px !important;
-        }
-        .event-item.multi-day {
-            position: absolute !important;
-            left: -6px !important;
-            right: -6px !important;
-            width: auto !important;
-            z-index: 10 !important;
-        }
-        .event-item.multi-day.event-middle {
-            border-radius: 0 !important;
-            border-left: none !important;
-            border-right: none !important;
-            margin: 0 !important;
-            left: -10px !important;
-            right: -10px !important;
-            z-index: 10 !important;
-            height: 28px !important;
-            min-height: 0 !important;
-            max-height: 28px !important;
-            padding: 0 !important;
-            overflow: hidden !important;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Add bottom padding under the description in multiday events */
-        .event-item.multi-day .event-description {
-            padding-bottom: 6px !important;
-        }
-
-        /* Add extra bottom padding for placeholder start/end descriptions */
-        .event-item.multi-day .placeholder-description {
-            padding-bottom: 10px !important;
-        }
-
-        /* Add extra bottom padding for multiday events with no real description */
-        .event-item.multi-day.no-description {
-            padding-bottom: 50px !important;
-        }
     </style>
 </head>
 <body>
@@ -1944,14 +1077,15 @@
         </div>
 
         <div class="calendar-scroll-container">
-            <div class="weekday-header">
-                <div>Sun</div>
-                <div>Mon</div>
-                <div>Tue</div>
-                <div>Wed</div>
-                <div>Thu</div>
-                <div>Fri</div>
-                <div>Sat</div>
+            <div class="calendar-grid text-center font-bold text-sm uppercase tracking-wide mb-2"
+                 style="color: var(--text-color);">
+                <div class="p-2">Sun</div>
+                <div class="p-2">Mon</div>
+                <div class="p-2">Tue</div>
+                <div class="p-2">Wed</div>
+                <div class="p-2">Thu</div>
+                <div class="p-2">Fri</div>
+                <div class="p-2">Sat</div>
             </div>
 
             <div id="calendar" class="calendar-grid">
@@ -1964,7 +1098,7 @@
             <h3 id="modal-title" class="text-2xl font-bold mb-4" style="color: var(--text-color);">Add New Event</h3>
             <div class="modal-content-scrollable">
                 <div class="mb-4">
-                    <label for="eventTitle" class="block text-sm font-medium text-gray-700 mb-1" style="color: var(--text-color);">Event Icon & Title</label>
+                    <label for="eventTitle" class="block text-sm font-medium text-gray-700 mb-1" style="color: var(--text-color);"> Event Icon & Title</label>
                     <div class="flex items-center space-x-2">
                         <div id="eventIconDisplay" class="event-icon-display">
                             <i class="fas fa-plus"></i> 
@@ -1973,7 +1107,7 @@
                     </div>
                 </div>
 
-                <div id="singleDayFields" class="mb-4 flex space-x-4">
+                <div class="mb-4 flex space-x-4">
                     <div class="w-1/2">
                         <label for="eventTime" class="block text-sm font-medium text-gray-700 mb-1" style="color: var(--text-color);">Time (Optional)</label>
                         <input type="time" id="eventTime" class="w-full p-3 focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200">
@@ -1981,35 +1115,6 @@
                     <div class="w-1/2">
                         <label for="eventDate" class="block text-sm font-medium text-gray-700 mb-1" style="color: var(--text-color);">Date</label>
                         <input type="date" id="eventDate" class="w-full p-3 focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200">
-                    </div>
-                </div>
-
-                <div id="multiDayFields" class="mb-4 hidden">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label for="eventStartDate" class="block text-sm font-medium text-gray-700 mb-1" style="color: var(--text-color);">Start Date</label>
-                            <input type="date" id="eventStartDate" class="w-full p-3 focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200">
-                        </div>
-                        <div>
-                            <label for="eventStartTime" class="block text-sm font-medium text-gray-700 mb-1" style="color: var(--text-color);">Start Time (Optional)</label>
-                            <input type="time" id="eventStartTime" class="w-full p-3 focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200">
-                        </div>
-                        <div>
-                            <label for="eventEndDate" class="block text-sm font-medium text-gray-700 mb-1" style="color: var(--text-color);">End Date</label>
-                            <input type="date" id="eventEndDate" class="w-full p-3 focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200">
-                        </div>
-                        <div>
-                            <label for="eventEndTime" class="block text-sm font-medium text-gray-700 mb-1" style="color: var(--text-color);">End Time (Optional)</label>
-                            <input type="time" id="eventEndTime" class="w-full p-3 focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200">
-                        </div>
-                    </div>
-                    <div class="mt-4">
-                        <label for="eventStartDescription" class="block text-sm font-medium text-gray-700 mb-1" style="color: var(--text-color);">Start Description (Optional)</label>
-                        <textarea id="eventStartDescription" class="w-full p-3 focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200 h-24 resize-y"></textarea>
-                    </div>
-                    <div class="mt-4">
-                        <label for="eventEndDescription" class="block text-sm font-medium text-gray-700 mb-1" style="color: var(--text-color);">End Description (Optional)</label>
-                        <textarea id="eventEndDescription" class="w-full p-3 focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200 h-24 resize-y"></textarea>
                     </div>
                 </div>
 
@@ -2065,18 +1170,6 @@
                         <label class="toggle-container">
                             <input type="checkbox" id="effectGradient">
                             <span class="toggle-label">Animated Gradient</span>
-                        </label>
-                        <label class="toggle-container">
-                            <input type="checkbox" id="effectRainbowVertical">
-                            <span class="toggle-label">Rainbow Vertical</span>
-                        </label>
-                        <label class="toggle-container">
-                            <input type="checkbox" id="effectSvgStars">
-                            <span class="toggle-label">Moving Stars</span>
-                        </label>
-                        <label class="toggle-container">
-                            <input type="checkbox" id="effectInnerGlow">
-                            <span class="toggle-label">Inner Glow</span>
                         </label>
                     </div>
                 </div>
@@ -2149,10 +1242,6 @@
                 <div class="mb-6">
                     <h4 class="h4-settings">Application Settings</h4>
                     <div class="toggle-container">
-                        <input type="checkbox" id="timeFormatToggle">
-                        <label for="timeFormatToggle" class="toggle-label">Use 24-hour time format</label>
-                    </div>
-                    <div class="toggle-container">
                         <input type="checkbox" id="forceLandscapeToggle">
                         <label for="forceLandscapeToggle" class="toggle-label">Force Landscape Mode (Android Only)</label>
                     </div>
@@ -2169,7 +1258,7 @@
                     </div>
 
                     <div class="mb-4">
-                        <h4 class="h4-settings">Special Themes</h4>
+                        <h4 class="h4-settings">Special Themes (Watch ad to unlock)</h4>
                         <div id="specialThemeBoxes" class="flex flex-wrap gap-3 mt-2 justify-center">
                             </div>
                     </div>
@@ -2291,13 +1380,6 @@
         let editingEventId = null;
         let currentCustomFontName = null;
         let draggedEventId = null;
-        let isDraggingSelection = false;
-        let selectionStartDate = null;
-        let selectionEndDate = null;
-        let longPressTimer = null;
-        let selectionDelayTimer = null;
-        const LONG_PRESS_DURATION = 500;
-        const SELECTION_DELAY = 100;
         const MAX_SAVED_THEMES = 5;
 
         const DEFAULT_FONT_FAMILY = 'Inter, sans-serif';
@@ -2390,7 +1472,6 @@
             const luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
             return luminance > 0.5;
         };
-        
 
         const DEFAULT_LIGHT_THEME = {
             name: "Default Light",
@@ -3127,7 +2208,55 @@ const initColorPalette = () => {
             'fas fa-satellite', 'fas fa-globe-americas', 'fas fa-flask', 'fas fa-magnet',
             'fas fa-bug', 'fas fa-seedling', 'fas fa-leaf', 'fas fa-concierge-bell', 'fas fa-hotel', 'fas fa-bed',
             'fas fa-person-walking', 'fas fa-running', 'fas fa-biking', 'fas fa-swimmer',
-            'fas fa-chart-line', 'fas fa-mug-hot', 'fas fa-pizza-slice', 'fas fa-plane-departure', 'fas fa-school', 'fas fa-hospital-user', 'far fa-closed-captioning', 'fab fa-money-bill', 'fas fa-'
+            'fas fa-chart-line', 'fas fa-mug-hot', 'fas fa-pizza-slice', 'fas fa-plane-departure', 'fas fa-school', 'fas fa-hospital-user', 'far fa-closed-captioning', 'fab fa-money-bill', 
+            'fas fa-clipboard', 'fas fa-clipboard-list', 'fas fa-clipboard-check',
+            'fas fa-birthday-cake', 'fas fa-candy-cane', 'fas fa-cookie', 'fas fa-ice-cream',
+            'fas fa-beer', 'fas fa-cocktail', 'fas fa-wine-glass-alt',
+            'fas fa-whiskey-glass', 'fas fa-champagne-glasses', 'fas fa-basketball-ball',
+            'fas fa-football-ball', 'fas fa-baseball-ball', 'fas fa-hockey-puck',
+            'fas fa-table-tennis', 'fas fa-volleyball-ball', 'fas fa-swimming-pool',
+            'fas fa-skiing', 'fas fa-snowboarding', 'fas fa-campground',
+            'fas fa-binoculars', 'fas fa-camera-retro', 'fas fa-video-slash',
+            'fas fa-headset', 'fas fa-keyboard', 'fas fa-mouse', 'fas fa-print',
+            'fas fa-fax', 'fas fa-sd-card', 'fas fa-sim-card',
+            'fas fa-ethernet', 'fas fa-hdd', 'fas fa-memory',
+            'fas fa-barcode', 'fas fa-qrcode', 'fas fa-satellite-dish',
+            'fas fa-stopwatch', 'fas fa-calendar-plus',
+            'fas fa-calendar-minus', 'fas fa-calendar-times', 'fas fa-calendar-check',
+            'fas fa-business-time', 'fas fa-piggy-bank', 'fas fa-wallet',
+            'fas fa-money-bill-wave', 'fas fa-coins', 'fas fa-ring',
+            'fas fa-tshirt', 'fas fa-hat-cowboy', 'fas fa-socks', 'fas fa-shoe-prints',
+            'fas fa-umbrella-beach', 'fas fa-bath', 'fas fa-shower',
+            'fas fa-toilet', 'fas fa-sink', 'fas fa-couch', 'fas fa-chair',
+            'fas fa-door-open', 'fas fa-traffic-light', 'fas fa-car-battery', 'fas fa-gas-pump',
+            'fas fa-screwdriver', 'fas fa-toolbox', 'fas fa-ruler', 'fas fa-tape',
+            'fas fa-paint-roller', 'fas fa-pencil-ruler', 'fas fa-stamp',
+            'fas fa-paperclip', 'fas fa-scissors', 'fas fa-calculator',
+            'fas fa-chalkboard', 'fas fa-atlas', 'fas fa-map-marked',
+            'fas fa-map-marked-alt', 'fas fa-vials',
+            'fas fa-prescription', 'fas fa-thermometer', 'fas fa-crutch',
+            'fas fa-wheelchair', 'fas fa-procedures', 'fas fa-virus',
+            'fas fa-virus-slash', 'fas fa-filter', 'fas fa-funnel-dollar',
+            'fas fa-trash-restore', 'fas fa-trash-restore-alt', 'fas fa-broom',
+            'fas fa-spray-can', 'fas fa-hand-sparkles', 'fas fa-hand-holding-water',
+            'fas fa-hand-holding-medical', 'fas fa-peace',
+            'fas fa-pray', 'fas fa-om', 'fas fa-yin-yang', 'fas fa-star-and-crescent',
+            'fas fa-cross', 'fas fa-church', 'fas fa-mosque', 'fas fa-synagogue',
+            'fas fa-torah', 'fas fa-bible', 'fas fa-quran', 'fas fa-place-of-worship',
+            'fas fa-ankh', 'fas fa-hamsa', 'fas fa-kaaba', 'fas fa-jedi',
+            'fas fa-journal-whills', 'fas fa-pastafarianism', 'fas fa-pen-fancy',
+            'fas fa-feather', 'fas fa-scroll', 'fas fa-chess', 'fas fa-chess-king',
+            'fas fa-chess-queen', 'fas fa-chess-pawn', 'fas fa-chess-bishop',
+            'fas fa-chess-knight', 'fas fa-chess-rook', 'fas fa-dice-d20',
+            'fas fa-dice-d6', 'fas fa-dice-five',
+            'fas fa-head-side-virus', 'fas fa-mask', 'fas fa-theater-masks',
+            'fas fa-hat-wizard', 'fas fa-dragon', 'fas fa-horse-head',
+            'fas fa-kiwi-bird', 'fas fa-otter', 'fas fa-hippo', 'fas fa-crow',
+            'fas fa-pepper-hot', 'fas fa-tractor', 'fas fa-truck-pickup', 'fas fa-icicles', 'fas fa-smog', 'fas fa-meteor',
+            'fas fa-shuttle-space', 'fas fa-user-astronaut', 'fas fa-cloud-moon-rain',
+            'fas fa-cloud-showers-heavy', 'fas fa-cloud-sun-rain',
+            'fas fa-temperature-high', 'fas fa-temperature-low',
+            'fas fa-spa',
         ];
 
         const initIconGrid = (filterText = '') => {
@@ -3512,30 +2641,30 @@ const initColorPalette = () => {
                 dayCell.dataset.date = fullDate;
 
                 const dayNumber = document.createElement('div');
-                dayNumber.classList.add('day-number');
+                dayNumber.classList.add('text-right', 'font-bold', 'text-lg', 'mb-2');
                 dayNumber.textContent = day;
                 dayNumber.style.color = `var(--text-color)`;
                 dayCell.appendChild(dayNumber);
-
-                const eventsContainer = document.createElement('div');
-                eventsContainer.classList.add('events-container');
 
                 const today = new Date();
                 if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
                     dayCell.classList.add('current-day');
                 }
 
-                if (selectionStartDate && selectionEndDate) {
-                    const cellDate = new Date(fullDate);
-                    if (cellDate >= selectionStartDate && cellDate <= selectionEndDate) {
-                        dayCell.classList.add('selected-range');
-                    }
-                }
-
                 const dayEvents = events.filter(event => {
                     const eventDate = new Date(event.date);
-                    const eventEndDate = event.endDate ? new Date(event.endDate) : eventDate;
-                    return (eventDate <= new Date(fullDate) && eventEndDate >= new Date(fullDate));
+                    return eventDate.getDate() === day &&
+                           eventDate.getMonth() === month &&
+                           eventDate.getFullYear() === year;
+                });
+
+                dayEvents.sort((a, b) => {
+                    if (a.time && b.time) {
+                        return a.time.localeCompare(b.time);
+                    }
+                    if (a.time) return -1;
+                    if (b.time) return 1;
+                    return 0;
                 });
 
                 dayEvents.forEach(event => {
@@ -3557,322 +2686,38 @@ const initColorPalette = () => {
                     const textColorRgba25 = hexToRgba(eventColorData.text, 0.25);
                     eventItem.style.setProperty('--event-item-text-color-rgba-25', textColorRgba25);
 
-                    if (event.description) {
-                        eventItem.classList.add('has-description');
-                    }
 
                     eventItem.classList.add('event-item');
                     eventItem.dataset.id = event.id;
                     eventItem.title = `${event.title} ${event.time ? '(' + event.time + ')' : ''}${event.description ? ' - ' + event.description : ''}`;
+                    eventItem.setAttribute('draggable', 'true');
 
                     if (event.effects) {
-                        const effectClasses = {
-                            glowing: 'glowing',
-                            striped: 'striped-effect',
-                            dotted: 'dotted-effect',
-                            particles: 'particles',
-                            snowFalling: 'snow-falling',
-                            glisteningStars: 'glistening-stars',
-                            gradientEffect: 'gradient-effect',
-                            animatedStripes: 'animated-stripes',
-                            rainbowVertical: 'rainbow-vertical',
-                            svgStars: 'svg-stars',
-                            innerGlow: 'inner-glow'
-                        };
-                        Object.entries(event.effects).forEach(([effectName, isActive]) => {
-                            if (isActive && effectClasses[effectName]) {
-                                eventItem.classList.add(effectClasses[effectName]);
-                            }
-                        });
+                        if (event.effects.glowing) eventItem.classList.add('glowing');
+                        if (event.effects.striped) eventItem.classList.add('striped-effect');
+                        if (event.effects.dotted) eventItem.classList.add('dotted-effect');
+                        if (event.effects.particles) eventItem.classList.add('particles');
+                        if (event.effects.snowFalling) eventItem.classList.add('snow-falling');
+                        if (event.effects.glisteningStars) eventItem.classList.add('glistening-stars');
+                        if (event.effects.gradientEffect) eventItem.classList.add('gradient-effect');
+                        if (event.effects.animatedStripes) eventItem.classList.add('animated-stripes');
                     }
-                    
-                    // drag and drop
-                    let isDragging = false;
-                    let dragStartX = 0;
-                    let dragStartY = 0;
-                    let originalParent = null;
-                    let dragGhost = null;
 
-                    eventItem.addEventListener('mousedown', (e) => {
-                        if (e.button === 0) { // Left mouse button only
-                            e.stopPropagation();
-                            e.preventDefault();
-                            
-                            // drag detection
-                            const dragThreshold = 5;
-                            let hasMoved = false;
-                            
-                            isDragging = true;
-                            dragStartX = e.clientX;
-                            dragStartY = e.clientY;
-                            originalParent = eventItem.parentElement;
-                            
-                            // ghost event
-                            dragGhost = eventItem.cloneNode(true);
-                            dragGhost.style.position = 'fixed';
-                            dragGhost.style.zIndex = '1000';
-                            dragGhost.style.opacity = '0.7';
-                            dragGhost.style.pointerEvents = 'none';
-                            dragGhost.style.width = eventItem.offsetWidth + 'px';
-                            dragGhost.style.height = eventItem.offsetHeight + 'px';
-                            
-                            // original event pos = ghost event pos
-                            const rect = eventItem.getBoundingClientRect();
-                            dragGhost.style.left = rect.left + 'px';
-                            dragGhost.style.top = rect.top + 'px';
-                            
-                            document.body.appendChild(dragGhost);
-                            
-                            eventItem.classList.add('dragging');
-                            
-                            const handleMouseMove = (e) => {
-                                if (!isDragging) return;
-                                
-                                const deltaX = Math.abs(e.clientX - dragStartX);
-                                const deltaY = Math.abs(e.clientY - dragStartY);
-                                
-                                if (!hasMoved && (deltaX > dragThreshold || deltaY > dragThreshold)) {
-                                    hasMoved = true;
-                                }
-                                
-                                if (hasMoved) {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    
-                                    dragGhost.style.left = (e.clientX - dragStartX + rect.left) + 'px';
-                                    dragGhost.style.top = (e.clientY - dragStartY + rect.top) + 'px';
-                                    
-                                    const elementsUnderMouse = document.elementsFromPoint(e.clientX, e.clientY);
-                                    const dayCell = elementsUnderMouse.find(el => el.classList.contains('day-cell'));
-                                    
-                                    document.querySelectorAll('.day-cell.drag-over').forEach(cell => {
-                                        cell.classList.remove('drag-over');
-                                    });
-                                    
-                                    if (dayCell && dayCell !== originalParent) {
-                                        dayCell.classList.add('drag-over');
-                                    }
-                                }
-                            };
-                            
-                            const handleMouseUp = (e) => {
-                                if (!isDragging) return;
-                                
-                                if (hasMoved) {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    
-                                    const elementsUnderMouse = document.elementsFromPoint(e.clientX, e.clientY);
-                                    const dayCell = elementsUnderMouse.find(el => el.classList.contains('day-cell'));
-                                    
-                                    if (dayCell && dayCell !== originalParent) {
-                                        const eventIndex = events.findIndex(ev => ev.id === event.id);
-                                        if (eventIndex !== -1) {
-                                            const eventToUpdate = events[eventIndex];
-                                            eventToUpdate.date = dayCell.dataset.date;
-                                            if (eventToUpdate.endDate) {
-                                                const duration = new Date(eventToUpdate.endDate) - new Date(eventToUpdate.date);
-                                                eventToUpdate.endDate = new Date(new Date(eventToUpdate.date).getTime() + duration).toISOString().split('T')[0];
-                                            }
-                                            saveEvents();
-                                            renderCalendar();
-                                        }
-                                    }
-                                }
-                                
-                                isDragging = false;
-                                eventItem.classList.remove('dragging');
-                                document.querySelectorAll('.day-cell.drag-over').forEach(cell => {
-                                    cell.classList.remove('drag-over');
-                                });
-                                if (dragGhost) {
-                                    dragGhost.remove();
-                                    dragGhost = null;
-                                }
-                                
-                                document.removeEventListener('mousemove', handleMouseMove);
-                                document.removeEventListener('mouseup', handleMouseUp);
-                            };
-                            
-                            document.addEventListener('mousemove', handleMouseMove);
-                            document.addEventListener('mouseup', handleMouseUp);
-                        }
-                    });
 
-                    eventItem.addEventListener('click', (e) => {
-                        if (!isDragging && !isDraggingEvent) {
-                            e.stopPropagation();
-                            e.preventDefault();
-                            const eventId = eventItem.dataset.id;
-                            if (eventId) {
-                                openEventModal(eventId);
-                            }
-                        }
-                    });
-
-                    dayCell.addEventListener('mousedown', (e) => {
-                        if (e.target.closest('.event-item')) {
-                            e.stopPropagation();
-                            e.preventDefault();
-                        }
-                    });
-
-                    if (event.endDate) {
-                        const eventStartDate = new Date(event.date);
-                        const eventEndDate = new Date(event.endDate);
-                        const cellDate = new Date(fullDate);
-                        
-                        eventItem.classList.add('multi-day');
-                        
-                        const startRow = Math.floor((eventStartDate.getDate() - 1) / 7);
-                        const currentRow = Math.floor((cellDate.getDate() - 1) / 7);
-                        const endRow = Math.floor((eventEndDate.getDate() - 1) / 7);
-
-                        if (cellDate.getTime() === eventStartDate.getTime()) {
-                            eventItem.classList.add('event-start');
-                        } else if (cellDate.getTime() === eventEndDate.getTime()) {
-                            eventItem.classList.add('event-end');
-                        } else {
-                            eventItem.classList.add('event-middle');
-                        }
-                        
-                        const mainContentDiv = document.createElement('div');
-                        mainContentDiv.classList.add('event-content');
-                        mainContentDiv.style.overflow = 'hidden';
-                        mainContentDiv.style.textOverflow = 'ellipsis';
-                        mainContentDiv.style.whiteSpace = 'nowrap';
-
-                        const totalDays = Math.ceil((eventEndDate - eventStartDate) / (1000 * 60 * 60 * 24)) + 1;
-                        const currentDayIndex = Math.ceil((cellDate - eventStartDate) / (1000 * 60 * 60 * 24));
-                        const isMiddleDay = currentDayIndex === Math.ceil(totalDays / 2);
-
-                        const hasStartOrEndInRow = dayEvents.some(e => {
-                            if (!e.endDate) return false;
-                            const eStartDate = new Date(e.date);
-                            const eEndDate = new Date(e.endDate);
-                            const eStartRow = Math.floor((eStartDate.getDate() - 1) / 7);
-                            const eEndRow = Math.floor((eEndDate.getDate() - 1) / 7);
-                            return (eStartRow === currentRow || eEndRow === currentRow);
-                        });
-
-                        if (cellDate.getTime() === eventStartDate.getTime()) {
-                            if (event.icon) {
-                                const iconContainer = document.createElement('span');
-                                iconContainer.classList.add('event-icon-container');
-                                iconContainer.innerHTML = `<i class="${event.icon}"></i>`;
-                                mainContentDiv.appendChild(iconContainer);
-                            }
-
-                            const timeTitleWrapper = document.createElement('div');
-                            timeTitleWrapper.classList.add('time-title-wrapper');
-
-                            if (event.time) {
-                                const timePart = document.createElement('span');
-                                timePart.classList.add('time-part');
-                                const use24Hour = document.getElementById('timeFormatToggle').checked;
-                                timePart.setAttribute('data-original-time', event.time);
-                                timePart.textContent = formatTime(event.time, use24Hour);
-                                timeTitleWrapper.appendChild(timePart);
-                            }
-
-                            const titlePart = document.createElement('span');
-                            titlePart.classList.add('title-part');
-                            titlePart.textContent = event.title;
-                            timeTitleWrapper.appendChild(titlePart);
-
-                            mainContentDiv.appendChild(timeTitleWrapper);
-                            
-                            if (event.startDescription) {
-                                const descDiv = document.createElement('div');
-                                descDiv.classList.add('event-description');
-                                descDiv.textContent = event.startDescription;
-                                mainContentDiv.appendChild(descDiv);
-                                eventItem.classList.add('has-description');
-                            } else {
-                                const descDiv = document.createElement('div');
-                                descDiv.classList.add('event-description', 'placeholder-description');
-                                descDiv.textContent = 'starting day';
-                                mainContentDiv.appendChild(descDiv);
-                                eventItem.classList.add('no-description');
-                            }
-                        } else if (cellDate.getTime() === eventEndDate.getTime()) {
-                            if (event.icon) {
-                                const iconContainer = document.createElement('span');
-                                iconContainer.classList.add('event-icon-container');
-                                iconContainer.innerHTML = `<i class="${event.icon}"></i>`;
-                                mainContentDiv.appendChild(iconContainer);
-                            }
-
-                            const timeTitleWrapper = document.createElement('div');
-                            timeTitleWrapper.classList.add('time-title-wrapper');
-
-                            if (event.endTime) {
-                                const timePart = document.createElement('span');
-                                timePart.classList.add('time-part');
-                                const use24Hour = document.getElementById('timeFormatToggle').checked;
-                                timePart.setAttribute('data-original-time', event.endTime);
-                                timePart.textContent = formatTime(event.endTime, use24Hour);
-                                timeTitleWrapper.appendChild(timePart);
-                            }
-
-                            const titlePart = document.createElement('span');
-                            titlePart.classList.add('title-part');
-                            titlePart.textContent = event.title;
-                            timeTitleWrapper.appendChild(titlePart);
-
-                            mainContentDiv.appendChild(timeTitleWrapper);
-                            
-                            if (event.endDescription) {
-                                const descDiv = document.createElement('div');
-                                descDiv.classList.add('event-description');
-                                descDiv.textContent = event.endDescription;
-                                mainContentDiv.appendChild(descDiv);
-                                eventItem.classList.add('has-description');
-                            } else {
-                                const descDiv = document.createElement('div');
-                                descDiv.classList.add('event-description', 'placeholder-description');
-                                descDiv.textContent = 'ending day';
-                                mainContentDiv.appendChild(descDiv);
-                                eventItem.classList.add('no-description');
-                            }
-                        } else if (isMiddleDay && !hasStartOrEndInRow) {
-                            // For middle days, show title on Wednesday (day 3) of each week
-                            const dayOfWeek = cellDate.getDay(); // 0 = Sunday, 3 = Wednesday
-                            if (dayOfWeek === 3) {
-                                const titlePart = document.createElement('span');
-                                titlePart.classList.add('title-part');
-                                titlePart.style.textAlign = 'center';
-                                titlePart.style.display = 'block';
-                                titlePart.style.width = '100%';
-                                titlePart.textContent = event.title;
-                                mainContentDiv.appendChild(titlePart);
-                            }
-                        }
-                        // For other middle days, no content is added
-
-                        eventItem.appendChild(mainContentDiv);
-                    } else {
-                        // !!!Single day event - show content as before
                     const mainContentDiv = document.createElement('div');
-                    mainContentDiv.classList.add('event-content');
+                    mainContentDiv.classList.add('main-content');
 
                     const textContentSpan = document.createElement('span');
-                    textContentSpan.classList.add('event-text-content');
+                    textContentSpan.classList.add('text-content');
 
-                    const timeTitleWrapper = document.createElement('div');
+                    const timeTitleWrapper = document.createElement('span');
                     timeTitleWrapper.classList.add('time-title-wrapper');
 
                     if (event.time) {
                         const timePart = document.createElement('span');
                         timePart.classList.add('font-semibold', 'time-part');
-                        const use24Hour = document.getElementById('timeFormatToggle').checked;
-                        timePart.setAttribute('data-original-time', event.time);
-                        timePart.textContent = formatTime(event.time, use24Hour);
+                        timePart.textContent = event.time;
                         timeTitleWrapper.appendChild(timePart);
-                        
-                        const spaceSpan = document.createElement('span');
-                        spaceSpan.innerHTML = '&nbsp;';
-                        timeTitleWrapper.appendChild(spaceSpan);
                     }
                     const titlePart = document.createElement('span');
                     titlePart.classList.add('title-part');
@@ -3890,182 +2735,168 @@ const initColorPalette = () => {
                     }
                     eventItem.appendChild(mainContentDiv);
 
+
                     if (event.description) {
                         const eventDescriptionEl = document.createElement('div');
                         eventDescriptionEl.classList.add('event-description');
                         eventDescriptionEl.style.color = adjustColor(eventColorData.text, 0.15);
                         eventDescriptionEl.textContent = event.description;
                         eventItem.appendChild(eventDescriptionEl);
-                        }
                     }
 
-                    dayCell.addEventListener('dragover', (e) => {
-                        e.preventDefault();
-                        dayCell.classList.add('drag-over');
+                    eventItem.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        openEventModal(event.id);
                     });
 
-                    dayCell.addEventListener('dragleave', (e) => {
-                        dayCell.classList.remove('drag-over');
+                    eventItem.addEventListener('dragstart', (e) => {
+                        draggedEventId = event.id;
+                        e.dataTransfer.setData('text/plain', event.id);
+                        setTimeout(() => {
+                            eventItem.classList.add('dragging');
+                        }, 0);
                     });
 
-                    dayCell.addEventListener('drop', (e) => {
+                    eventItem.addEventListener('dragend', () => {
+                        draggedEventId = null;
+                        eventItem.classList.remove('dragging');
+                        document.querySelectorAll('.event-item').forEach(item => item.classList.remove('drop-target-top', 'drop-target-bottom'));
+                        document.querySelectorAll('.day-cell').forEach(cell => cell.classList.remove('drag-over'));
+                    });
+
+                    eventItem.addEventListener('dragover', (e) => {
                         e.preventDefault();
-                        dayCell.classList.remove('drag-over');
+                        e.stopPropagation();
+                        const rect = eventItem.getBoundingClientRect();
+                        const y = e.clientY - rect.top;
+                        if (y < rect.height / 2) {
+                            eventItem.classList.add('drop-target-top');
+                            eventItem.classList.remove('drop-target-bottom');
+                        } else {
+                            eventItem.classList.add('drop-target-bottom');
+                            eventItem.classList.remove('drop-target-top');
+                        }
+                    });
+
+                    eventItem.addEventListener('dragleave', (e) => {
+                        e.stopPropagation();
+                        eventItem.classList.remove('drop-target-top', 'drop-target-bottom');
+                    });
+
+                    eventItem.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        eventItem.classList.remove('drop-target-top', 'drop-target-bottom');
 
                         const droppedEventId = e.dataTransfer.getData('text/plain');
-                        console.log('Dropped event:', droppedEventId);
-                        
-                        if (droppedEventId) {
-                            const eventIndex = events.findIndex(event => event.id === droppedEventId);
-                            if (eventIndex !== -1) {
-                                const event = events[eventIndex];
-                                event.date = dayCell.dataset.date;
-                                if (event.endDate) {
-                                    const duration = new Date(event.endDate) - new Date(event.date);
-                                    event.endDate = new Date(new Date(event.date).getTime() + duration).toISOString().split('T')[0];
+                        if (!droppedEventId || droppedEventId === event.id) return;
+
+                        const draggedEventIndex = events.findIndex(ev => ev.id === droppedEventId);
+                        const targetEventIndex = events.findIndex(ev => ev.id === event.id);
+
+                        if (draggedEventIndex === -1 || targetEventIndex === -1) return;
+
+                        const draggedEvent = events[draggedEventIndex];
+                        if (draggedEvent.date !== event.date) {
+                            draggedEvent.date = event.date;
+                            events.sort((a, b) => {
+                                const dateA = new Date(a.date);
+                                const dateB = new Date(b.date);
+                                if (dateA.getTime() === dateB.getTime()) {
+                                    if (a.time && b.time) return a.time.localeCompare(b.time);
+                                    if (a.time) return -1;
+                                    if (b.time) return 1;
+                                    return 0;
+                                }
+                                return dateA.getTime() - dateB.getTime();
+                            });
+                        } else {
+                            const draggedEventItem = events.splice(draggedEventIndex, 1)[0];
+                            const rect = eventItem.getBoundingClientRect();
+                            const y = e.clientY - rect.top;
+
+                            let newIndex = targetEventIndex;
+                            if (draggedEventIndex < targetEventIndex) {
+                                newIndex = events.findIndex(ev => ev.id === event.id);
+                                if (y > rect.height / 2) {
+                                    newIndex++;
+                                }
+                            } else {
+                                newIndex = events.findIndex(ev => ev.id === event.id);
+                                if (y > rect.height / 2) {
+                                    newIndex++;
+                                }
+                            }
+                            events.splice(newIndex, 0, draggedEventItem);
                         }
                         saveEvents();
                         renderCalendar();
-                            }
-                        }
                     });
 
-                    eventsContainer.appendChild(eventItem);
+                    dayCell.appendChild(eventItem);
                 });
-
-                dayCell.appendChild(eventsContainer);
 
                 dayCell.addEventListener('click', () => {
                     openEventModal(null, dayCell.dataset.date);
                 });
 
-                    dayCell.addEventListener('dragover', (e) => {
-                        e.preventDefault();
-                        e.dataTransfer.dropEffect = 'move';
-                        dayCell.classList.add('drag-over');
-                    });
+                dayCell.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    dayCell.classList.add('drag-over');
+                });
 
-                    dayCell.addEventListener('dragleave', (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        if (!dayCell.contains(e.relatedTarget)) {
-                            dayCell.classList.remove('drag-over');
-                        }
-                    });
+                dayCell.addEventListener('dragleave', () => {
+                    dayCell.classList.remove('drag-over');
+                });
 
-                    dayCell.addEventListener('drop', (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
+                dayCell.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    if (e.target.classList.contains('event-item') || e.target.closest('.event-item')) {
                         dayCell.classList.remove('drag-over');
+                        return;
+                    }
 
-                        if (e.target.classList.contains('event-item') || e.target.closest('.event-item')) {
-                            return;
-                        }
+                    dayCell.classList.remove('drag-over');
 
-                        const droppedEventId = e.dataTransfer.getData('text/plain');
-                        const newDate = dayCell.dataset.date;
+                    const droppedEventId = e.dataTransfer.getData('text/plain');
+                    const newDate = dayCell.dataset.date;
 
-                        if (droppedEventId) {
-                            const eventIndex = events.findIndex(event => event.id === droppedEventId);
-                            if (eventIndex !== -1) {
-                                const event = events[eventIndex];
-                                event.date = newDate;
-                                if (event.endDate) {
-                                    const duration = new Date(event.endDate) - new Date(event.date);
-                                    event.endDate = new Date(new Date(newDate).getTime() + duration).toISOString().split('T')[0];
+                    if (droppedEventId) {
+                        const eventIndex = events.findIndex(event => event.id === droppedEventId);
+                        if (eventIndex !== -1) {
+                            events[eventIndex].date = newDate;
+                            events.sort((a, b) => {
+                                const dateA = new Date(a.date);
+                                const dateB = new Date(b.date);
+                                if (dateA.getTime() === dateB.getTime()) {
+                                    if (a.time && b.time) return a.time.localeCompare(b.time);
+                                    if (a.time) return -1;
+                                    if (b.time) return 1;
+                                    return 0;
                                 }
-                                saveEvents();
-                                renderCalendar();
-                            }
-                        }
-                    });
-
-                    let isSelecting = false;
-                    let isDraggingEvent = false;
-
-                    dayCell.addEventListener('mousedown', (e) => {
-                        if (e.button === 0) { // Left mouse button
-                            e.preventDefault(); // Prevent text selection
-                            
-                            if (e.target.closest('.event-item')) {
-                                isDraggingEvent = true;
-                                return;
-                            }
-
-                            isSelecting = true;
-                            isDraggingSelection = true;
-                            selectionStartDate = new Date(fullDate);
-                            selectionEndDate = new Date(fullDate);
-                            
-                            selectionDelayTimer = setTimeout(() => {
-                                if (isDraggingSelection) {
-                                    dayCell.classList.add('selecting');
-                                }
-                            }, SELECTION_DELAY);
-                        }
-                    });
-
-                    dayCell.addEventListener('mouseenter', () => {
-                        if (isDraggingSelection && !isDraggingEvent) {
-                            selectionEndDate = new Date(fullDate);
-                            clearTimeout(selectionDelayTimer);
-                            selectionDelayTimer = setTimeout(() => {
-                                dayCell.classList.add('selecting');
-                                renderCalendar(); // Re-render to update selection highlights
-                            }, SELECTION_DELAY);
-                        }
-                    });
-
-                    document.addEventListener('mouseup', () => {
-                            clearTimeout(longPressTimer);
-                            isDraggingSelection = false;
-                            isSelecting = false;
-                            isDraggingEvent = false;
-                            
-                            document.querySelectorAll('.day-cell.selecting').forEach(cell => {
-                                cell.classList.remove('selecting');
+                                return dateA.getTime() - dateB.getTime();
                             });
-                            
-                        if (selectionStartDate && selectionEndDate) {
-                            if (selectionStartDate.getTime() !== selectionEndDate.getTime()) {
-                                openEventModal(null, selectionStartDate.toISOString().split('T')[0], true, selectionEndDate.toISOString().split('T')[0]);
-                            } else {
-                                const clickedDate = selectionStartDate.toISOString().split('T')[0];
-                                openEventModal(null, clickedDate, false);
-                            }
-                            
-                            selectionStartDate = null;
-                            selectionEndDate = null;
+                            saveEvents();
                             renderCalendar();
                         }
-                    });
-                    
-                    dayCell.addEventListener('click', (e) => {
-                        if (!isDraggingSelection && !isDraggingEvent) {
-                            openEventModal(null, fullDate, false);
-                        }
-                    });
+                    }
+                });
 
                 calendarEl.appendChild(dayCell);
             }
         };
 
-        const openEventModal = (eventId = null, date = null, isMultiDay = false, endDate = null) => {
+        const openEventModal = (eventId = null, date = null) => {
             eventModal.classList.remove('hidden');
             editingEventId = eventId;
 
             eventTitleInput.value = '';
             eventTimeInput.value = '';
-            eventDateInput.value = '';
             eventDescriptionInput.value = '';
+            eventDateInput.value = '';
             eventColorInput.value = '';
             eventIconInput.value = '';
             iconSearchInput.value = '';
-            eventStartDateInput.value = '';
-            eventStartTimeInput.value = '';
-            eventEndDateInput.value = '';
-            eventEndTimeInput.value = '';
-
             effectGlowing.checked = false;
             effectStriped.checked = false;
             effectDotted.checked = false;
@@ -4074,14 +2905,13 @@ const initColorPalette = () => {
             effectGlisteningStars.checked = false;
             effectGradient.checked = false;
             effectAnimatedStripes.checked = false;
-            effectRainbowVertical.checked = false;
-            effectSvgStars.checked = false;
-            effectInnerGlow.checked = false;
 
             document.querySelectorAll('#colorPalette .color-box').forEach(box => box.classList.remove('selected'));
             document.querySelectorAll('#iconGrid .icon-item').forEach(item => item.classList.remove('selected'));
-            eventIconDisplay.innerHTML = '<i class="fas fa-plus"></i>';
-            eventIconDisplay.classList.remove('selected');
+
+            // Reset icon display!!
+            eventIconDisplay.innerHTML = '<i class="fas fa-plus"></i>'; 
+            eventIconDisplay.classList.remove('selected'); 
 
             if (eventId) {
                 modalTitle.textContent = 'Edit Event';
@@ -4091,40 +2921,45 @@ const initColorPalette = () => {
                 const event = events.find(e => e.id === eventId);
                 if (event) {
                     eventTitleInput.value = event.title;
+                    eventTimeInput.value = event.time || '';
+                    eventDateInput.value = event.date;
                     eventDescriptionInput.value = event.description || '';
-                    eventStartDescriptionInput.value = event.startDescription || '';
-                    eventEndDescriptionInput.value = event.endDescription || '';
 
-                    if (event.endDate) {
-                        singleDayFields.classList.add('hidden');
-                        multiDayFields.classList.remove('hidden');
-                        eventStartDateInput.value = event.date;
-                        eventEndDateInput.value = event.endDate;
-                        eventStartTimeInput.value = event.time || '';
-                        eventEndTimeInput.value = event.endTime || '';
-                    } else {
-                        singleDayFields.classList.remove('hidden');
-                        multiDayFields.classList.add('hidden');
-                        eventDateInput.value = event.date;
-                        eventTimeInput.value = event.time || '';
-                    }
-
+                    let selectedColorPrimary;
+                    let selectedColorText;
                     try {
                         const eventColor = JSON.parse(event.color);
-                        const colorBox = document.querySelector(`#colorPalette .color-box[data-primary="${eventColor.primary}"][data-text-color="${eventColor.text}"]`);
-                        if (colorBox) {
-                            colorBox.classList.add('selected');
-                            eventColorInput.value = event.color;
-                        }
+                        selectedColorPrimary = eventColor.primary;
+                        selectedColorText = eventColor.text;
                     } catch (e) {
                         console.error("Failed to parse event color:", event.color, e);
                     }
+                    const colorBox = document.querySelector(`#colorPalette .color-box[data-primary="${selectedColorPrimary}"][data-text-color="${selectedColorText}"]`);
+                    if (colorBox) {
+                        colorBox.classList.add('selected');
+                        eventColorInput.value = event.color;
+                    } else {
+                        initColorPalette();
+                        const defaultColor = eventColors.find(c => c.isLight) || eventColors[0];
+                        const defaultPrimary = defaultColor.lightPrimary;
+                        const defaultText = defaultColor.lightText;
+                        eventColorInput.value = JSON.stringify({ primary: defaultPrimary, text: defaultText });
+                        const defaultColorBox = document.querySelector(`#colorPalette .color-box[data-primary="${defaultPrimary}"][data-text-color="${defaultText}"]`);
+                        if(defaultColorBox) defaultColorBox.classList.add('selected');
+                    }
+
 
                     if (event.icon) {
                         eventIconDisplay.innerHTML = `<i class="${event.icon}"></i>`;
                         eventIconDisplay.classList.add('selected');
                         eventIconInput.value = event.icon;
+                    } else {
+                        eventIconDisplay.innerHTML = '<i class="fas fa-plus"></i>';
+                        eventIconDisplay.classList.remove('selected');
+                        eventIconInput.value = '';
                     }
+                    initIconGrid();
+
 
                     if (event.effects) {
                         effectGlowing.checked = event.effects.glowing || false;
@@ -4135,26 +2970,13 @@ const initColorPalette = () => {
                         effectGlisteningStars.checked = event.effects.glisteningStars || false;
                         effectGradient.checked = event.effects.gradientEffect || false;
                         effectAnimatedStripes.checked = event.effects.animatedStripes || false;
-                        effectRainbowVertical.checked = event.effects.rainbowVertical || false;
-                        effectSvgStars.checked = event.effects.svgStars || false;
-                        effectInnerGlow.checked = event.effects.innerGlow || false;
                     }
                 }
             } else {
                 modalTitle.textContent = 'Add New Event';
                 saveEventButton.textContent = 'Save Event';
                 deleteEventButton.classList.add('hidden');
-
-                if (isMultiDay) {
-                    singleDayFields.classList.add('hidden');
-                    multiDayFields.classList.remove('hidden');
-                    eventStartDateInput.value = date;
-                    eventEndDateInput.value = endDate;
-                } else {
-                    singleDayFields.classList.remove('hidden');
-                    multiDayFields.classList.add('hidden');
-                    eventDateInput.value = date;
-                }
+                eventDateInput.value = date;
 
                 initColorPalette();
                 initIconGrid();
@@ -4277,7 +3099,7 @@ const initColorPalette = () => {
                     });
                     await saveSettings(currentCustomFontName, null, currentBaseThemeKey, isDarkModeActive,
                                  uiRoundnessInput.value, fontSizeInput.value,
-                                 eventRoundnessInput.value, eventBorderThicknessInput.value, dayCellMinWidthInput.value, null, areCustomColorPickersLocked, unlockedSpecialThemesKeys, forceLandscapeMode, savedCustomThemes);
+                                 eventRoundnessInput.value, eventBorderThicknessInput.value, dayCellMinWidthInput.value, currentBaseTheme, areCustomColorPickersLocked, unlockedSpecialThemesKeys, forceLandscapeMode, savedCustomThemes);
                 });
                 themePreviewDiv.appendChild(applyButton);
 
@@ -4512,100 +3334,70 @@ const initColorPalette = () => {
 
         const handleSaveEvent = async () => {
             const title = eventTitleInput.value.trim();
+            const time = eventTimeInput.value.trim();
             const description = eventDescriptionInput.value.trim();
+            const date = eventDateInput.value;
             const color = eventColorInput.value;
             const icon = eventIconInput.value;
 
-            const effects = {
-                glowing: effectGlowing.checked,
-                striped: effectStriped.checked,
-                dotted: effectDotted.checked,
-                particles: effectParticles.checked,
-                snowFalling: effectSnowFalling.checked,
-                glisteningStars: effectGlisteningStars.checked,
-                gradientEffect: effectGradient.checked,
-                animatedStripes: effectAnimatedStripes.checked,
-                rainbowVertical: effectRainbowVertical.checked,
-                svgStars: effectSvgStars.checked,
-                innerGlow: effectInnerGlow.checked
-            };
+        const effects = {
+            glowing: effectGlowing.checked,
+            striped: effectStriped.checked,
+            dotted: effectDotted.checked,
+            particles: effectParticles.checked,
+            snowFalling: effectSnowFalling.checked,
+            glisteningStars: effectGlisteningStars.checked,
+            gradientEffect: effectGradient.checked,
+            animatedStripes: effectAnimatedStripes.checked
+        };
 
-            if (!title) {
-                showMessage('Please enter an event title.');
+            if (!title || !date) {
+                const messageBox = document.createElement('div');
+                messageBox.innerHTML = `
+                    <div class="fixed inset-0" style="background-color: var(--modal-overlay-bg); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+                        <div class="p-6 rounded-lg shadow-xl text-center" style="border-radius: var(--ui-roundness-lg); background-color: var(--main-container-bg); color: var(--text-color);">
+                            <p class="text-lg font-semibold mb-4" style="color: var(--text-color);">Please enter event title and date.</p>
+                            <button class="px-4 py-2 themed-button" onclick="this.parentNode.parentNode.remove()">OK</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(messageBox);
                 return;
-            }
-
-            let eventData;
-            if (multiDayFields.classList.contains('hidden')) {
-
-                const date = eventDateInput.value;
-                const time = eventTimeInput.value.trim();
-                
-                if (!date) {
-                    showMessage('Please select a date.');
-                    return;
-                }
-
-                eventData = {
-                    title,
-                    date,
-                    time,
-                    description,
-                    color,
-                    icon,
-                    effects
-                };
-            } else {
-
-                const startDate = eventStartDateInput.value;
-                const endDate = eventEndDateInput.value;
-                const startTime = eventStartTimeInput.value.trim();
-                const endTime = eventEndTimeInput.value.trim();
-
-                if (!startDate || !endDate) {
-                    showMessage('Please select both start and end dates.');
-                    return;
-                }
-
-                if (new Date(endDate) < new Date(startDate)) {
-                    showMessage('End date cannot be before start date.');
-                    return;
-                }
-
-                eventData = {
-                    title,
-                    date: startDate,
-                    endDate,
-                    time: startTime,
-                    endTime,
-                    description,
-                    startDescription: eventStartDescriptionInput.value.trim(),
-                    endDescription: eventEndDescriptionInput.value.trim(),
-                    color,
-                    icon,
-                    effects
-                };
             }
 
             if (editingEventId) {
                 const eventIndex = events.findIndex(e => e.id === editingEventId);
                 if (eventIndex !== -1) {
-                    events[eventIndex] = { ...events[eventIndex], ...eventData };
+                    events[eventIndex] = {
+                        id: editingEventId,
+                        title,
+                        time,
+                        date,
+                        description,
+                        color,
+                        icon,
+                        effects
+                    };
                 }
             } else {
                 const newEvent = {
                     id: generateUniqueId(),
-                    ...eventData
+                    title,
+                    time,
+                    date,
+                    description,
+                    color,
+                    icon,
+                    effects
                 };
                 events.push(newEvent);
             }
-
             await saveEvents();
             renderCalendar();
             closeEventModal();
         };
 
-        const handleDeleteEvent = async () => {
+        const handleDeleteEvent = () => {
             if (editingEventId) {
                 const confirmBox = document.createElement('div');
                 confirmBox.innerHTML = `
@@ -4613,8 +3405,8 @@ const initColorPalette = () => {
                         <div class="p-6 rounded-lg shadow-xl text-center" style="border-radius: var(--ui-roundness-lg); background-color: var(--main-container-bg); color: var(--text-color);">
                             <p class="text-lg font-semibold mb-4" style="color: var(--text-color);">Are you sure you want to delete this event?</p>
                             <div class="flex justify-center space-x-4">
-                                <button class="themed-button danger" id="confirmDeleteYes">Yes, Delete</button>
-                                <button class="themed-button secondary" id="confirmDeleteNo">Cancel</button>
+                                <button class="themed-button" id="confirmDeleteYes">Yes</button>
+                                <button class="themed-button secondary" id="confirmDeleteNo">No</button>
                             </div>
                         </div>
                     </div>
@@ -4688,114 +3480,20 @@ const initColorPalette = () => {
         };
 
         const handleWatchAd = async () => {
-            // IMPORTANT: Replace this with your actual AdMob rewarded interstitial ad unit ID
-            // when you build your app for production.
-            const adUnitId = ''; // Test Ad Unit ID for rewarded interstitial
-            const isTesting = true; // Set to false when you are ready to publish your app!
+            watchAdButton.classList.add('hidden');
+            adLoadingSpinner.classList.remove('hidden');
+            showAdMobPlaceholder();
 
-            showAdMobPlaceholder('Loading Ad...');
-
-            try {
-                if (window.AdMob) {
-                    // Check if AdMob plugin is available (only in Capacitor environment)
-                    await window.AdMob.prepareRewardedInterstitial({
-                        adId: adUnitId,
-                        isTesting: isTesting,
-                    });
-                    await window.AdMob.showRewardedInterstitial();
-                } else {
-                    // Fallback for browser environment (not running in Capacitor)
-                    console.warn('window.AdMob not found. Simulating rewarded ad experience.');
-                    showAdMobPlaceholder('Showing Ad...');
-                    await new Promise(resolve => setTimeout(resolve, 3000)); // Simulate ad duration
-                    hideAdMobPlaceholder();
-                    
-                    // Simulate reward for browser testing
-                    areCustomColorPickersLocked = false;
-                    setCustomColorPickerState(false);
-                    await saveSettings(currentCustomFontName, null, currentBaseThemeKey, isDarkModeActive,
-                        uiRoundnessInput.value, fontSizeInput.value,
-                        eventRoundnessInput.value, eventBorderThicknessInput.value, dayCellMinWidthInput.value, 
-                        currentBaseTheme, false, unlockedSpecialThemesKeys, forceLandscapeMode, savedCustomThemes);
-                }
-            } catch (e) {
-                console.error('Error preparing or showing rewarded ad:', e);
-                hideAdMobPlaceholder();
-                // Show error message to user
-                const messageBox = document.createElement('div');
-                messageBox.innerHTML = `
-                    <div class="fixed inset-0" style="background-color: var(--modal-overlay-bg); display: flex; align-items: center; justify-content: center; z-index: 1000;">
-                        <div class="p-6 rounded-lg shadow-xl text-center" style="border-radius: var(--ui-roundness-lg); background-color: var(--main-container-bg); color: var(--text-color);">
-                            <p class="text-lg font-semibold mb-4" style="color: var(--text-color);">Error loading ad. Please try again later.</p>
-                            <button class="px-4 py-2 themed-button" onclick="this.parentNode.parentNode.remove()">OK</button>
-                        </div>
-                    </div>
-                `;
-                document.body.appendChild(messageBox);
-            }
-        };
-
-        document.addEventListener('adMob.rewardedInterstitialAdDismissed', (event) => {
-            // This event specifically fires for rewarded interstitial ads when dismissed.
-            // It includes information about whether the user was rewarded.
-            console.log('AdMob.rewardedInterstitialAdDismissed: Rewarded ad was dismissed.', event.detail);
-            hideAdMobPlaceholder();
-            if (event.detail && event.detail.rewarded) {
-                console.log('AdMob: User was rewarded. Unlocking feature.');
+            setTimeout(async () => {
+                adMobPlaceholder.classList.add('hidden');
+                adLoadingSpinner.classList.add('hidden');
                 areCustomColorPickersLocked = false;
                 setCustomColorPickerState(false);
-                // Save the unlocked state
-                saveSettings(currentCustomFontName, null, currentBaseThemeKey, isDarkModeActive,
-                    uiRoundnessInput.value, fontSizeInput.value,
-                    eventRoundnessInput.value, eventBorderThicknessInput.value, dayCellMinWidthInput.value, 
-                    currentBaseTheme, false, unlockedSpecialThemesKeys, forceLandscapeMode, savedCustomThemes);
-            } else {
-                console.log('AdMob: User was not rewarded or dismissed ad without full completion.');
-                // Show message that reward wasn't earned
-                const messageBox = document.createElement('div');
-                messageBox.innerHTML = `
-                    <div class="fixed inset-0" style="background-color: var(--modal-overlay-bg); display: flex; align-items: center; justify-content: center; z-index: 1000;">
-                        <div class="p-6 rounded-lg shadow-xl text-center" style="border-radius: var(--ui-roundness-lg); background-color: var(--main-container-bg); color: var(--text-color);">
-                            <p class="text-lg font-semibold mb-4" style="color: var(--text-color);">Ad dismissed without reward. Please watch the full ad to unlock features.</p>
-                            <button class="px-4 py-2 themed-button" onclick="this.parentNode.parentNode.remove()">OK</button>
-                        </div>
-                    </div>
-                `;
-                document.body.appendChild(messageBox);
-            }
-        });
-
-        document.addEventListener('adMob.adFailedToLoad', (data) => {
-            console.error('AdMob.adFailedToLoad:', data.detail?.message || 'Unknown error');
-            hideAdMobPlaceholder();
-            // Show error message to user
-            const messageBox = document.createElement('div');
-            messageBox.innerHTML = `
-                <div class="fixed inset-0" style="background-color: var(--modal-overlay-bg); display: flex; align-items: center; justify-content: center; z-index: 1000;">
-                    <div class="p-6 rounded-lg shadow-xl text-center" style="border-radius: var(--ui-roundness-lg); background-color: var(--main-container-bg); color: var(--text-color);">
-                        <p class="text-lg font-semibold mb-4" style="color: var(--text-color);">Ad failed to load: ${data.detail?.message || 'Unknown error'}</p>
-                        <button class="px-4 py-2 themed-button" onclick="this.parentNode.parentNode.remove()">OK</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(messageBox);
-        });
-
-        document.addEventListener('adMob.adFailedToShow', (data) => {
-            console.error('AdMob.adFailedToShow:', data.detail?.message || 'Unknown error');
-            hideAdMobPlaceholder();
-            // Show error message to user
-            const messageBox = document.createElement('div');
-            messageBox.innerHTML = `
-                <div class="fixed inset-0" style="background-color: var(--modal-overlay-bg); display: flex; align-items: center; justify-content: center; z-index: 1000;">
-                    <div class="p-6 rounded-lg shadow-xl text-center" style="border-radius: var(--ui-roundness-lg); background-color: var(--main-container-bg); color: var(--text-color);">
-                        <p class="text-lg font-semibold mb-4" style="color: var(--text-color);">Ad failed to show: ${data.detail?.message || 'Unknown error'}</p>
-                        <button class="px-4 py-2 themed-button" onclick="this.parentNode.parentNode.remove()">OK</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(messageBox);
-        });
+                await saveSettings(currentCustomFontName, null, currentBaseThemeKey, isDarkModeActive,
+                                 uiRoundnessInput.value, fontSizeInput.value,
+                                 eventRoundnessInput.value, eventBorderThicknessInput.value, dayCellMinWidthInput.value, currentBaseTheme, false, unlockedSpecialThemesKeys, forceLandscapeMode, savedCustomThemes);
+            }, 3000);
+        };
 
 
         window.onload = async () => {
@@ -4830,9 +3528,6 @@ const initColorPalette = () => {
             effectGlisteningStars = document.getElementById('effectGlisteningStars');
             effectGradient = document.getElementById('effectGradient');
             effectAnimatedStripes = document.getElementById('effectAnimatedStripes');
-            effectRainbowVertical = document.getElementById('effectRainbowVertical');
-            effectSvgStars = document.getElementById('effectSvgStars');
-            effectInnerGlow = document.getElementById('effectInnerGlow');
 
 
             settingsModal = document.getElementById('settings-modal');
@@ -4890,17 +3585,6 @@ const initColorPalette = () => {
             themeNameInput = document.getElementById('themeNameInput');
             cancelThemeNameButton = document.getElementById('cancelThemeName');
             saveThemeNameButton = document.getElementById('saveThemeName');
-
-                    // Add these event listeners in your window.onload function
-        document.addEventListener('adMob.adLoaded', () => {
-            console.log('AdMob.adLoaded: Ad has loaded and is ready to show.');
-            showAdMobPlaceholder('Ad Loaded, preparing to show...');
-        });
-
-        document.addEventListener('adMob.adShowed', () => {
-            console.log('AdMob.adShowed: Ad is now visible.');
-            hideAdMobPlaceholder(); // Hide the placeholder as the actual ad is now covering the screen
-        });
 
 
             const loadedSettings = await loadSettings();
@@ -5110,78 +3794,23 @@ const initColorPalette = () => {
 
             watchAdButton.addEventListener('click', handleWatchAd);
 
-            let mouseDownOnOverlay = false;
-            eventModal.addEventListener('mousedown', (e) => {
-                mouseDownOnOverlay = (e.target === eventModal);
-            });
-            eventModal.addEventListener('mouseup', (e) => {
-                if (mouseDownOnOverlay && e.target === eventModal) {
+            eventModal.addEventListener('click', (e) => {
+                if (e.target === eventModal) {
                     closeEventModal();
                 }
-                mouseDownOnOverlay = false;
+            });
+
+            settingsModal.addEventListener('click', (e) => {
+                if (e.target === settingsModal) {
+                    closeSettingsModal();
+                }
             });
 
             removeAllEventsButton.addEventListener('click', handleRemoveAllEvents);
             removeAllCustomThemesButton.addEventListener('click', handleRemoveAllCustomThemes);
             resetApplicationButton.addEventListener('click', handleResetApplication);
             saveCustomThemeButton.addEventListener('click', handleSaveCustomTheme); 
-
-            eventStartDateInput = document.getElementById('eventStartDate');
-            eventStartTimeInput = document.getElementById('eventStartTime');
-            eventEndDateInput = document.getElementById('eventEndDate');
-            eventEndTimeInput = document.getElementById('eventEndTime');
-            eventStartDescriptionInput = document.getElementById('eventStartDescription');
-            eventEndDescriptionInput = document.getElementById('eventEndDescription');
-            singleDayFields = document.getElementById('singleDayFields');
-            multiDayFields = document.getElementById('multiDayFields');
         };
-
-        function formatTime(time, use24Hour = false) {
-            if (!time) return '';
-            
-            const [hours, minutes] = time.split(':');
-            const hour = parseInt(hours);
-            
-            if (use24Hour) {
-                return `${hours}:${minutes}`;
-            } else {
-                const period = hour >= 12 ? 'PM' : 'AM';
-                const hour12 = hour % 12 || 12;
-                return `${hour12}:${minutes} ${period}`;
-            }
-        }
-
-        document.getElementById('timeFormatToggle').addEventListener('change', function(e) {
-            const use24Hour = e.target.checked;
-            const timeElements = document.querySelectorAll('.time-display');
-            timeElements.forEach(element => {
-                const currentTime = element.getAttribute('data-time');
-                if (currentTime) {
-                    const [hours, minutes] = currentTime.split(':');
-                    const date = new Date();
-                    date.setHours(parseInt(hours));
-                    date.setMinutes(parseInt(minutes));
-                    
-                    element.textContent = use24Hour 
-                        ? date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })
-                        : date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
-                }
-            });
-        });
-
-        function enforceTitleWordWrap() {
-            document.querySelectorAll('.title-part').forEach(el => {
-                el.style.whiteSpace = 'normal';
-                el.style.wordBreak = 'break-word';
-                el.style.overflowWrap = 'break-word';
-                el.style.paddingRight = '3em';
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', enforceTitleWordWrap);
-
-        const observer = new MutationObserver(enforceTitleWordWrap);
-        observer.observe(document.body, { childList: true, subtree: true });
     </script>
 </body>
 </html>
