@@ -42,3 +42,7 @@ If you're gonna be looking at a Calendar often, then you have a right to have it
 - No device sync.
 - No Year/Week/Custom Day View.
 - Buttons are stuck in a specific style.
+
+# UPDATES
+- I tried to implement Long/Multiday Events and they ended up looking terrible.
+- I plan to turn this into an app using Flutter.
