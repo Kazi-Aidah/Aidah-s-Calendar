@@ -38,7 +38,8 @@
             --slider-track-bg: var(--secondary-button-bg);
             --modal-overlay-bg: rgba(0, 0, 0, 0.5);
             --custom-pickers-overlay-bg: rgba(255, 255, 255, 0.5);
-            --holder-sidebar-width: 250px;
+            --holder-sidebar-width: 250px; 
+            --holder-border-thickness: 2px; 
 
             --main-container-margin: 1rem auto;
             --main-container-width: 90vw;
@@ -64,13 +65,6 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-        }
-
-        #watchAdButton {
-            position: relative;
-            z-index: 100;
-            opacity: 1;
-            transition: opacity 0.3s ease;
         }
 
         #main-container {
@@ -133,6 +127,13 @@
             scrollbar-color: var(--accent-color) transparent;
         }
 
+        .hide-scrollbars::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbars {
+            scrollbar-width: none;
+        }
+
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, minmax(var(--day-cell-min-width), 1fr));
@@ -171,6 +172,24 @@
             border: 3px dashed var(--drag-over-border-color);
             background-color: var(--day-cell-drag-bg);
         }
+
+        .day-cell.folded {
+            max-height: 140px; 
+            overflow: hidden;
+            position: relative;
+        }
+
+
+        .day-cell.folded:hover {
+            overflow-y: auto; 
+        }
+        .day-cell.folded.hide-scrollbars::-webkit-scrollbar {
+            display: none;
+        }
+        .day-cell.folded.hide-scrollbars {
+            scrollbar-width: none;
+        }
+
 
         .event-item {
             display: flex;
@@ -386,6 +405,48 @@
             }
         }
 
+.event-item.animated-vertical-rainbow {
+    position: relative;
+    overflow: hidden;
+}
+
+.event-item.animated-vertical-rainbow::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to bottom,
+        hsla(0, 100%, 50%, 0.3) 0%,
+        hsla(30, 100%, 50%, 0.3) 10%,
+        hsla(60, 100%, 50%, 0.3) 20%,
+        hsla(120, 100%, 50%, 0.3) 40%,
+        hsla(240, 100%, 50%, 0.3) 60%,
+        hsla(270, 100%, 50%, 0.3) 80%,
+        hsla(300, 100%, 50%, 0.3) 100%
+    );
+    background-size: 100% 300%;
+    animation: vertical-rainbow-scroll 1s linear infinite;
+    z-index: 0;
+    mix-blend-mode: overlay;
+    opacity: 0.5;
+    pointer-events: none;
+    border-radius: inherit;
+}
+
+@keyframes vertical-rainbow-scroll {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 0% 100%; }
+}
+
+.event-item.animated-vertical-rainbow > * {
+    position: relative;
+    z-index: 1;
+}
+
+
+
+
+
         .event-item.no-animations {
             animation: none !important;
             transition: none !important;
@@ -402,7 +463,6 @@
             display: flex;
             align-items: center;
             width: 100%;
-            padding-right: var(--icon-padding-right, 0);
         }
         .event-item .text-content {
             display: flex;
@@ -477,6 +537,7 @@
             display: flex;
             flex-direction: column;
             padding-bottom: 0;
+            border-radius: var(--ui-roundness-lg);
         }
         @keyframes fadeInScale {
             from {
@@ -489,7 +550,7 @@
             }
         }
         #settings-modal .modal-content {
-            max-width: 700px;
+            max-width: 720px;
         }
 
         .modal-content-scrollable {
@@ -605,7 +666,7 @@
         }
 
         .theme-box {
-            width: 100px;
+            width: 150px;
             height: 80px;
             display: flex;
             flex-direction: column;
@@ -613,7 +674,7 @@
             justify-content: center;
             padding: 0.5rem;
             cursor: pointer;
-            border: 3px solid transparent;
+            border: 3px solid rgba(var(--secondary-button-text-rgb), 0.5); 
             border-radius: var(--ui-roundness);
             transition: border-color 0.2s, transform 0.1s, box-shadow 0.2s;
             text-align: center;
@@ -633,6 +694,7 @@
 
 
         .theme-box.selected {
+            border-width: 4px;
             border-color: var(--accent-color);
             transform: scale(1.05);
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
@@ -934,17 +996,9 @@
         }
 
 
-        #adMobPlaceholder {
-            transition: opacity 0.3s ease-in-out;
-        }
-        #adMobPlaceholder > div {
-            background-color: var(--main-container-bg);
-            color: var(--text-color);
-        }
-
-
         .special-theme-box {
             position: relative;
+            border: 3px solid rgba(var(--secondary-button-text-rgb), 0.5);
         }
 
         .special-theme-lock-overlay {
@@ -1060,9 +1114,9 @@
 
         #holder-sidebar {
             background-color: var(--main-container-bg);
-            border-right: 3px solid var(--day-cell-border-color);
+            border-right: var(--holder-border-thickness) solid var(--day-cell-border-color); 
             box-shadow: 5px 0 15px rgba(0, 0, 0, 0.15);
-            transition: left 0.3s ease-in-out, background-color 0.3s ease-in-out, border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            transition: left 0.3s ease-in-out, background-color 0.3s ease-in-out, border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out, width 0.3s ease-in-out;
             width: var(--holder-sidebar-width);
             overflow: hidden;
             pointer-events: none;
@@ -1091,6 +1145,199 @@
             border-color: var(--day-cell-border-color);
             background-color: var(--day-cell-bg);
             transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out;
+            border: 2.5px dashed var(--day-cell-border-color);
+            border-radius: var(--ui-roundness);
+        }
+
+        #addHolderEventButton.styled-like-holder {
+            background-color: var(--day-cell-bg);
+            color: var(--text-color);
+            border: 3px dashed var(--day-cell-border-color);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+        }
+
+        #addHolderEventButton.styled-like-holder:hover {
+            background-color: var(--day-cell-hover-bg-color);
+            border-color: var(--accent-color);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        #eventContextMenu {
+            position: fixed;
+            background-color: var(--main-container-bg);
+            border: 1px solid var(--day-cell-border-color);
+            border-radius: var(--ui-roundness);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            padding: 0.5rem 0;
+            min-width: 150px;
+            display: none;
+            flex-direction: column;
+        }
+
+        #eventContextMenu button {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.6rem 1rem;
+            width: 100%;
+            text-align: left;
+            background-color: transparent;
+            border: none;
+            color: var(--text-color);
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        #eventContextMenu button:hover {
+            background-color: var(--day-cell-hover-bg-color);
+        }
+
+        #holderSidebarCloseButton {
+            display: none;
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background-color: transparent;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-color);
+            cursor: pointer;
+            z-index: 60;
+        }
+
+        @media (max-width: 768px) {
+            #holderSidebarCloseButton {
+                display: block;
+            }
+        }
+
+        .dark-mode-toggle-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 1em; 
+            font-weight: 600;
+            padding: 0.75rem 1rem;
+            border-radius: var(--ui-roundness);
+            border: 3px solid var(--secondary-button-text);
+            background-color: var(--secondary-button-bg);
+            color: var(--secondary-button-text);
+            cursor: pointer;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            min-width: 100px;
+            height: calc(80px * 2 + 0.75rem);             
+            flex-shrink: 0; 
+        }
+        .dark-mode-toggle-button.selected {
+            background-color: var(--primary-button-text);
+            color: var(--primary-button-bg);
+            border-color: var(--primary-button-text);
+            border-width: 4px;
+        }
+        .dark-mode-toggle-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+        .dark-mode-toggle-button .small-text {
+            font-size: 0.7em; 
+            font-weight: 400;
+            margin-top: 0.25rem;
+        }
+
+        #premadeThemeBoxesContainer {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            width: 100%; 
+        }
+
+        #premadeThemeBoxes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            flex-grow: 1; 
+            justify-content: flex-start;
+        }
+
+        @media (min-width: 768px) {
+
+            .modal-content {
+                max-height: 80vh;
+                overflow-y: auto;
+            }
+            
+            #premadeThemeBoxesContainer {
+                display: flex;
+                flex-direction: row;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+            
+            #premadeThemeBoxes {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                grid-template-rows: repeat(2, 1fr);
+                gap: 0.75rem;
+                width: auto;
+                transform: translateX(6px);
+            }
+
+            #specialThemeBoxes {
+                display: grid;
+                width: auto;
+                grid-template-columns: repeat(4, 1fr);
+                grid-template-rows: repeat(3, 1fr);
+                gap: 0.75rem;
+            }
+            
+            .dark-mode-toggle-button {
+                height: auto;
+                min-height: calc(85px * 2 + 0.75rem);
+            }
+            
+        }
+
+        @media (max-width: 767px) { 
+            #premadeThemeBoxesContainer {
+                flex-direction: column; 
+                align-items: center;
+            }
+            .dark-mode-toggle-button {
+                width: 100%; 
+                height: auto; 
+                margin-bottom: 0.75rem; 
+            }
+            #premadeThemeBoxes {
+                width: 100%; 
+                justify-content: center; 
+            }
+            #premadeThemeBoxes .theme-box,
+            #specialThemeBoxes .theme-box {
+                flex-basis: calc(50% - 0.375rem); 
+                max-width: calc(50% - 0.375rem);
+            }
+            
+        }
+
+        .resize-handle {
+            width: 1.5px;
+            height: 100%;
+            background-color: var(--day-cell-border-color);
+            position: absolute;
+            right: 0;
+            top: 0;
+            cursor: ew-resize;
+            z-index: 51;
+            transition: background-color 0.2s ease;
+        }
+        .resize-handle:hover {
+            background-color: var(--accent-color);
         }
     </style>
 </head>
@@ -1221,6 +1468,10 @@
                             <input type="checkbox" id="effectGradient">
                             <span class="toggle-label">Animated Gradient</span>
                         </label>
+                        <label class="toggle-container">
+                            <input type="checkbox" id="effectAnimatedVerticalRainbow">
+                            <span class="toggle-label">Animated Vertical Rainbow</span>
+                        </label>
                     </div>
                 </div>
 
@@ -1292,45 +1543,59 @@
                 <div class="mb-6">
                     <h4 class="h4-settings">Application Settings</h4>
                     <div class="toggle-container">
-                        <input type="checkbox" id="disableSidebarAnimationsToggle">
-                        <label for="disableSidebarAnimationsToggle" class="toggle-label">Disable Sidebar Animations</label>
+                        <input type="checkbox" id="use24HourFormatToggle">
+                        <label for="use24HourFormatToggle" class="toggle-label">Use 24-Hour Format</label>
                     </div>
                     <div class="toggle-container">
-                        <input type="checkbox" id="darkModeToggle">
-                        <label for="darkModeToggle" class="toggle-label">Dark Mode</label>
-                    </div>
-                    <div class="toggle-container">
-                        <input type="checkbox" id="holderIconToggle">
-                        <label for="holderIconToggle" class="toggle-label">Show Holder Icon</label>
+                        <input type="checkbox" id="hideScrollbarsToggle">
+                        <label for="hideScrollbarsToggle" class="toggle-label">Hide Scrollbars</label>
                     </div>
                     <div class="toggle-container">
                         <input type="checkbox" id="noBackgroundToggle">
                         <label for="noBackgroundToggle" class="toggle-label">No Background (Full Screen)</label>
                     </div>
+                    <div class="toggle-container">
+                        <input type="checkbox" id="foldDayCellsToggle">
+                        <label for="foldDayCellsToggle" class="toggle-label">Fold Day Cells (on hover)</label>
+                    </div>
+                    
+                    <h4 class="h4-settings">Holder</h4>
+                    <div class="toggle-container">
+                        <input type="checkbox" id="holderIconToggle">
+                        <label for="holderIconToggle" class="toggle-label">Show Holder Icon</label>
+                    </div>
+                    <div class="toggle-container">
+                        <input type="checkbox" id="showHolderByDefaultToggle">
+                        <label for="showHolderByDefaultToggle" class="toggle-label">Show Holder Sidebar by Default</label>
+                    </div>
+                    <div class="toggle-container">
+                        <input type="checkbox" id="disableSidebarAnimationsToggle">
+                        <label for="disableSidebarAnimationsToggle" class="toggle-label">Disable Sidebar Animations</label>
+                    </div>
+                    <div class="toggle-container">
+                        <input type="checkbox" id="hideAddEventButtonInHolderToggle">
+                        <label for="hideAddEventButtonInHolderToggle" class="toggle-label">Hide Add Event Button in Holder</label>
+                    </div>
 
 
                     <div class="mb-4">
                         <h4 class="h4-settings">Pre-made Themes</h4>
-                        <div id="premadeThemeBoxes" class="flex flex-wrap gap-3 mt-2 justify-center">
+                        <div id="premadeThemeBoxesContainer">
+                            <button id="darkModeButton" class="dark-mode-toggle-button">
+                                Dark Mode <span class="small-text">(Off)</span>
+                            </button>
+                            <div id="premadeThemeBoxes" class="flex flex-wrap gap-3 mt-2 justify-center">
                             </div>
+                        </div>
                     </div>
 
                     <div class="mb-4">
-                        <h4 class="h4-settings">Special Themes (Watch ad to unlock)</h4>
+                        <h4 class="h4-settings">Special Themes</h4>
                         <div id="specialThemeBoxes" class="flex flex-wrap gap-3 mt-2 justify-center">
                             </div>
                     </div>
 
                     <div id="customColorPickersContainer" class="relative">
-                        <div id="colorPickersOverlay" class="absolute inset-0 flex flex-col items-center justify-center p-4 rounded-lg z-10 hidden" style="border-radius: var(--ui-roundness); background-color: var(--custom-pickers-overlay-bg);">
-                            <p class="text-center font-medium mb-4" style="color: var(--text-color);">Unlock custom themes by watching an ad!</p>
-                            <button id="watchAdButton" class="themed-button">
-                                <i class="fas fa-play-circle mr-2"></i> Watch Ad
-                            </button>
-                            <div id="adLoadingSpinner" class="hidden mt-4">
-                                <i class="fas fa-spinner fa-spin text-accent-color text-2xl"></i>
-                            </div>
-                        </div>
                         <h4 class="h4-settings">Custom Theming</h4>
                         <div class="color-input-group">
                             <label for="themeBodyBg">Background Color</label>
@@ -1424,19 +1689,24 @@
         </div>
     </div>
 
-    <div id="adMobPlaceholder" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[1001] hidden">
-        <div class="bg-white p-8 rounded-lg shadow-2xl text-center flex flex-col items-center justify-center" style="max-width: 90%; width: 400px; height: 250px; border-radius: var(--ui-roundness-lg); background-color: var(--main-container-bg); color: var(--text-color);">
-            <i class="fas fa-video fa-3x text-red-500 mb-4 animate-pulse"></i>
-            <p class="text-xl font-semibold mb-2" style="color: var(--text-color);">Loading Your Ad...</p>
-            <p class="text-sm text-gray-600" style="color: var(--text-color);">Please wait a moment.</p>
-        </div>
-    </div>
-
     <div id="holder-sidebar" class="fixed top-0 left-0 h-full bg-white shadow-lg z-50 transition-all duration-300 flex flex-col items-center p-4">
+        <button id="holderSidebarCloseButton" class="md:hidden">
+            <i class="fas fa-times"></i>
+        </button>
         <h3 class="text-xl font-bold mb-4 text-gray-700">HOLDER</h3>
         <div id="holder-content" class="flex-grow w-full border-2 border-dashed border-gray-300 rounded-lg p-2 overflow-y-auto"
              style="min-height: 100px; background-color: var(--day-cell-bg);">
         </div>
+        <button id="addHolderEventButton" class="themed-button w-full mt-4 styled-like-holder">
+            <i class="fas fa-plus mr-2"></i> Add Event
+        </button>
+        <div class="resize-handle"></div>
+    </div>
+
+    <div id="eventContextMenu" class="hidden">
+        <button id="contextEditEvent"><i class="fas fa-edit"></i> Edit Event</button>
+        <button id="contextDuplicateEvent"><i class="fas fa-copy"></i> Duplicate Event</button>
+        <button id="contextDeleteEvent"><i class="fas fa-trash"></i> Delete Event</button>
     </div>
 
     <script>
@@ -1446,7 +1716,15 @@
         let editingEventId = null;
         let currentCustomFontName = null;
         let draggedEventId = null;
+        let contextMenuEventId = null;
+        let isResizingHolder = false;
+        let initialHolderWidth;
+        let initialMouseX;
+
         const MAX_SAVED_THEMES = 5;
+        const MAX_VISIBLE_EVENTS_FOLDED = 3;
+        const MIN_HOLDER_WIDTH = 150;
+        const MAX_HOLDER_WIDTH = 400;
 
         const DEFAULT_FONT_FAMILY = 'Inter, sans-serif';
 
@@ -1515,6 +1793,69 @@
             } : null;
         };
 
+        const rgbToHsl = (r, g, b) => {
+            r /= 255;
+            g /= 255;
+            b /= 255;
+
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+
+            if (max === min) {
+                h = s = 0; 
+            } else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
+                }
+                h /= 6;
+            }
+            return [h * 360, s * 100, l * 100];
+        };
+
+        const hslToRgb = (h, s, l) => {
+            h /= 360;
+            s /= 100;
+            l /= 100;
+            let r, g, b;
+
+            if (s === 0) {
+                r = g = b = l;
+            } else {
+                const hue2rgb = (p, q, t) => {
+                    if (t < 0) t += 1;
+                    if (t > 1) t -= 1;
+                    if (t < 1 / 6) return p + (q - p) * 6 * t;
+                    if (t < 1 / 2) return q;
+                    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+                    return p;
+                };
+                const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                const p = 2 * l - q;
+                r = hue2rgb(p, q, h + 1 / 3);
+                g = hue2rgb(p, q, h);
+                b = hue2rgb(p, q, h - 1 / 3);
+            }
+            return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+        };
+
+        const hexToHsl = (hex) => {
+            const rgb = hexToRgb(hex);
+            if (rgb) {
+                return rgbToHsl(rgb.r, rgb.g, rgb.b);
+            }
+            return [0, 0, 0];
+        };
+
+        const hslToHex = (h, s, l) => {
+            const [r, g, b] = hslToRgb(h, s, l);
+            return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+        };
+
         const hexToRgba = (hex, alpha) => {
             const rgb = hexToRgb(hex);
             if (rgb) {
@@ -1535,56 +1876,56 @@
             return luminance > 0.5;
         };
 
-        const DEFAULT_LIGHT_THEME = {
-            name: "Default Light",
-            bodyBg: '#F8E8F0',
-            mainText: '#4A4A4A',
-            headerBg: '#FFFFFF',
-            primaryButtonBg: '#FFFFFF',
-            primaryButtonText: '#E085B0',
-            secondaryButtonBg: '#F3E0E9',
-            secondaryButtonText: '#8B4B66',
-            accentColor: '#E085B0',
-            dayCellBorder: '#D4DDE3',
-            mainContainerBg: '#FFFFFF',
-            dayCellBg: '#FFFFFF',
-            dayCellHoverBg: '#F8F0F5',
-            currentDayBg: '#FFEAF4',
-            arrowButtonBg: 'transparent',
-            arrowButtonHoverBg: 'rgba(0,0,0,0.05)',
-            arrowButtonText: '#4B5563',
-            headerBorderColor: '#E5E7EB'
-        };
-
-        const DEFAULT_DARK_THEME = {
-            name: "Default Dark",
-            bodyBg: '#2C2C34',
-            mainText: '#E0E0E0',
-            headerBg: '#3A3A45',
-            mainContainerBg: '#3A3A45',
-            dayCellBg: '#4A4A50',
-            dayCellHoverBg: '#5A5A60',
-            currentDayBg: '#6A6A70',
-            primaryButtonBg: '#E085B0',
-            primaryButtonText: '#FFFFFF',
-            secondaryButtonBg: '#6E6E77',
-            secondaryButtonText: '#C0C0C0',
-            accentColor: '#FFADD9',
-            dayCellBorder: '#5A5A60',
-            arrowButtonBg: 'transparent',
-            arrowButtonHoverBg: 'rgba(255,255,255,0.1)',
-            arrowButtonText: '#E0E0E0',
-            headerBorderColor: 'rgba(255,255,255,0.15)'
-        };
-
-        const PASTEL_THEMES = {
-            blue: {
+        const THEMES = {
+            light: {
+                name: "Light",
+                bodyBg: '#F8E8F0',
+                mainText: '#4A4A4A',
+                headerBg: '#FFFFFF',
+                primaryButtonBg: '#F3E0E9',
+                primaryButtonText: '#8B4B66',
+                secondaryButtonBg: '#FFFFFF',
+                secondaryButtonText: '#E085B0',
+                accentColor: '#E085B0',
+                dayCellBorder: '#D4DDE3',
+                mainContainerBg: '#FFFFFF',
+                dayCellBg: '#FFFFFF',
+                dayCellHoverBg: '#F8F0F5',
+                currentDayBg: '#FFEAF4',
+                arrowButtonBg: 'transparent',
+                arrowButtonHoverBg: 'rgba(0,0,0,0.05)',
+                arrowButtonText: '#4B5563',
+                headerBorderColor: '#E5E7EB'
+            },
+            dark: {
+                name: "Dark",
+                bodyBg: '#2C2C34',
+                mainText: '#E0E0E0',
+                headerBg: '#3A3A45',
+                mainContainerBg: '#3A3A45',
+                dayCellBg: '#4A4A50',
+                dayCellHoverBg: '#5A5A60',
+                currentDayBg: '#6A6A70',
+                primaryButtonBg: '#E085B0',
+                primaryButtonText: '#FFFFFF',
+                secondaryButtonBg: '#6E6E77',
+                secondaryButtonText: '#C0C0C0',
+                accentColor: '#FFADD9',
+                dayCellBorder: '#5A5A60',
+                arrowButtonBg: 'transparent',
+                arrowButtonHoverBg: 'rgba(255,255,255,0.1)',
+                arrowButtonText: '#E0E0E0',
+                headerBorderColor: 'rgba(255,255,255,0.15)'
+            },
+            pastelBlue: {
                 light: {
                     name: "Blue", bodyBg: '#E0F2F7', mainText: '#3F51B5', headerBg: '#FFFFFF', mainContainerBg: '#FFFFFF',
                     dayCellBg: '#FFFFFF', dayCellHoverBg: '#CFECF5', currentDayBg: '#B3E5FC',
-                    primaryButtonBg: '#FFFFFF', primaryButtonText: '#42A5F5',
-                    secondaryButtonBg: '#BBDEFB',
-                    secondaryButtonText: '#2196F3', accentColor: '#42A5F5', dayCellBorder: '#90CAF9',
+                    primaryButtonBg: '#BBDEFB',
+                    primaryButtonText: '#2196F3',
+                    secondaryButtonBg: '#FFFFFF',
+                    secondaryButtonText: '#42A5F5',
+                    accentColor: '#42A5F5', dayCellBorder: '#90CAF9',
                     arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#2196F3', headerBorderColor: '#90CAF9'
                 },
                 dark: {
@@ -1596,13 +1937,15 @@
                     arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(255,255,255,0.1)', arrowButtonText: '#81d4fa', headerBorderColor: 'rgba(255,255,255,0.15)'
                 }
             },
-            green: {
+            pastelGreen: {
                 light: {
                     name: "Green", bodyBg: '#E8F5E9', mainText: '#388E3C', headerBg: '#FFFFFF', mainContainerBg: '#FFFFFF',
                     dayCellBg: '#FFFFFF', dayCellHoverBg: '#D9F1DB', currentDayBg: '#C8E6C9',
-                    primaryButtonBg: '#FFFFFF', primaryButtonText: '#81C784',
-                    secondaryButtonBg: '#C5E1A5',
-                    secondaryButtonText: '#66BB6A', accentColor: '#81C784', dayCellBorder: '#A1CF90',
+                    primaryButtonBg: '#C5E1A5',
+                    primaryButtonText: '#66BB6A',
+                    secondaryButtonBg: '#FFFFFF',
+                    secondaryButtonText: '#81C784',
+                    accentColor: '#81C784', dayCellBorder: '#A1CF90',
                     arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#66BB6A', headerBorderColor: '#A1CF90'
                 },
                 dark: {
@@ -1614,13 +1957,15 @@
                     arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(255,255,255,0.1)', arrowButtonText: '#C8E6C9', headerBorderColor: 'rgba(255,255,255,0.15)'
                 }
             },
-            yellow: {
+            pastelYellow: {
                 light: {
                     name: "Yellow", bodyBg: '#FFFDE7', mainText: '#c78800', headerBg: '#FFFFFF', mainContainerBg: '#FFFFFF',
                     dayCellBg: '#FFFFFF', dayCellHoverBg: '#fff9c4', currentDayBg: '#fff9c4',
-                    primaryButtonBg: '#FFFFFF', primaryButtonText: '#d39831',
-                    secondaryButtonBg: '#fff59d',
-                    secondaryButtonText: '#e0a906', accentColor: '#d07916', dayCellBorder: '#FFD375',
+                    primaryButtonBg: '#fff59d',
+                    primaryButtonText: '#c89406', 
+                    secondaryButtonBg: '#FFFFFF',
+                    secondaryButtonText: '#d39831',
+                    accentColor: '#ffc800', dayCellBorder: '#FFD375',
                     arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#FFCA28', headerBorderColor: '#FFF176'
                 },
                 dark: {
@@ -1633,10 +1978,10 @@
                     dayCellHoverBg: '#170f08',
                     currentDayBg: '#22160a',
                     primaryButtonBg: '#663a1c',
-                    primaryButtonText: '#ffd95f',
+                    primaryButtonText: '#c89406',
                     secondaryButtonBg: '#391c0b',
                     secondaryButtonText: '#e0a906',
-                    accentColor: '#E6A900',
+                    accentColor: '#c89406', 
                     dayCellBorder: '#50371b',
                     arrowButtonBg: 'transparent',
                     arrowButtonHoverBg: 'rgba(255,255,255,0.1)',
@@ -1644,13 +1989,15 @@
                     headerBorderColor: 'rgba(255,255,255,0.15)'
                 }
             },
-            purple: {
+            pastelPurple: {
                 light: {
                     name: "Purple", bodyBg: '#F3E5F5', mainText: '#7B1FA2', headerBg: '#FFFFFF', mainContainerBg: '#FFFFFF',
                     dayCellBg: '#FFFFFF', dayCellHoverBg: '#ECCFF0', currentDayBg: '#E1BEE7',
-                    primaryButtonBg: '#FFFFFF', primaryButtonText: '#BA68C8',
-                    secondaryButtonBg: '#E1BEE7',
-                    secondaryButtonText: '#9C27B0', accentColor: '#BA68C8', dayCellBorder: '#D1C4E9',
+                    primaryButtonBg: '#E1BEE7',
+                    primaryButtonText: '#9C27B0',
+                    secondaryButtonBg: '#FFFFFF',
+                    secondaryButtonText: '#BA68C8',
+                    accentColor: '#BA68C8', dayCellBorder: '#D1C4E9',
                     arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#9C27B0', headerBorderColor: '#D1C4E9'
                 },
                 dark: {
@@ -1674,13 +2021,15 @@
                     headerBorderColor: 'rgba(255,255,255,0.15)'
                 }
             },
-            pink: {
+            pastelPink: {
                 light: {
                     name: "Pink", bodyBg: '#FCE4EC', mainText: '#C2185B', headerBg: '#FFFFFF', mainContainerBg: '#FFFFFF',
                     dayCellBg: '#FFFFFF', dayCellHoverBg: '#F8D1DF', currentDayBg: '#F8BBD0',
-                    primaryButtonBg: '#F8BBD0', primaryButtonText: '#E91E63',
-                    secondaryButtonBg: '#f2cbe5',
-                    secondaryButtonText: '#EC407A', accentColor: '#E91E63', dayCellBorder: '#ffa3c2',
+                    primaryButtonBg: '#F8BBD0',
+                    primaryButtonText: '#EC407A',
+                    secondaryButtonBg: '#FFFFFF',
+                    secondaryButtonText: '#E91E63',
+                    accentColor: '#E91E63', dayCellBorder: '#ffa3c2',
                     arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#EC407A', headerBorderColor: '#F06292'
                 },
                 dark: {
@@ -1696,9 +2045,11 @@
                 light: {
                     name: "Pure Black", bodyBg: '#000000', mainText: '#FFFFFF', headerBg: '#000000', mainContainerBg: '#000000',
                     dayCellBg: '#111111', dayCellHoverBg: '#222222', currentDayBg: '#333333',
-                    primaryButtonBg: '#FFFFFF', primaryButtonText: '#000000',
-                    secondaryButtonBg: '#333333',
-                    secondaryButtonText: '#CCCCCC', accentColor: '#CCCCCC', dayCellBorder: '#3d3d3d',
+                    primaryButtonBg: '#333333',
+                    primaryButtonText: '#CCCCCC',
+                    secondaryButtonBg: '#FFFFFF',
+                    secondaryButtonText: '#000000',
+                    accentColor: '#CCCCCC', dayCellBorder: '#3d3d3d',
                     arrowButtonBg: 'transparent',
                     arrowButtonHoverBg: 'rgba(255,255,255,0.1)',
                     arrowButtonText: '#BBBBBB', headerBorderColor: '#2A2A2A'
@@ -1708,282 +2059,357 @@
                     dayCellBg: '#0A0A0A', dayCellHoverBg: '#1A1A1A', currentDayBg: '#2A2A2A',
                     primaryButtonBg: '#FFFFFF', primaryButtonText: '#000000',
                     secondaryButtonBg: '#1A1A1A',
-                    secondaryButtonText: '#AAAAAA', accentColor: '#AAAAAA', dayCellBorder: '#3d3d3d',
+                    secondaryButtonText: '#AAAAAA', accentColor: '#AAAAAA', dayCellBorder: '#1A1A1A',
                     arrowButtonBg: 'transparent',
                     arrowButtonHoverBg: 'rgba(255,255,255,0.1)',
                     arrowButtonText: '#E0E0E0', headerBorderColor: '#1A1A1A'
                 }
-            }
-        };
-
-        const SPECIAL_THEMES = {
+            },
+            aidah: {
+                light: {
+                    name: "Aidah", bodyBg: '#F7F7F7', mainText: '#333333', headerBg: '#FFFFFF', mainContainerBg: '#FFFFFF',
+                    dayCellBg: '#FFFFFF', dayCellHoverBg: '#EEEEEE', currentDayBg: '#E8E8E8',
+                    primaryButtonBg: '#D1D1D1',
+                    primaryButtonText: '#333333',
+                    secondaryButtonBg: '#E9E9E9',
+                    secondaryButtonText: '#555555',
+                    accentColor: '#AAAAAA', dayCellBorder: '#DDDDDD',
+                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#4B5563', headerBorderColor: '#E5E7EB'
+                },
+                dark: {
+                    name: "Aidah (Dark)",
+                    bodyBg: '#181926', mainText: '#c5cfe9', headerBg: '#333333', mainContainerBg: '#24273a',
+                    dayCellBg: '#32354b', dayCellHoverBg: '#181926', currentDayBg: '#3a2c40',
+                    primaryButtonBg: '#2f402c', primaryButtonText: '#a6da85',
+                    secondaryButtonBg: '#3a2c40', secondaryButtonText: '#ff9bd5',
+                    accentColor: '#ff9bd5', dayCellBorder: '#454b66',
+                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(255,255,255,0.1)', arrowButtonText: '#a6d475', headerBorderColor: '#454b66',
+                }
+            },
             dracula: {
-                defaultIsDark: true,
                 light: {
                     name: "Dracula", bodyBg: '#F8F8F2', mainText: '#282A36', headerBg: '#F8F8F2', mainContainerBg: '#F8F8F2',
                     dayCellBg: '#FFFFFF', dayCellHoverBg: '#EAEAEA', currentDayBg: '#F0F0F0',
-                    primaryButtonBg: '#FF79C6', primaryButtonText: '#FFFFFF',
-                    secondaryButtonBg: '#BD93F9', secondaryButtonText: '#FFFFFF', accentColor: '#FF79C6', dayCellBorder: '#EAEAEA',
+                    primaryButtonBg: '#FF79C6',
+                    primaryButtonText: '#FFFFFF',
+                    secondaryButtonBg: '#BD93F9',
+                    secondaryButtonText: '#FFFFFF',
+                    accentColor: '#FF79C6', dayCellBorder: '#EAEAEA',
                     arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#44475A', headerBorderColor: '#EAEAEA'
                 },
                 dark: {
                     name: "Dracula", bodyBg: '#282A36', mainText: '#F8F8F2', headerBg: '#3A3A4A', mainContainerBg: '#3A3A4A',
                     dayCellBg: '#44475A', dayCellHoverBg: '#505364', currentDayBg: '#6272A4',
-                    primaryButtonBg: '#FF79C6', primaryButtonText: '#FFFFFF',
-                    secondaryButtonBg: '#6272A4', secondaryButtonText: '#F8F8F2', accentColor: '#FF79C6', dayCellBorder: '#5d6283',
+                    primaryButtonBg: '#FF79C6', 
+                    primaryButtonText: '#FFFFFF', 
+                    secondaryButtonBg: '#6272A4', 
+                    secondaryButtonText: '#F8F8F2', 
+                    accentColor: '#FF79C6', dayCellBorder: '#5d6283',
                     arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(255,255,255,0.1)', arrowButtonText: '#F8F8F2', headerBorderColor: '#44475A'
                 }
             },
             nord: {
-                defaultIsDark: true,
                 light: {
                     name: "Nord", bodyBg: '#ECEFF4', mainText: '#2E3440', headerBg: '#FFFFFF', mainContainerBg: '#FFFFFF',
                     dayCellBg: '#D8DEE9', dayCellHoverBg: '#E5E9F0', currentDayBg: '#BF616A',
-                    primaryButtonBg: '#88C0D0', primaryButtonText: '#FFFFFF',
-                    secondaryButtonBg: '#E5E9F0', secondaryButtonText: '#4C566A', accentColor: '#88C0D0', dayCellBorder: '#D8DEE9',
+                    primaryButtonBg: '#88C0D0',
+                    primaryButtonText: '#FFFFFF',
+                    secondaryButtonBg: '#E5E9F0',
+                    secondaryButtonText: '#4C566A',
+                    accentColor: '#88C0D0', dayCellBorder: '#D8DEE9',
                     arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#4C566A', headerBorderColor: '#D8DEE9'
                 },
                 dark: {
                     name: "Nord", bodyBg: '#2E3440', mainText: '#ECEFF4', headerBg: '#3B4252', mainContainerBg: '#3B4252',
-                    dayCellBg: '#4C566A', dayCellHoverBg: '#5E6B7A', currentDayBg: '#81A1C1',
-                    primaryButtonBg: '#88C0D0', primaryButtonText: '#FFFFFF',
-                    secondaryButtonBg: '#4C566A', secondaryButtonText: '#ECEFF4', accentColor: '#88C0D0', dayCellBorder: '#4C566A',
+                    dayCellBg: '#4C566A', dayCellHoverBg: '#5E81AC', currentDayBg: '#81A1C1',
+                    primaryButtonBg: '#88C0D0', 
+                    primaryButtonText: '#FFFFFF',
+                    secondaryButtonBg: '#4C566A', 
+                    secondaryButtonText: '#ECEFF4',
+                    accentColor: '#88C0D0', dayCellBorder: '#4C566A',
                     arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(255,255,255,0.1)', arrowButtonText: '#ECEFF4', headerBorderColor: '#4C566A'
                 }
             },
             oneDark: {
-                defaultIsDark: true,
                 light: {
                     name: "One Dark", bodyBg: '#FBFBFB', mainText: '#383A42', headerBg: '#FFFFFF', mainContainerBg: '#FFFFFF',
                     dayCellBg: '#EAEAEA', dayCellHoverBg: '#DBDBDB', currentDayBg: '#C0C0C0',
-                    primaryButtonBg: '#61AFEF', primaryButtonText: '#FFFFFF',
-                    secondaryButtonBg: '#98C379', secondaryButtonText: '#FFFFFF', accentColor: '#E06C75', dayCellBorder: '#DBDBDB',
+                    primaryButtonBg: '#61AFEF',
+                    primaryButtonText: '#FFFFFF',
+                    secondaryButtonBg: '#98C379',
+                    secondaryButtonText: '#FFFFFF',
+                    accentColor: '#E06C75', dayCellBorder: '#DBDBDB',
                     arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#4B5563', headerBorderColor: '#DBDBDB'
                 },
                 dark: {
                     name: "One Dark", bodyBg: '#282C34', mainText: '#ABB2BF', headerBg: '#333842', mainContainerBg: '#333842',
                     dayCellBg: '#3E4451', dayCellHoverBg: '#4B5262', currentDayBg: '#5C6777',
-                    primaryButtonBg: '#61AFEF', primaryButtonText: '#FFFFFF',
-                    secondaryButtonBg: '#ABB2BF', secondaryButtonText: '#282C34', accentColor: '#E06C75', dayCellBorder: '#3E4451',
+                    primaryButtonBg: '#61AFEF',
+                    primaryButtonText: '#FFFFFF',
+                    secondaryButtonBg: '#ABB2BF', 
+                    secondaryButtonText: '#282C34',
+                    accentColor: '#E06C75', dayCellBorder: '#3E4451',
                     arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(255,255,255,0.1)', arrowButtonText: '#ABB2BF', headerBorderColor: '#3E4451'
                 }
             },
             serikaDark: {
-                defaultIsDark: true,
                 light: {
                     name: "Serika Dark", bodyBg: '#F0F0F0', mainText: '#363636', headerBg: '#FFFFFF', mainContainerBg: '#FFFFFF',
                     dayCellBg: '#EAEAEA', dayCellHoverBg: '#DBDBDB', currentDayBg: '#C7C7C7',
-                    primaryButtonBg: '#F5C77F', primaryButtonText: '#363636',
-                    secondaryButtonBg: '#E0E0E0', secondaryButtonText: '#5A5A5A', accentColor: '#F5C77F', dayCellBorder: '#C7C7C7',
+                    primaryButtonBg: '#F5C77F',
+                    primaryButtonText: '#363636',
+                    secondaryButtonBg: '#E0E0E0',
+                    secondaryButtonText: '#5A5A5A',
+                    accentColor: '#F5C77F', dayCellBorder: '#C7C7C7',
                     arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#5A5A5A', headerBorderColor: '#C7C7C7'
                 },
                 dark: {
                     name: "Serika Dark", bodyBg: '#2C2C2C', mainText: '#D0D0D0', headerBg: '#3A3A3A', mainContainerBg: '#3A3A3A',
                     dayCellBg: '#4A4A4A', dayCellHoverBg: '#5A5A5A', currentDayBg: '#6A6A6A',
-                    primaryButtonBg: '#F5C77F', primaryButtonText: '#363636',
-                    secondaryButtonBg: '#5A5A5A', secondaryButtonText: '#D0D0D0', accentColor: '#F5C77F', dayCellBorder: '#4A4A4A',
+                    primaryButtonBg: '#F5C77F',
+                    primaryButtonText: '#363636', 
+                    secondaryButtonBg: '#5A5A5A', 
+                    secondaryButtonText: '#D0D0D0',
+                    accentColor: '#F5C77F', dayCellBorder: '#4A4A4A',
                     arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(255,255,255,0.1)', arrowButtonText: '#D0D0D0', headerBorderColor: '#4A4A4A'
                 }
             },
             superuser: {
-                defaultIsDark: true,
                 light: {
                     name: "Super user", bodyBg: '#EFEFEF', mainText: '#1C1C1C', headerBg: '#FFFFFF', mainContainerBg: '#FFFFFF',
                     dayCellBg: '#EAEAEA', dayCellHoverBg: '#DBDBDB', currentDayBg: '#C7C7C7',
-                    primaryButtonBg: '#00FF00', primaryButtonText: '#1C1C1C',
-                    secondaryButtonBg: '#333333', secondaryButtonText: '#EFEFEF', accentColor: '#00FF00', dayCellBorder: '#DBDBDB',
+                    primaryButtonBg: '#00FF00',
+                    primaryButtonText: '#1C1C1C',
+                    secondaryButtonBg: '#333333',
+                    secondaryButtonText: '#EFEFEF',
+                    accentColor: '#00FF00', dayCellBorder: '#DBDBDB',
                     arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#1C1C1C', headerBorderColor: '#DBDBDB'
                 },
                 dark: {
                     name: "Super user", bodyBg: '#000000', mainText: '#00FF00', headerBg: '#111111', mainContainerBg: '#111111',
                     dayCellBg: '#222222', dayCellHoverBg: '#333333', currentDayBg: '#444444',
-                    primaryButtonBg: '#00FF00', primaryButtonText: '#000000',
-                    secondaryButtonBg: '#444444', secondaryButtonText: '#00FF00', accentColor: '#00FF00', dayCellBorder: '#222222',
+                    primaryButtonBg: '#00FF00',
+                    primaryButtonText: '#000000',
+                    secondaryButtonBg: '#444444', 
+                    secondaryButtonText: '#00FF00', 
+                    accentColor: '#00FF00', dayCellBorder: '#222222',
                     arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(255,255,255,0.1)', arrowButtonText: '#00FF00', headerBorderColor: '#222222'
                 }
             },
             stealth: {
-                defaultIsDark: true,
                 light: {
                     name: "Stealth", bodyBg: '#F5F5F5', mainText: '#424242', headerBg: '#FFFFFF', mainContainerBg: '#FFFFFF',
                     dayCellBg: '#E0E0E0', dayCellHoverBg: '#D0D0D0', currentDayBg: '#C0C0C0',
-                    primaryButtonBg: '#9E9E9E', primaryButtonText: '#FFFFFF',
-                    secondaryButtonBg: '#BDBDBD', secondaryButtonText: '#424242', accentColor: '#757575', dayCellBorder: '#D0D0D0',
+                    primaryButtonBg: '#BDBDBD', 
+                    primaryButtonText: '#424242',
+                    secondaryButtonBg: '#9E9E9E', 
+                    secondaryButtonText: '#FFFFFF',
+                    accentColor: '#757575', dayCellBorder: '#D0D0D0',
                     arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#424242', headerBorderColor: '#D0D0D0'
                 },
                 dark: {
                     name: "Stealth", bodyBg: '#212121', mainText: '#BDBDBD', headerBg: '#2C2C2C', mainContainerBg: '#2C2C2C',
                     dayCellBg: '#363636', dayCellHoverBg: '#424242', currentDayBg: '#525252',
-                    primaryButtonBg: '#9E9E9E', primaryButtonText: '#212121',
-                    secondaryButtonBg: '#424242', secondaryButtonText: '#BDBDBD', accentColor: '#9E9E9E', dayCellBorder: '#363636',
+                    primaryButtonBg: '#9E9E9E', 
+                    primaryButtonText: '#212121', 
+                    secondaryButtonBg: '#424242', 
+                    secondaryButtonText: '#BDBDBD', 
+                    accentColor: '#9E9E9E', dayCellBorder: '#363636',
                     arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(255,255,255,0.1)', arrowButtonText: '#BDBDBD', headerBorderColor: '#363636'
                 }
             },
             taro: {
-                defaultIsDark: true,
                 light: {
                     name: "Taro", bodyBg: '#F5F0FF', mainText: '#5A2C85', headerBg: '#FFFFFF', mainContainerBg: '#FFFFFF',
                     dayCellBg: '#E1BEE7', dayCellHoverBg: '#CFADDF', currentDayBg: '#BA68C8',
-                    primaryButtonBg: '#FFEB3B', primaryButtonText: '#5A2C85',
-                    secondaryButtonBg: '#CE93D8', secondaryButtonText: '#9C27B0', accentColor: '#BA68C8', dayCellBorder: '#D1C4E9',
+                    primaryButtonBg: '#FFEB3B',
+                    primaryButtonText: '#5A2C85',
+                    secondaryButtonBg: '#CE93D8',
+                    secondaryButtonText: '#9C27B0',
+                    accentColor: '#BA68C8', dayCellBorder: '#D1C4E9',
                     arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#9C27B0', headerBorderColor: '#D1C4E9'
                 },
                 dark: {
                     name: "Taro", bodyBg: '#3A2B5E', mainText: '#FDF9E2', headerBg: '#47396B', mainContainerBg: '#47396B',
                     dayCellBg: '#544679', dayCellHoverBg: '#615486', currentDayBg: '#706294',
-                    primaryButtonBg: '#FFEB3B', primaryButtonText: '#3A2B5E',
-                    secondaryButtonBg: '#615486', secondaryButtonText: '#FDF9E2', accentColor: '#BA68C8', dayCellBorder: '#544679',
+                    primaryButtonBg: '#FFEB3B', 
+                    primaryButtonText: '#3A2B5E', 
+                    secondaryButtonBg: '#615486', 
+                    secondaryButtonText: '#FDF9E2',
+                    accentColor: '#BA68C8', dayCellBorder: '#544679',
                     arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(255,255,255,0.1)', arrowButtonText: '#FDF9E2', headerBorderColor: '#544679',
                 }
             },
             horizon: {
-                defaultIsDark: true,
                 light: {
-                    name: "Horizon", bodyBg: '#F8F8F8', mainText: '#333333', headerBg: '#FFFFFF', mainContainerBg: '#FFFFFF',
-                    dayCellBg: '#F0F0F0', dayCellHoverBg: '#E0E0E0', currentDayBg: '#D0D0D0',
-                    primaryButtonBg: '#DA4453', primaryButtonText: '#FFFFFF',
-                    secondaryButtonBg: '#FF6F61', secondaryButtonText: '#FFFFFF', accentColor: '#DA4453', dayCellBorder: '#E0E0E0',
-                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#333333', headerBorderColor: '#E0E0E0'
+                    name: "Horizon", bodyBg: '#FDF0ED', mainText: '#333333', headerBg: '#FFFFFF', mainContainerBg: '#FFFFFF',
+                    dayCellBg: '#FDF0ED', dayCellHoverBg: '#FADAD1', currentDayBg: '#E73665',
+                    primaryButtonBg: '#E73665',
+                    primaryButtonText: '#FFFFFF',
+                    secondaryButtonBg: '#F7806D',
+                    secondaryButtonText: '#FFFFFF',
+                    accentColor: '#E73665', dayCellBorder: '#FADAD1',
+                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#333333', headerBorderColor: '#FADAD1'
                 },
                 dark: {
                     name: "Horizon", bodyBg: '#1C1E26', mainText: '#F9F0DA', headerBg: '#2A2C34', mainContainerBg: '#2A2C34',
-                    dayCellBg: '#383A42', dayCellHoverBg: '#464850', currentDayBg: '#54565E',
-                    primaryButtonBg: '#DA4453', primaryButtonText: '#FFFFFF',
-                    secondaryButtonBg: '#FF6F61', secondaryButtonText: '#F9F0DA', accentColor: '#DA4453', dayCellBorder: '#4c4f57',
-                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(255,255,255,0.1)', arrowButtonText: '#F9F0DA', headerBorderColor: '#383A42'
+                    dayCellBg: '#2E303B', dayCellHoverBg: '#3A3C47', currentDayBg: '#E95678',
+                    primaryButtonBg: '#E95678',
+                    primaryButtonText: '#FFFFFF',
+                    secondaryButtonBg: '#FAB795',
+                    secondaryButtonText: '#6d7095',
+                    accentColor: '#E95678', dayCellBorder: '#3A3C47',
+                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(255,255,255,0.1)', arrowButtonText: '#F9F0DA', headerBorderColor: '#3A3C47'
                 }
             },
             sweden: {
-                defaultIsDark: false,
                 light: {
                     name: "Sweden", bodyBg: '#E0F2F7', mainText: '#004B8E', headerBg: '#FFFFFF', mainContainerBg: '#FFFFFF',
                     dayCellBg: '#B3E5FC', dayCellHoverBg: '#81D4FA', currentDayBg: '#4FC3F7',
-                    primaryButtonBg: '#FFD700', primaryButtonText: '#004B8E',
-                    secondaryButtonBg: '#BBDEFB', secondaryButtonText: '#1976D2', accentColor: '#FFD700', dayCellBorder: '#90CAF9',
+                    primaryButtonBg: '#FFD700',
+                    primaryButtonText: '#004B8E',
+                    secondaryButtonBg: '#BBDEFB',
+                    secondaryButtonText: '#1976D2',
+                    accentColor: '#FFD700', dayCellBorder: '#90CAF9',
                     arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#1976D2', headerBorderColor: '#90CAF9'
                 },
                 dark: {
                     name: "Sweden", bodyBg: '#002B4B', mainText: '#ADD8E6', headerBg: '#003A63', mainContainerBg: '#003A63',
                     dayCellBg: '#004D8C', dayCellHoverBg: '#005CA8', currentDayBg: '#006CD0',
-                    primaryButtonBg: '#FFD700', primaryButtonText: '#002B4B',
-                    secondaryButtonBg: '#004D8C', secondaryButtonText: '#ADD8E6', accentColor: '#FFD700', dayCellBorder: '#004D8C',
+                    primaryButtonBg: '#FFD700',
+                    primaryButtonText: '#002B4B', 
+                    secondaryButtonBg: '#004D8C',
+                    secondaryButtonText: '#ADD8E6', 
+                    accentColor: '#FFD700', dayCellBorder: '#004D8C',
                     arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(255,255,255,0.1)', arrowButtonText: '#ADD8E6', headerBorderColor: '#004D8C'
                 }
             },
             catppuccinLatte: {
-                defaultIsDark: false,
                 light: {
                     name: "Catppuccin Latte", bodyBg: '#EFF1F5', mainText: '#4C4F69', headerBg: '#FFFFFF', mainContainerBg: '#FFFFFF',
                     dayCellBg: '#E6E9EF', dayCellHoverBg: '#DCE0EE', currentDayBg: '#CCD0DA',
-                    primaryButtonBg: '#DC8A78', primaryButtonText: '#4C4F69',
-                    secondaryButtonBg: '#D2D4E3', secondaryButtonText: '#6C6F85', accentColor: '#DC8A78', dayCellBorder: '#DCE0EE',
+                    primaryButtonBg: '#DC8A78',
+                    primaryButtonText: '#4C4F69',
+                    secondaryButtonBg: '#D2D4E3',
+                    secondaryButtonText: '#6C6F85',
+                    accentColor: '#DC8A78', dayCellBorder: '#DCE0EE',
                     arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#6C6F85', headerBorderColor: '#DCE0EE'
                 },
                 dark: {
-                    name: "Catppuccin Mocha", bodyBg: '#24273A', mainText: '#CAD3F5', headerBg: '#363A4F', mainContainerBg: '#363A4F',
-                    dayCellBg: '#494D64', dayCellHoverBg: '#5B6078', currentDayBg: '#6E738D',
-                    primaryButtonBg: '#F28C8C', primaryButtonText: '#24273A',
-                    secondaryButtonBg: '#5B6078', secondaryButtonText: '#CAD3F5', accentColor: '#F28C8C', dayCellBorder: '#494D64',
-                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(255,255,255,0.1)', arrowButtonText: '#CAD3F5', headerBorderColor: '#494D64'
+                    name: "Catppuccin Mocha", bodyBg: '#1E1E2E', mainText: '#CDD6F4', headerBg: '#181825', mainContainerBg: '#181825',
+                    dayCellBg: '#313244', dayCellHoverBg: '#45475A', currentDayBg: '#F38BA8',
+                    primaryButtonBg: '#F38BA8',
+                    primaryButtonText: '#1E1E2E',
+                    secondaryButtonBg: '#45475A',
+                    secondaryButtonText: '#CDD6F4',
+                    accentColor: '#F38BA8', dayCellBorder: '#313244',
+                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(255,255,255,0.1)', arrowButtonText: '#CDD6F4', headerBorderColor: '#313244'
                 }
             },
             github: {
-                defaultIsDark: false,
                 light: {
                     name: "GitHub", bodyBg: '#F6F8FA', mainText: '#24292E', headerBg: '#FFFFFF', mainContainerBg: '#FFFFFF',
-                    dayCellBg: '#FFFFFF', dayCellHoverBg: '#F0F3F6', currentDayBg: '#E6E8EB',
-                    primaryButtonBg: '#2EA44F', primaryButtonText: '#FFFFFF',
-                    secondaryButtonBg: '#F3F4F6', secondaryButtonText: '#24292E', accentColor: '#0366D6', dayCellBorder: '#D1D7DC',
-                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#24292E', headerBorderColor: '#D1D7DC'
+                    dayCellBg: '#FFFFFF', dayCellHoverBg: '#F3F4F6', currentDayBg: '#E6E8EB',
+                    primaryButtonBg: '#28A745',
+                    primaryButtonText: '#FFFFFF',
+                    secondaryButtonBg: '#F6F8FA',
+                    secondaryButtonText: '#24292E',
+                    accentColor: '#0366D6', dayCellBorder: '#D1D5DA',
+                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#24292E', headerBorderColor: '#D1D5DA'
                 },
                 dark: {
                     name: "GitHub Dark", bodyBg: '#0D1117', mainText: '#C9D1D9', headerBg: '#161B22', mainContainerBg: '#161B22',
                     dayCellBg: '#21262D', dayCellHoverBg: '#30363D', currentDayBg: '#444C56',
-                    primaryButtonBg: '#238636', primaryButtonText: '#FFFFFF',
-                    secondaryButtonBg: '#30363D', secondaryButtonText: '#C9D1D9', accentColor: '#58A6FF', dayCellBorder: '#21262D',
-                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(255,255,255,0.1)', arrowButtonText: '#C9D1D9', headerBorderColor: '#21262D'
+                    primaryButtonBg: '#238636',
+                    primaryButtonText: '#FFFFFF',
+                    secondaryButtonBg: '#30363D',
+                    secondaryButtonText: '#C9D1D9',
+                    accentColor: '#58A6FF', dayCellBorder: '#30363D',
+                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(255,255,255,0.1)', arrowButtonText: '#C9D1D9', headerBorderColor: '#30363D'
                 }
             },
             tokyoNight: {
-                defaultIsDark: true,
                 light: {
                     name: "Tokyo Night", bodyBg: '#E1E4F2', mainText: '#565A6E', headerBg: '#FFFFFF', mainContainerBg: '#FFFFFF',
                     dayCellBg: '#FFFFFF', dayCellHoverBg: '#F0F2F9', currentDayBg: '#C7C9DB',
-                    primaryButtonBg: '#BB9AF7', primaryButtonText: '#FFFFFF',
-                    secondaryButtonBg: '#DDE1F0', secondaryButtonText: '#565A6E', accentColor: '#BB9AF7', dayCellBorder: '#DDE1F0',
+                    primaryButtonBg: '#BB9AF7',
+                    primaryButtonText: '#FFFFFF',
+                    secondaryButtonBg: '#DDE1F0',
+                    secondaryButtonText: '#565A6E', 
+                    accentColor: '#BB9AF7', dayCellBorder: '#DDE1F0',
                     arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#565A6E', headerBorderColor: '#DDE1F0'
                 },
                 dark: {
                     name: "Tokyo Night", bodyBg: '#1A1B26', mainText: '#C0CAF5', headerBg: '#232635', mainContainerBg: '#232635',
                     dayCellBg: '#2D3043', dayCellHoverBg: '#393D55', currentDayBg: '#4A4F6B',
-                    primaryButtonBg: '#BB9AF7', primaryButtonText: '#FFFFFF',
-                    secondaryButtonBg: '#393D55', secondaryButtonText: '#C0CAF5', accentColor: '#BB9AF7', dayCellBorder: '#2D3043',
+                    primaryButtonBg: '#BB9AF7',
+                    primaryButtonText: '#FFFFFF',
+                    secondaryButtonBg: '#393D55', 
+                    secondaryButtonText: '#C0CAF5',
+                    accentColor: '#BB9AF7', dayCellBorder: '#2D3043',
                     arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(255,255,255,0.1)', arrowButtonText: '#C0CAF5', headerBorderColor: '#2D3043'
                 }
             },
             gruvbox: {
-                defaultIsDark: true,
                 light: {
                     name: "Gruvbox", bodyBg: '#FBF1C7', mainText: '#3C3836', headerBg: '#FFFFFF', mainContainerBg: '#FFFFFF',
-                    dayCellBg: '#FEFBF3', dayCellHoverBg: '#F2E5BC', currentDayBg: '#FABD2F',
-                    primaryButtonBg: '#FABD2F', primaryButtonText: '#3C3836',
-                    secondaryButtonBg: '#EBDBB2', secondaryButtonText: '#3C3836', accentColor: '#D79921', dayCellBorder: '#D6C09D',
-                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#3C3836', headerBorderColor: '#D6C09D'
+                    dayCellBg: '#F2E5BC', dayCellHoverBg: '#EBDBB2', currentDayBg: '#D5C4A1',
+                    primaryButtonBg: '#FABD2F',
+                    primaryButtonText: '#3C3836',
+                    secondaryButtonBg: '#EBDBB2',
+                    secondaryButtonText: '#3C3836',
+                    accentColor: '#D79921', dayCellBorder: '#EBDBB2',
+                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#3C3836', headerBorderColor: '#EBDBB2'
                 },
                 dark: {
                     name: "Gruvbox Dark", bodyBg: '#282828', mainText: '#EBDBB2', headerBg: '#32302F', mainContainerBg: '#32302F',
                     dayCellBg: '#3C3836', dayCellHoverBg: '#504945', currentDayBg: '#665C54',
-                    primaryButtonBg: '#FABD2F', primaryButtonText: '#282828',
-                    secondaryButtonBg: '#504945', secondaryButtonText: '#EBDBB2', accentColor: '#FABD2F', dayCellBorder: '#3C3836',
+                    primaryButtonBg: '#FABD2F',
+                    primaryButtonText: '#282828',
+                    secondaryButtonBg: '#504945',
+                    secondaryButtonText: '#EBDBB2',
+                    accentColor: '#FABD2F', dayCellBorder: '#3C3836',
                     arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(255,255,255,0.1)', arrowButtonText: '#EBDBB2', headerBorderColor: '#3C3836'
                 }
             },
             solarized: {
-                defaultIsDark: false,
                 light: {
                     name: "Solarized Light", bodyBg: '#FDF6E3', mainText: '#657B83', headerBg: '#FFFFFF', mainContainerBg: '#FFFFFF',
-                    dayCellBg: '#EEE8D5', dayCellHoverBg: '#E0DECE', currentDayBg: '#CB4B16',
-                    primaryButtonBg: '#2AA198', primaryButtonText: '#FFFFFF',
-                    secondaryButtonBg: '#FDF6E3', secondaryButtonText: '#657B83', accentColor: '#2AA198', dayCellBorder: '#D0D0C8',
-                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#657B83', headerBorderColor: '#D0D0C8'
+                    dayCellBg: '#EEE8D5', dayCellHoverBg: '#E0DECE', currentDayBg: '#D9D2B6',
+                    primaryButtonBg: '#2AA198',
+                    primaryButtonText: '#FFFFFF',
+                    secondaryButtonBg: '#FDF6E3',
+                    secondaryButtonText: '#657B83',
+                    accentColor: '#2AA198', dayCellBorder: '#E0DECE',
+                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#657B83', headerBorderColor: '#E0DECE'
                 },
                 dark: {
                     name: "Solarized Dark", bodyBg: '#002B36', mainText: '#839496', headerBg: '#073642', mainContainerBg: '#073642',
-                    dayCellBg: '#073642', dayCellHoverBg: '#586E75', currentDayBg: '#DC322F',
-                    primaryButtonBg: '#2AA198', primaryButtonText: '#FFFFFF',
-                    secondaryButtonBg: '#073642', secondaryButtonText: '#839496', accentColor: '#2AA198', dayCellBorder: '#586E75',
+                    dayCellBg: '#073642', dayCellHoverBg: '#586E75', currentDayBg: '#1a575b',
+                    primaryButtonBg: '#2AA198',
+                    primaryButtonText: '#FFFFFF',
+                    secondaryButtonBg: '#073642',
+                    secondaryButtonText: '#839496',
+                    accentColor: '#2AA198', dayCellBorder: '#586E75',
                     arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(255,255,255,0.1)', arrowButtonText: '#839496', headerBorderColor: '#586E75'
                 }
-            },
-            aidah: {
-                defaultIsDark: true,
-                light: {
-                    name: "Aidah", bodyBg: '#F7F7F7', mainText: '#333333', headerBg: '#FFFFFF', mainContainerBg: '#FFFFFF',
-                    dayCellBg: '#FFFFFF', dayCellHoverBg: '#EEEEEE', currentDayBg: '#E8E8E8',
-                    primaryButtonBg: '#D1D1D1', primaryButtonText: '#333333',
-                    secondaryButtonBg: '#E9E9E9', secondaryButtonText: '#555555', accentColor: '#AAAAAA', dayCellBorder: '#DDDDDD',
-                },
-                dark: {
-                    name: "Aidah",
-                    bodyBg: '#181926', mainText: '#c5cfe9', headerBg: '#333333', mainContainerBg: '#24273a',
-                    dayCellBg: '#32354b', dayCellHoverBg: '#181926', currentDayBg: '#3a2c40',
-                    primaryButtonBg: '#3a2c40', primaryButtonText: '#ff9bd5',
-                    secondaryButtonBg: '#2f402c', secondaryButtonText: '#a6da85', accentColor: '#ff9bd5', dayCellBorder: '#454b66',
-                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(255,255,255,0.1)', arrowButtonText: '#a6d475', headerBorderColor: '#454b66',
-                }
             }
-
         };
 
-        let currentBaseThemeKey = null;
+        let currentBaseThemeKey = 'pastelBlue';
         let isDarkModeActive = false;
-        let holderIconEnabled = false;
+        let holderIconEnabled = true;
         let noBackgroundMode = false;
         let disableSidebarAnimations = true;
-        let currentBaseTheme = null;
-        let areCustomColorPickersLocked = true;
+        let hideScrollbars = false;
+        let foldDayCellsEnabled = false;
+        let showHolderByDefault = false;
+        let use24HourFormat = false;
+        let hideAddEventButtonInHolder = false;
+        let currentBaseTheme = THEMES.pastelBlue.light;
         let unlockedSpecialThemesKeys = new Set();
         let savedCustomThemes = [];
+        let holderSidebarWidth = 250; 
 
         const saveEvents = async () => {
             await Preferences.set({ key: 'calendarEvents', value: JSON.stringify(events) });
@@ -2016,7 +2442,7 @@
             }
         };
 
-        const saveSettings = async (fontName, fontData, baseThemeKey, isDarkMode, uiRoundness, fontSize, eventRoundness, eventBorderThickness, dayCellMinWidth, customThemeColors = null, customColorPickersLocked = true, unlockedSpecialThemes = [], holderIconEnabledState = false, noBackgroundModeState = false, savedThemes = [], disableSidebarAnimationsState = false) => {
+        const saveSettings = async (fontName, fontData, baseThemeKey, isDarkMode, uiRoundness, fontSize, eventRoundness, eventBorderThickness, dayCellMinWidth, customThemeColors = null, unlockedSpecialThemes = [], holderIconEnabledState = false, noBackgroundModeState = false, savedThemes = [], disableSidebarAnimationsState = false, hideScrollbarsState = false, foldDayCellsEnabledState = false, showHolderByDefaultState = false, use24HourFormatState = false, currentHolderSidebarWidth = 250, hideAddEventButtonInHolderState = false) => {
             const settings = {
                 customFontName: fontName,
                 customFontData: fontData,
@@ -2027,13 +2453,18 @@
                 eventRoundness: eventRoundness,
                 eventBorderThickness: eventBorderThickness,
                 dayCellMinWidth: dayCellMinWidth,
-                customThemeColors: customThemeColors,
-                customColorPickersLocked: customColorPickersLocked,
+                customThemeColors: baseThemeKey === null ? customThemeColors : null,
                 unlockedSpecialThemes: Array.from(unlockedSpecialThemes),
                 holderIconEnabled: holderIconEnabledState,
                 noBackgroundMode: noBackgroundModeState,
                 savedCustomThemes: savedThemes,
-                disableSidebarAnimations: disableSidebarAnimationsState
+                disableSidebarAnimations: disableSidebarAnimationsState,
+                hideScrollbars: hideScrollbarsState,
+                foldDayCellsEnabled: foldDayCellsEnabledState,
+                showHolderByDefault: showHolderByDefaultState,
+                use24HourFormat: use24HourFormatState,
+                holderSidebarWidth: currentHolderSidebarWidth,
+                hideAddEventButtonInHolder: hideAddEventButtonInHolderState 
             };
             await Preferences.set({ key: 'calendarSettings', value: JSON.stringify(settings) });
         };
@@ -2042,7 +2473,7 @@
             eventModal, modalTitle, eventTitleInput, eventTimeInput, eventDateInput, eventDescriptionInput,
             eventColorInput, eventIconInput, colorPaletteEl, iconGridEl, saveEventButton, deleteEventButton, cancelEventButton,
             settingsModal, customFontUploadInput, customFontNameDisplay, resetCustomFontButton,
-            uiRoundnessInput, uiRoundnessValueDisplay, fontSizeInput, fontSizeValueDisplay, darkModeToggle,
+            uiRoundnessInput, uiRoundnessValueDisplay, fontSizeInput, fontSizeValueDisplay,
             eventRoundnessInput, eventRoundnessValueDisplay, eventBorderThicknessInput, eventBorderThicknessValueDisplay,
             dayCellMinWidthInput, dayCellMinWidthValueDisplay,
             themeBodyBgInput, themeTextColorInput, themeHeaderBgInput, themeMainContainerBgInput,
@@ -2050,11 +2481,13 @@
             themePrimaryButtonBgInput, themePrimaryButtonTextInput, themeSecondaryButtonBgInput,
             themeSecondaryButtonTextInput, themeAccentColorInput, themeDayCellBorderColorInput,
             saveSettingsButton, cancelSettingsButton, premadeThemeBoxesEl, iconSearchInput,
-            adMobPlaceholder, customColorPickersContainer, colorPickersOverlay, watchAdButton, adLoadingSpinner,
             specialThemeBoxesEl, saveCustomThemeButton, savedThemePreviewsEl, removeAllEventsButton, resetApplicationButton,
             removeAllCustomThemesButton, themeNameModal, themeNameInput, cancelThemeNameButton, saveThemeNameButton,
-            effectGlowing, effectStriped, effectDotted, effectParticles, effectSnowFalling, effectGlisteningStars, effectGradient, effectAnimatedStripes, eventIconDisplay,
-            holderContentEl, hamburgerIcon, holderSidebar, holderIconToggle, noBackgroundToggle, disableSidebarAnimationsToggle, mainContainerEl;
+            effectGlowing, effectStriped, effectDotted, effectParticles, effectSnowFalling, effectGlisteningStars, effectGradient, effectAnimatedStripes, effectAnimatedVerticalRainbow, eventIconDisplay,
+            holderContentEl, hamburgerIcon, holderSidebar, holderIconToggle, noBackgroundToggle, disableSidebarAnimationsToggle, mainContainerEl,
+            eventContextMenu, contextEditEventButton, contextDuplicateEventButton, contextDeleteEventButton, hideScrollbarsToggle, holderSidebarCloseButton,
+            darkModeButton, foldDayCellsToggle, showHolderByDefaultToggle, use24HourFormatToggle, addHolderEventButton, hideAddEventButtonInHolderToggle,
+            holderResizeHandle, premadeThemeBoxesContainer;
 
         const loadSettings = async () => {
             const { value: storedSettings } = await Preferences.get({ key: 'calendarSettings' });
@@ -2071,35 +2504,45 @@
 
             let loadedCustomFontName = null;
             let loadedCustomFontData = null;
-            let loadedBaseThemeKey = 'blue';
+            let loadedBaseThemeKey = 'pastelBlue';
             let loadedIsDarkMode = false;
-            let loadedHolderIconEnabled = false;
+            let loadedHolderIconEnabled = true;
             let loadedNoBackgroundMode = false;
             let loadedDisableSidebarAnimations = true;
+            let loadedHideScrollbars = true;
+            let loadedFoldDayCellsEnabled = false;
+            let loadedShowHolderByDefault = false;
+            let loadedUse24HourFormat = false;
+            let loadedHideAddEventButtonInHolder = false;
             let loadedCustomThemeColors = null;
-            let loadedCustomColorPickersLocked = true;
             let loadedUnlockedSpecialThemes = [];
             let loadedSavedCustomThemes = [];
+            let loadedHolderSidebarWidth = 250;
 
             if (storedSettings) {
                 const settings = JSON.parse(storedSettings);
                 loadedCustomFontName = settings.customFontName;
                 loadedCustomFontData = settings.customFontData;
 
-                loadedBaseThemeKey = settings.baseThemeKey !== undefined ? settings.baseThemeKey : 'blue';
+                loadedBaseThemeKey = settings.baseThemeKey !== undefined ? settings.baseThemeKey : 'pastelBlue';
                 loadedIsDarkMode = settings.isDarkMode !== undefined ? settings.isDarkMode : false;
                 loadedHolderIconEnabled = settings.holderIconEnabled !== undefined ? settings.holderIconEnabled : false;
                 loadedNoBackgroundMode = settings.noBackgroundMode !== undefined ? settings.noBackgroundMode : false;
                 loadedDisableSidebarAnimations = settings.disableSidebarAnimations !== undefined ? settings.disableSidebarAnimations : true;
+                loadedHideScrollbars = settings.hideScrollbars !== undefined ? settings.hideScrollbars : false;
+                loadedFoldDayCellsEnabled = settings.foldDayCellsEnabled !== undefined ? settings.foldDayCellsEnabled : false;
+                loadedShowHolderByDefault = settings.showHolderByDefault !== undefined ? settings.showHolderByDefault : false;
+                loadedUse24HourFormat = settings.use24HourFormat !== undefined ? settings.use24HourFormat : false;
+                loadedHideAddEventButtonInHolder = settings.hideAddEventButtonInHolder !== undefined ? settings.hideAddEventButtonInHolder : false; 
 
                 currentUiRoundness = settings.uiRoundness !== undefined ? settings.uiRoundness : defaultRoundness;
                 currentFontSize = settings.fontSize !== undefined ? settings.fontSize : defaultFontSize;
                 currentEventRoundness = settings.eventRoundness !== undefined ? settings.eventRoundness : currentUiRoundness;
                 currentEventBorderThickness = settings.eventBorderThickness !== undefined ? settings.eventBorderThickness : defaultEventBorderThickness;
                 currentDayCellMinWidth = settings.dayCellMinWidth !== undefined ? settings.dayCellMinWidth : defaultDayCellMinWidth;
+                loadedHolderSidebarWidth = settings.holderSidebarWidth !== undefined ? settings.holderSidebarWidth : 250;
 
                 loadedCustomThemeColors = settings.customThemeColors || null;
-                loadedCustomColorPickersLocked = settings.customColorPickersLocked === false ? false : true;
                 loadedUnlockedSpecialThemes = settings.unlockedSpecialThemes || [];
                 loadedSavedCustomThemes = settings.savedCustomThemes || [];
             }
@@ -2114,14 +2557,24 @@
             holderIconEnabled = loadedHolderIconEnabled;
             noBackgroundMode = loadedNoBackgroundMode;
             disableSidebarAnimations = loadedDisableSidebarAnimations;
-            areCustomColorPickersLocked = loadedCustomColorPickersLocked;
+            hideScrollbars = loadedHideScrollbars;
+            foldDayCellsEnabled = loadedFoldDayCellsEnabled;
+            showHolderByDefault = loadedShowHolderByDefault;
+            use24HourFormat = loadedUse24HourFormat;
+            hideAddEventButtonInHolder = loadedHideAddEventButtonInHolder; 
             unlockedSpecialThemesKeys = new Set(loadedUnlockedSpecialThemes);
             savedCustomThemes = loadedSavedCustomThemes;
+            holderSidebarWidth = loadedHolderSidebarWidth;
 
             if (currentBaseThemeKey === null) {
-                currentBaseTheme = loadedCustomThemeColors || { ...DEFAULT_LIGHT_THEME };
+                currentBaseTheme = loadedCustomThemeColors || { ...THEMES.pastelBlue.light };
             } else {
-                currentBaseTheme = null;
+                if (THEMES[currentBaseThemeKey]) {
+                    currentBaseTheme = isDarkModeActive ? THEMES[currentBaseThemeKey].dark : THEMES[currentBaseThemeKey].light;
+                } else {
+                    currentBaseTheme = THEMES.pastelBlue.light;
+                    currentBaseThemeKey = 'pastelBlue';
+                }
             }
 
 
@@ -2133,15 +2586,20 @@
                 holderIconEnabled: loadedHolderIconEnabled,
                 noBackgroundMode: loadedNoBackgroundMode,
                 disableSidebarAnimations: loadedDisableSidebarAnimations,
+                hideScrollbars: loadedHideScrollbars,
+                foldDayCellsEnabled: loadedFoldDayCellsEnabled,
+                showHolderByDefault: loadedShowHolderByDefault,
+                use24HourFormat: loadedUse24HourFormat,
+                hideAddEventButtonInHolder: loadedHideAddEventButtonInHolder, 
                 currentUiRoundness: currentUiRoundness,
                 currentFontSize: currentFontSize,
                 currentEventRoundness: currentEventRoundness,
                 currentEventBorderThickness: currentEventBorderThickness,
                 currentDayCellMinWidth: currentDayCellMinWidth,
                 customThemeColors: loadedCustomThemeColors,
-                customColorPickersLocked: loadedCustomColorPickersLocked,
                 unlockedSpecialThemes: loadedUnlockedSpecialThemes,
-                savedCustomThemes: loadedSavedCustomThemes
+                savedCustomThemes: loadedSavedCustomThemes,
+                holderSidebarWidth: loadedHolderSidebarWidth
             };
         };
 
@@ -2360,11 +2818,18 @@ const initColorPalette = () => {
                 iconItem.innerHTML = `<i class="${iconClass}"></i>`;
                 iconItem.dataset.icon = iconClass;
                 iconItem.addEventListener('click', () => {
-                    document.querySelectorAll('.icon-item').forEach(item => item.classList.remove('selected'));
-                    iconItem.classList.add('selected');
-                    eventIconInput.value = iconClass;
-                    eventIconDisplay.innerHTML = `<i class="${iconClass}"></i>`;
-                    eventIconDisplay.classList.add('selected'); 
+                    if (iconItem.classList.contains('selected') && eventIconInput.value === iconClass) {
+                        iconItem.classList.remove('selected');
+                        eventIconInput.value = '';
+                        eventIconDisplay.innerHTML = '<i class="fas fa-plus"></i>';
+                        eventIconDisplay.classList.remove('selected');
+                    } else {
+                        document.querySelectorAll('.icon-item').forEach(item => item.classList.remove('selected'));
+                        iconItem.classList.add('selected');
+                        eventIconInput.value = iconClass;
+                        eventIconDisplay.innerHTML = `<i class="${iconClass}"></i>`;
+                        eventIconDisplay.classList.add('selected'); 
+                    }
                 });
                 iconGridEl.appendChild(iconItem);
             });
@@ -2395,36 +2860,19 @@ const initColorPalette = () => {
         const getEffectiveTheme = (baseThemeKey, isDarkMode) => {
             let themeToApply;
 
-            if (baseThemeKey && PASTEL_THEMES[baseThemeKey]) {
-                themeToApply = { ...(isDarkMode ? PASTEL_THEMES[baseThemeKey].dark : PASTEL_THEMES[baseThemeKey].light) };
-            } else if (baseThemeKey && SPECIAL_THEMES[baseThemeKey]) {
-                themeToApply = { ...(isDarkMode ? SPECIAL_THEMES[baseThemeKey].dark : SPECIAL_THEMES[baseThemeKey].light) };
-            } else {
+            if (baseThemeKey === null) {
                 themeToApply = { ...currentBaseTheme };
-            }
-
-            if (baseThemeKey === 'pureBlack' || (baseThemeKey === null && themeToApply.bodyBg === '#000000')) {
-                themeToApply.bodyBg = '#000000';
-                themeToApply.mainText = '#FFFFFF';
-                themeToApply.headerBg = '#000000';
-                themeToApply.mainContainerBg = '#000000';
-                themeToApply.dayCellBg = '#0A0A0A';
-                themeToApply.dayCellHoverBg = '#1A1A1A';
-                themeToApply.currentDayBg = '#2A2A2A';
-                themeToApply.primaryButtonBg = '#FFFFFF';
-                themeToApply.primaryButtonText = '#000000';
-                themeToApply.secondaryButtonBg = '#1A1A1A';
-                themeToApply.secondaryButtonText = '#AAAAAA';
-                themeToApply.accentColor = '#AAAAAA';
-                themeToApply.dayCellBorder = '#1A1A1A';
-                themeToApply.arrowButtonBg = 'transparent';
-                themeToApply.arrowButtonHoverBg = 'rgba(255,255,255,0.1)';
-                themeToApply.arrowButtonText = '#E0E0E0';
-                themeToApply.headerBorderColor = '#1A1A1A';
+            } else {
+                const themeDef = THEMES[baseThemeKey];
+                if (themeDef) {
+                    themeToApply = isDarkMode ? { ...themeDef.dark } : { ...themeDef.light };
+                } else {
+                    themeToApply = isDarkMode ? { ...THEMES.pastelBlue.dark } : { ...THEMES.pastelBlue.light };
+                    currentBaseThemeKey = 'pastelBlue';
+                }
             }
 
             themeToApply.primaryButtonBorderColor = themeToApply.primaryButtonText;
-
             return themeToApply;
         };
 
@@ -2445,6 +2893,11 @@ const initColorPalette = () => {
 
             document.documentElement.style.setProperty('--secondary-button-bg', effectiveTheme.secondaryButtonBg);
             document.documentElement.style.setProperty('--secondary-button-text', effectiveTheme.secondaryButtonText);
+            const secondaryTextRgb = hexToRgb(effectiveTheme.secondaryButtonText);
+            if (secondaryTextRgb) {
+                document.documentElement.style.setProperty('--secondary-button-text-rgb', `${secondaryTextRgb.r}, ${secondaryTextRgb.g}, ${secondaryTextRgb.b}`);
+            }
+
 
             document.documentElement.style.setProperty('--accent-color', effectiveTheme.accentColor);
             document.documentElement.style.setProperty('--day-cell-border-color', effectiveTheme.dayCellBorder);
@@ -2457,16 +2910,12 @@ const initColorPalette = () => {
             if (isDarkModeActive) {
                 document.documentElement.style.setProperty('--slider-track-bg', '#666666');
             } else {
-                document.documentElement.style.setProperty('--slider-track-bg', effectiveTheme.secondaryButtonBg);
+                document.documentElement.style.setProperty('--slider-track-bg', '#D1D5DB');
             }
 
             document.documentElement.style.setProperty('--modal-overlay-bg', `rgba(0, 0, 0, 0.5)`);
 
-            if (isDarkModeActive) {
-                document.documentElement.style.setProperty('--custom-pickers-overlay-bg', `rgba(0, 0, 0, 0.5)`);
-            } else {
-                document.documentElement.style.setProperty('--custom-pickers-overlay-bg', `rgba(255, 255, 255, 0.5)`);
-            }
+            document.documentElement.style.setProperty('--custom-pickers-overlay-bg', `rgba(255, 255, 255, 0.5)`);
 
             if (inputs && inputs.themeBodyBgInput) {
                 const sourceThemeForPickers = effectiveTheme;
@@ -2501,6 +2950,9 @@ const initColorPalette = () => {
             renderCalendar();
             renderHolderEvents();
             applyAnimationsState();
+            applyScrollbarVisibility();
+            updateThemeSelectionInSettings();
+            applyAddEventButtonVisibility(); 
         };
 
         const injectCustomFont = (fontName, fontData) => {
@@ -2539,7 +2991,7 @@ const initColorPalette = () => {
 
                 await saveSettings(fontName, fontData, currentBaseThemeKey, isDarkModeActive,
                              uiRoundnessInput.value, fontSizeInput.value,
-                             eventRoundnessInput.value, eventBorderThicknessInput.value, dayCellMinWidthInput.value, currentBaseTheme, areCustomColorPickersLocked, unlockedSpecialThemesKeys, holderIconEnabled, noBackgroundMode, savedCustomThemes, disableSidebarAnimations);
+                             eventRoundnessInput.value, eventBorderThicknessInput.value, dayCellMinWidthInput.value, currentBaseTheme, unlockedSpecialThemesKeys, holderIconEnabled, noBackgroundMode, savedCustomThemes, disableSidebarAnimations, hideScrollbars, foldDayCellsEnabled, showHolderByDefault, use24HourFormat, holderSidebarWidth, hideAddEventButtonInHolder);
             };
             reader.readAsDataURL(file);
         };
@@ -2555,26 +3007,59 @@ const initColorPalette = () => {
 
             await saveSettings(null, null, currentBaseThemeKey, isDarkModeActive,
                          uiRoundnessInput.value, fontSizeInput.value,
-                         eventRoundnessInput.value, eventBorderThicknessInput.value, dayCellMinWidthInput.value, currentBaseTheme, areCustomColorPickersLocked, unlockedSpecialThemesKeys, holderIconEnabled, noBackgroundMode, savedCustomThemes, disableSidebarAnimations);
+                         eventRoundnessInput.value, eventBorderThicknessInput.value, dayCellMinWidthInput.value, currentBaseTheme, unlockedSpecialThemesKeys, holderIconEnabled, noBackgroundMode, savedCustomThemes, disableSidebarAnimations, hideScrollbars, foldDayCellsEnabled, showHolderByDefault, use24HourFormat, holderSidebarWidth, hideAddEventButtonInHolder);
         };
 
         const initPremadeThemeBoxes = () => {
             premadeThemeBoxesEl.innerHTML = '';
-            const themeKeysOrdered = ['blue', 'green', 'yellow', 'purple', 'pink', 'pureBlack'];
+        
+            const pureBlackTheme = THEMES.pureBlack.light;
+            const pureBlackThemeBox = document.createElement('div');
+            pureBlackThemeBox.classList.add('theme-box');
 
-            themeKeysOrdered.forEach(key => {
-                const theme = PASTEL_THEMES[key].light;
+            const pureBlackColorPreview = document.createElement('div');
+            pureBlackColorPreview.classList.add('color-preview');
+            pureBlackColorPreview.style.backgroundColor = pureBlackTheme.accentColor;
+            pureBlackThemeBox.appendChild(pureBlackColorPreview);
+
+            const pureBlackThemeName = document.createElement('span');
+            pureBlackThemeName.textContent = 'Pure Black';
+            pureBlackThemeBox.appendChild(pureBlackThemeName);
+
+            pureBlackThemeBox.addEventListener('click', async () => {
+                document.querySelectorAll('.theme-box').forEach(box => box.classList.remove('selected'));
+                pureBlackThemeBox.classList.add('selected');
+                darkModeButton.classList.remove('selected');
+
+                currentBaseThemeKey = 'pureBlack';
+                currentBaseTheme = null;
+
+                applyTheme(getEffectiveTheme(currentBaseThemeKey, isDarkModeActive), {
+                    themeBodyBgInput, themeTextColorInput, themeHeaderBgInput, themeMainContainerBgInput,
+                    themeDayCellBgInput, themeDayCellHoverBgInput, themeCurrentDayBgInput,
+                    themePrimaryButtonBgInput, themePrimaryButtonTextInput,
+                    themeSecondaryButtonBgInput, themeSecondaryButtonTextInput,
+                    themeAccentColorInput, themeDayCellBorderColorInput
+                });
+                initColorPalette();
+
+                await saveSettings(currentCustomFontName, null, currentBaseThemeKey, isDarkModeActive,
+                             uiRoundnessInput.value, fontSizeInput.value,
+                             eventRoundnessInput.value, eventBorderThicknessInput.value, dayCellMinWidthInput.value, null, unlockedSpecialThemesKeys, holderIconEnabled, noBackgroundMode, savedCustomThemes, disableSidebarAnimations, hideScrollbars, foldDayCellsEnabled, showHolderByDefault, use24HourFormat, holderSidebarWidth, hideAddEventButtonInHolder);
+            });
+            premadeThemeBoxesEl.appendChild(pureBlackThemeBox);
+
+            const pastelThemeKeysOrdered = ['pastelBlue', 'pastelGreen', 'pastelYellow', 'pastelPink', 'pastelPurple'];
+
+            pastelThemeKeysOrdered.forEach(key => {
+                const theme = THEMES[key].light;
                 const themeBox = document.createElement('div');
                 themeBox.classList.add('theme-box');
                 themeBox.dataset.themeKey = key;
 
                 const colorPreview = document.createElement('div');
                 colorPreview.classList.add('color-preview');
-                if (key === 'yellow') {
-                    colorPreview.style.backgroundColor = '#FFD700';
-                } else {
-                    colorPreview.style.backgroundColor = theme.accentColor;
-                }
+                colorPreview.style.backgroundColor = theme.accentColor;
                 themeBox.appendChild(colorPreview);
 
                 const themeName = document.createElement('span');
@@ -2584,6 +3069,7 @@ const initColorPalette = () => {
                 themeBox.addEventListener('click', async () => {
                     document.querySelectorAll('.theme-box').forEach(box => box.classList.remove('selected'));
                     themeBox.classList.add('selected');
+                    darkModeButton.classList.remove('selected');
 
                     currentBaseThemeKey = key;
                     currentBaseTheme = null;
@@ -2595,110 +3081,81 @@ const initColorPalette = () => {
                         themeSecondaryButtonBgInput, themeSecondaryButtonTextInput,
                         themeAccentColorInput, themeDayCellBorderColorInput
                     });
+                    initColorPalette();
 
                     await saveSettings(currentCustomFontName, null, currentBaseThemeKey, isDarkModeActive,
                                  uiRoundnessInput.value, fontSizeInput.value,
-                                 eventRoundnessInput.value, eventBorderThicknessInput.value, dayCellMinWidthInput.value, null, areCustomColorPickersLocked, unlockedSpecialThemesKeys, holderIconEnabled, noBackgroundMode, savedCustomThemes, disableSidebarAnimations);
+                                 eventRoundnessInput.value, eventBorderThicknessInput.value, dayCellMinWidthInput.value, null, unlockedSpecialThemesKeys, holderIconEnabled, noBackgroundMode, savedCustomThemes, disableSidebarAnimations, hideScrollbars, foldDayCellsEnabled, showHolderByDefault, use24HourFormat, holderSidebarWidth, hideAddEventButtonInHolder);
                 });
                 premadeThemeBoxesEl.appendChild(themeBox);
             });
+            updateThemeSelectionInSettings();
         };
 
         const initSpecialThemeBoxes = () => {
             specialThemeBoxesEl.innerHTML = '';
-            const specialThemeKeysOrdered = Object.keys(SPECIAL_THEMES);
+            const specialThemeKeysOrdered = ['dracula', 'nord', 'oneDark', 'serikaDark', 'superuser', 'stealth', 'taro', 'horizon', 'sweden', 'catppuccinLatte', 'github', 'tokyoNight', 'gruvbox', 'solarized', 'aidah'];
 
             specialThemeKeysOrdered.forEach(key => {
-                const theme = SPECIAL_THEMES[key].light;
+                const theme = THEMES[key].light;
                 const themeBox = document.createElement('div');
                 themeBox.classList.add('theme-box', 'special-theme-box');
                 themeBox.dataset.themeKey = key;
 
-                if (unlockedSpecialThemesKeys.has(key)) {
-                    themeBox.classList.add('unlocked');
-                }
+                unlockedSpecialThemesKeys.add(key);
+                themeBox.classList.add('unlocked');
 
                 const colorPreview = document.createElement('div');
                 colorPreview.classList.add('color-preview');
-                if (key === 'aidah') {
-                    colorPreview.style.backgroundColor = '#e983d0';
-                } else {
-                    colorPreview.style.backgroundColor = theme.accentColor;
-                }
+                colorPreview.style.backgroundColor = theme.accentColor;
                 themeBox.appendChild(colorPreview);
 
                 const themeName = document.createElement('span');
                 themeName.textContent = theme.name;
                 themeBox.appendChild(themeName);
 
-                const lockOverlay = document.createElement('div');
-                lockOverlay.classList.add('special-theme-lock-overlay');
-                lockOverlay.innerHTML = '<i class="fas fa-lock"></i>';
-                themeBox.appendChild(lockOverlay);
-
-
                 themeBox.addEventListener('click', async () => {
-                    const isLocked = !unlockedSpecialThemesKeys.has(key);
-                    const selectedSpecialTheme = SPECIAL_THEMES[key];
+                    document.querySelectorAll('.theme-box').forEach(box => box.classList.remove('selected'));
+                    themeBox.classList.add('selected');
+                    darkModeButton.classList.remove('selected');
 
-                    if (isLocked) {
-                        showAdMobPlaceholder();
-                        watchAdButton.classList.add('hidden');
-                        adLoadingSpinner.classList.remove('hidden');
+                    currentBaseThemeKey = key;
+                    currentBaseTheme = null;
+                    
+                    applyTheme(getEffectiveTheme(currentBaseThemeKey, isDarkModeActive), {
+                        themeBodyBgInput, themeTextColorInput, themeHeaderBgInput, themeMainContainerBgInput,
+                        themeDayCellBgInput, themeDayCellHoverBgInput, themeCurrentDayBgInput,
+                        themePrimaryButtonBgInput, themePrimaryButtonTextInput,
+                        themeSecondaryButtonBgInput, themeSecondaryButtonTextInput,
+                        themeAccentColorInput, themeDayCellBorderColorInput
+                    });
+                    initColorPalette();
 
-                        setTimeout(async () => {
-                            adMobPlaceholder.classList.add('hidden');
-                            adLoadingSpinner.classList.add('hidden');
-
-                            unlockedSpecialThemesKeys.add(key);
-                            themeBox.classList.add('unlocked');
-
-                            document.querySelectorAll('.theme-box').forEach(box => box.classList.remove('selected'));
-                            themeBox.classList.add('selected');
-
-                            currentBaseThemeKey = key;
-                            currentBaseTheme = null;
-
-                            isDarkModeActive = selectedSpecialTheme.defaultIsDark;
-                            darkModeToggle.checked = isDarkModeActive;
-
-                            applyTheme(getEffectiveTheme(currentBaseThemeKey, isDarkModeActive), {
-                                themeBodyBgInput, themeTextColorInput, themeHeaderBgInput, themeMainContainerBgInput,
-                                themeDayCellBgInput, themeDayCellHoverBgInput, themeCurrentDayBgInput,
-                                themePrimaryButtonBgInput, themePrimaryButtonTextInput,
-                                themeSecondaryButtonBgInput, themeSecondaryButtonTextInput,
-                                themeAccentColorInput, themeDayCellBorderColorInput
-                            });
-
-                            await saveSettings(currentCustomFontName, null, currentBaseThemeKey, isDarkModeActive,
-                                         uiRoundnessInput.value, fontSizeInput.value,
-                                         eventRoundnessInput.value, eventBorderThicknessInput.value, dayCellMinWidthInput.value, null, areCustomColorPickersLocked, unlockedSpecialThemesKeys, holderIconEnabled, noBackgroundMode, savedCustomThemes, disableSidebarAnimations);
-                        }, 3000);
-                    } else {
-                        document.querySelectorAll('.theme-box').forEach(box => box.classList.remove('selected'));
-                        themeBox.classList.add('selected');
-
-                        currentBaseThemeKey = key;
-                        currentBaseTheme = null;
-
-                        isDarkModeActive = selectedSpecialTheme.defaultIsDark;
-                        darkModeToggle.checked = isDarkModeActive;
-
-                        applyTheme(getEffectiveTheme(currentBaseThemeKey, isDarkModeActive), {
-                            themeBodyBgInput, themeTextColorInput, themeHeaderBgInput, themeMainContainerBgInput,
-                            themeDayCellBgInput, themeDayCellHoverBgInput, themeCurrentDayBgInput,
-                            themePrimaryButtonBgInput, themePrimaryButtonTextInput,
-                            themeSecondaryButtonBgInput, themeSecondaryButtonTextInput,
-                            themeAccentColorInput, themeDayCellBorderColorInput
-                        });
-
-                        await saveSettings(currentCustomFontName, null, currentBaseThemeKey, isDarkModeActive,
-                                     uiRoundnessInput.value, fontSizeInput.value,
-                                     eventRoundnessInput.value, eventBorderThicknessInput.value, dayCellMinWidthInput.value, null, areCustomColorPickersLocked, unlockedSpecialThemesKeys, holderIconEnabled, noBackgroundMode, savedCustomThemes, disableSidebarAnimations);
-                    }
+                    await saveSettings(currentCustomFontName, null, currentBaseThemeKey, isDarkModeActive,
+                                 uiRoundnessInput.value, fontSizeInput.value,
+                                 eventRoundnessInput.value, eventBorderThicknessInput.value, dayCellMinWidthInput.value, null, unlockedSpecialThemesKeys, holderIconEnabled, noBackgroundMode, savedCustomThemes, disableSidebarAnimations, hideScrollbars, foldDayCellsEnabled, showHolderByDefault, use24HourFormat, holderSidebarWidth, hideAddEventButtonInHolder);
                 });
                 specialThemeBoxesEl.appendChild(themeBox);
             });
+        };
+
+        const updateThemeSelectionInSettings = () => {
+            document.querySelectorAll('.theme-box').forEach(box => box.classList.remove('selected'));
+            if (currentBaseThemeKey) {
+                const selectedThemeBox = document.querySelector(`.theme-box[data-theme-key="${currentBaseThemeKey}"]`);
+                if (selectedThemeBox) {
+                    selectedThemeBox.classList.add('selected');
+                }
+            }
+            if (darkModeButton) {
+                if (isDarkModeActive) {
+                    darkModeButton.classList.add('selected');
+                    darkModeButton.innerHTML = `Dark Mode <span class="small-text">(On)</span>`;
+                } else {
+                    darkModeButton.classList.remove('selected');
+                    darkModeButton.innerHTML = `Dark Mode <span class="small-text">(Off)</span>`;
+                }
+            }
         };
 
 
@@ -2749,198 +3206,28 @@ const initColorPalette = () => {
                            event.date !== 'holder';
                 });
 
-                dayEvents.sort((a, b) => {
-                    const hasTimeA = !!a.time;
-                    const hasTimeB = !!b.time;
+                const eventContainer = document.createElement('div');
+                eventContainer.classList.add('event-container');
+                dayCell.appendChild(eventContainer);
 
-                    if (hasTimeA && hasTimeB) {
-                        return a.time.localeCompare(b.time);
-                    } else if (hasTimeA) {
-                        return -1; 
-                    } else if (hasTimeB) {
-                        return 1; 
-                    } else {
-                        return a.title.localeCompare(b.title);
+                if (foldDayCellsEnabled && dayEvents.length > MAX_VISIBLE_EVENTS_FOLDED) {
+                    dayCell.classList.add('folded');
+                    if (hideScrollbars) {
+                        dayCell.classList.add('hide-scrollbars');
                     }
-                });
+                    dayEvents.forEach(event => {
+                        eventContainer.appendChild(createEventItem(event));
+                    });
+                } else {
+                    dayEvents.forEach(event => {
+                        eventContainer.appendChild(createEventItem(event));
+                    });
+                }
 
-                dayEvents.forEach(event => {
-                    const eventItem = document.createElement('div');
-                    let eventColorData = { primary: '#FFCDD2', text: '#C62828' };
-
-                    try {
-                        const parsedColor = JSON.parse(event.color);
-                        eventColorData = parsedColor;
-                    } catch (e) {
+                dayCell.addEventListener('click', (e) => {
+                    if (!e.target.closest('.event-item')) {
+                        openEventModal(null, dayCell.dataset.date);
                     }
-
-                    eventItem.style.backgroundColor = eventColorData.primary;
-                    eventItem.style.color = eventColorData.text;
-                    eventItem.style.borderColor = eventColorData.text;
-                    eventItem.style.setProperty('--event-item-text-color', eventColorData.text);
-
-                    const textColorRgba25 = hexToRgba(eventColorData.text, 0.25);
-                    eventItem.style.setProperty('--event-item-text-color-rgba-25', textColorRgba25);
-
-
-                    eventItem.classList.add('event-item');
-                    eventItem.dataset.id = event.id;
-                    eventItem.title = `${event.title} ${event.time ? '(' + event.time + ')' : ''}${event.description ? ' - ' + event.description : ''}`;
-                    eventItem.setAttribute('draggable', 'true');
-
-                    if (event.effects) {
-                        if (event.effects.glowing) eventItem.classList.add('glowing');
-                        if (event.effects.striped) eventItem.classList.add('striped-effect');
-                        if (event.effects.dotted) eventItem.classList.add('dotted-effect');
-                        if (event.effects.particles) eventItem.classList.add('particles');
-                        if (event.effects.snowFalling) eventItem.classList.add('snow-falling');
-                        if (event.effects.glisteningStars) eventItem.classList.add('glistening-stars');
-                        if (event.effects.gradientEffect) eventItem.classList.add('gradient-effect');
-                        if (event.effects.animatedStripes) eventItem.classList.add('animated-stripes');
-                    }
-
-
-                    const mainContentDiv = document.createElement('div');
-                    mainContentDiv.classList.add('main-content');
-
-                    const textContentSpan = document.createElement('span');
-                    textContentSpan.classList.add('text-content');
-
-                    const timeTitleWrapper = document.createElement('span');
-                    timeTitleWrapper.classList.add('time-title-wrapper');
-
-                    if (event.time) {
-                        const timePart = document.createElement('span');
-                        timePart.classList.add('font-semibold', 'time-part');
-                        timePart.textContent = event.time;
-                        timeTitleWrapper.appendChild(timePart);
-                    }
-                    const titlePart = document.createElement('span');
-                    titlePart.classList.add('title-part');
-                    titlePart.textContent = event.title;
-                    timeTitleWrapper.appendChild(titlePart);
-
-                    textContentSpan.appendChild(timeTitleWrapper);
-                    mainContentDiv.appendChild(textContentSpan);
-
-                    if (event.icon) {
-                        const iconContainer = document.createElement('span');
-                        iconContainer.classList.add('event-icon-container');
-                        iconContainer.innerHTML = `<i class="${event.icon}"></i> `;
-                        eventItem.appendChild(iconContainer);
-                        eventItem.style.setProperty('--icon-padding-right', 'calc(0.6rem + 1.5rem)');
-                    } else {
-                        eventItem.style.setProperty('--icon-padding-right', '0');
-                    }
-                    eventItem.appendChild(mainContentDiv);
-
-
-                    if (event.description) {
-                        const eventDescriptionEl = document.createElement('div');
-                        eventDescriptionEl.classList.add('event-description');
-                        eventDescriptionEl.style.color = adjustColor(eventColorData.text, 0.15);
-                        eventDescriptionEl.textContent = event.description;
-                        eventItem.appendChild(eventDescriptionEl);
-                    }
-
-                    eventItem.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        openEventModal(event.id);
-                    });
-
-                    eventItem.addEventListener('dragstart', (e) => {
-                        draggedEventId = event.id;
-                        e.dataTransfer.setData('text/plain', event.id);
-                        setTimeout(() => {
-                            eventItem.classList.add('dragging');
-                        }, 0);
-                    });
-
-                    eventItem.addEventListener('dragend', () => {
-                        draggedEventId = null;
-                        eventItem.classList.remove('dragging');
-                        document.querySelectorAll('.event-item').forEach(item => item.classList.remove('drop-target-top', 'drop-target-bottom'));
-                        document.querySelectorAll('.day-cell').forEach(cell => cell.classList.remove('drag-over'));
-                        holderContentEl.classList.remove('drag-over');
-                    });
-
-                    eventItem.addEventListener('dragover', (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        const rect = eventItem.getBoundingClientRect();
-                        const y = e.clientY - rect.top;
-                        if (y < rect.height / 2) {
-                            eventItem.classList.add('drop-target-top');
-                            eventItem.classList.remove('drop-target-bottom');
-                        } else {
-                            eventItem.classList.add('drop-target-bottom');
-                            eventItem.classList.remove('drop-target-top');
-                        }
-                    });
-
-                    eventItem.addEventListener('dragleave', (e) => {
-                        e.stopPropagation();
-                        eventItem.classList.remove('drop-target-top', 'drop-target-bottom');
-                    });
-
-                    eventItem.addEventListener('drop', (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        eventItem.classList.remove('drop-target-top', 'drop-target-bottom');
-
-                        const droppedEventId = e.dataTransfer.getData('text/plain');
-                        if (!droppedEventId || droppedEventId === event.id) return;
-
-                        const draggedEventIndex = events.findIndex(ev => ev.id === droppedEventId);
-                        const targetEventIndex = events.findIndex(ev => ev.id === event.id);
-
-                        if (draggedEventIndex === -1 || targetEventIndex === -1) return;
-
-                        const draggedEvent = events.splice(draggedEventIndex, 1)[0];
-                        if (draggedEvent.date !== event.date) {
-                            draggedEvent.date = event.date;
-                            events.sort((a, b) => {
-                                const hasTimeA = !!a.time;
-                                const hasTimeB = !!b.time;
-
-                                if (hasTimeA && hasTimeB) {
-                                    return a.time.localeCompare(b.time);
-                                } else if (hasTimeA) {
-                                    return -1; 
-                                } else if (hasTimeB) {
-                                    return 1; 
-                                } else {
-                                    return a.title.localeCompare(b.title);
-                                }
-                            });
-                        } else {
-                            const draggedEventItem = events.splice(draggedEventIndex, 1)[0];
-                            const rect = eventItem.getBoundingClientRect();
-                            const y = e.clientY - rect.top;
-
-                            let newIndex = targetEventIndex;
-                            if (draggedEventIndex < targetEventIndex) {
-                                newIndex = events.findIndex(ev => ev.id === event.id);
-                                if (y > rect.height / 2) {
-                                    newIndex++;
-                                }
-                            } else {
-                                newIndex = events.findIndex(ev => ev.id === event.id);
-                                if (y > rect.height / 2) {
-                                    newIndex++;
-                                }
-                            }
-                            events.splice(newIndex, 0, draggedEventItem);
-                        }
-                        saveEvents();
-                        renderCalendar();
-                    });
-
-                    dayCell.appendChild(eventItem);
-                });
-
-                dayCell.addEventListener('click', () => {
-                    openEventModal(null, dayCell.dataset.date);
                 });
 
                 dayCell.addEventListener('dragover', (e) => {
@@ -2982,20 +3269,6 @@ const initColorPalette = () => {
                         }
 
                         if (eventFound) {
-                            events.sort((a, b) => {
-                                const hasTimeA = !!a.time;
-                                const hasTimeB = !!b.time;
-
-                                if (hasTimeA && hasTimeB) {
-                                    return a.time.localeCompare(b.time);
-                                } else if (hasTimeA) {
-                                    return -1; 
-                                } else if (hasTimeB) {
-                                    return 1; 
-                                } else {
-                                    return a.title.localeCompare(b.title);
-                                }
-                            });
                             await saveEvents();
                             renderCalendar();
                             renderHolderEvents();
@@ -3006,6 +3279,192 @@ const initColorPalette = () => {
                 calendarEl.appendChild(dayCell);
             }
             applyAnimationsState();
+        };
+
+        const createEventItem = (event) => {
+            const eventItem = document.createElement('div');
+            let eventColorData = { primary: '#FFCDD2', text: '#C62828' };
+
+            try {
+                const parsedColor = JSON.parse(event.color);
+                eventColorData = parsedColor;
+            } catch (e) {
+            }
+
+            eventItem.style.backgroundColor = eventColorData.primary;
+            eventItem.style.color = eventColorData.text;
+            eventItem.style.borderColor = eventColorData.text;
+            eventItem.style.setProperty('--event-item-text-color', eventColorData.text);
+
+            const textColorRgba25 = hexToRgba(eventColorData.text, 0.25);
+            eventItem.style.setProperty('--event-item-text-color-rgba-25', textColorRgba25);
+
+
+            eventItem.classList.add('event-item');
+            eventItem.dataset.id = event.id;
+            eventItem.title = `${event.title} ${event.time ? '(' + event.time + ')' : ''}${event.description ? ' - ' + event.description : ''}`;
+            eventItem.setAttribute('draggable', 'true');
+
+            if (event.effects) {
+                if (event.effects.glowing) eventItem.classList.add('glowing');
+                if (event.effects.striped) eventItem.classList.add('striped-effect');
+                if (event.effects.dotted) eventItem.classList.add('dotted-effect');
+                if (event.effects.particles) eventItem.classList.add('particles');
+                if (event.effects.snowFalling) eventItem.classList.add('snow-falling');
+                if (event.effects.glisteningStars) eventItem.classList.add('glistening-stars');
+                if (event.effects.gradientEffect) eventItem.classList.add('gradient-effect');
+                if (event.effects.animatedStripes) eventItem.classList.add('animated-stripes');
+                
+                if (event.effects.animatedVerticalRainbow) {
+                    eventItem.classList.add('animated-vertical-rainbow');
+                    const [h, s, l] = hexToHsl(eventColorData.text);
+                    const gradientColors = [];
+                    for (let i = 0; i < 7; i++) {
+                        const hue = (h + (i * (360 / 6))) % 360;
+                        gradientColors.push(hslToHex(hue, s, l));
+                    }
+                    eventItem.style.backgroundImage = `linear-gradient(to bottom, ${gradientColors.join(', ')})`;
+                }
+            }
+
+
+            const mainContentDiv = document.createElement('div');
+            mainContentDiv.classList.add('main-content');
+
+            const textContentSpan = document.createElement('span');
+            textContentSpan.classList.add('text-content');
+
+            const timeTitleWrapper = document.createElement('span');
+            timeTitleWrapper.classList.add('time-title-wrapper');
+
+            if (event.time) {
+                const timePart = document.createElement('span');
+                timePart.classList.add('font-semibold', 'time-part');
+                const [hours, minutes] = event.time.split(':');
+                const dateForFormatting = new Date();
+                dateForFormatting.setHours(parseInt(hours), parseInt(minutes));
+                timePart.textContent = dateForFormatting.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: !use24HourFormat });
+                timeTitleWrapper.appendChild(timePart);
+            }
+            const titlePart = document.createElement('span');
+            titlePart.classList.add('title-part');
+            titlePart.textContent = event.title;
+            timeTitleWrapper.appendChild(titlePart);
+
+            textContentSpan.appendChild(timeTitleWrapper);
+            mainContentDiv.appendChild(textContentSpan);
+
+            if (event.icon) {
+                const iconContainer = document.createElement('span');
+                iconContainer.classList.add('event-icon-container');
+                iconContainer.innerHTML = `<i class="${event.icon}"></i> `;
+                eventItem.appendChild(iconContainer);
+            } else {
+            }
+            eventItem.appendChild(mainContentDiv);
+
+
+            if (event.description) {
+                const eventDescriptionEl = document.createElement('div');
+                eventDescriptionEl.classList.add('event-description');
+                eventDescriptionEl.style.color = adjustColor(eventColorData.text, 0.15);
+                eventDescriptionEl.textContent = event.description;
+                eventItem.appendChild(eventDescriptionEl);
+            }
+
+            eventItem.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openEventModal(event.id);
+            });
+
+            eventItem.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                contextMenuEventId = event.id;
+                eventContextMenu.style.left = `${e.clientX}px`;
+                eventContextMenu.style.top = `${e.clientY}px`;
+                eventContextMenu.style.display = 'flex';
+            });
+
+            eventItem.addEventListener('dragstart', (e) => {
+                draggedEventId = event.id;
+                e.dataTransfer.setData('text/plain', event.id);
+                setTimeout(() => {
+                    eventItem.classList.add('dragging');
+                }, 0);
+            });
+
+            eventItem.addEventListener('dragend', () => {
+                draggedEventId = null;
+                eventItem.classList.remove('dragging');
+                document.querySelectorAll('.event-item').forEach(item => item.classList.remove('drop-target-top', 'drop-target-bottom'));
+                document.querySelectorAll('.day-cell').forEach(cell => cell.classList.remove('drag-over'));
+                holderContentEl.classList.remove('drag-over');
+            });
+
+            eventItem.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const rect = eventItem.getBoundingClientRect();
+                const y = e.clientY - rect.top;
+                if (y < rect.height / 2) {
+                    eventItem.classList.add('drop-target-top');
+                    eventItem.classList.remove('drop-target-bottom');
+                } else {
+                    eventItem.classList.add('drop-target-bottom');
+                    eventItem.classList.remove('drop-target-top');
+                }
+            });
+
+            eventItem.addEventListener('dragleave', (e) => {
+                e.stopPropagation();
+                eventItem.classList.remove('drop-target-top', 'drop-target-bottom');
+            });
+
+            eventItem.addEventListener('drop', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                eventItem.classList.remove('drop-target-top', 'drop-target-bottom');
+
+                const droppedEventId = e.dataTransfer.getData('text/plain');
+                if (!droppedEventId || droppedEventId === event.id) return;
+
+                const draggedEventIndex = events.findIndex(ev => ev.id === droppedEventId);
+                const targetEventIndex = events.findIndex(ev => ev.id === event.id);
+
+                if (draggedEventIndex === -1 && holderEvents.findIndex(ev => ev.id === droppedEventId) === -1) return;
+                if (targetEventIndex === -1 && holderEvents.findIndex(ev => ev.id === event.id) === -1) return;
+
+                let draggedEvent;
+                let draggedFromHolder = false;
+
+                if (events.findIndex(ev => ev.id === droppedEventId) !== -1) {
+                    draggedEvent = events.splice(events.findIndex(ev => ev.id === droppedEventId), 1)[0];
+                } else {
+                    draggedEvent = holderEvents.splice(holderEvents.findIndex(ev => ev.id === droppedEventId), 1)[0];
+                    draggedFromHolder = true;
+                }
+
+                if (draggedEvent.date !== event.date) {
+                    draggedEvent.date = event.date;
+                    events.push(draggedEvent);
+                } else {
+                    const rect = eventItem.getBoundingClientRect();
+                    const y = e.clientY - rect.top;
+                    const currentEventsInDay = events.filter(ev => ev.date === event.date);
+                    const targetIndexInDay = currentEventsInDay.findIndex(ev => ev.id === event.id);
+
+                    let newPositionIndex = events.indexOf(currentEventsInDay[targetIndexInDay]);
+                    if (y > rect.height / 2) {
+                        newPositionIndex++;
+                    }
+
+                    events.splice(newPositionIndex, 0, draggedEvent);
+                }
+                saveEvents();
+                renderCalendar();
+                renderHolderEvents();
+            });
+            return eventItem;
         };
 
         const renderHolderEvents = () => {
@@ -3041,6 +3500,17 @@ const initColorPalette = () => {
                     if (event.effects.glisteningStars) eventItem.classList.add('glistening-stars');
                     if (event.effects.gradientEffect) eventItem.classList.add('gradient-effect');
                     if (event.effects.animatedStripes) eventItem.classList.add('animated-stripes');
+                    
+                    if (event.effects.animatedVerticalRainbow) {
+                        eventItem.classList.add('animated-vertical-rainbow');
+                        const [h, s, l] = hexToHsl(eventColorData.text);
+                        const gradientColors = [];
+                        for (let i = 0; i < 7; i++) {
+                            const hue = (h + (i * (360 / 6))) % 360;
+                            gradientColors.push(hslToHex(hue, s, l));
+                        }
+                        eventItem.style.backgroundImage = `linear-gradient(to bottom, ${gradientColors.join(', ')})`;
+                    }
                 }
 
                 const mainContentDiv = document.createElement('div');
@@ -3055,7 +3525,10 @@ const initColorPalette = () => {
                 if (event.time) {
                     const timePart = document.createElement('span');
                     timePart.classList.add('font-semibold', 'time-part');
-                    timePart.textContent = event.time;
+                    const [hours, minutes] = event.time.split(':');
+                    const dateForFormatting = new Date();
+                    dateForFormatting.setHours(parseInt(hours), parseInt(minutes));
+                    timePart.textContent = dateForFormatting.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: !use24HourFormat });
                     timeTitleWrapper.appendChild(timePart);
                 }
                 const titlePart = document.createElement('span');
@@ -3071,9 +3544,7 @@ const initColorPalette = () => {
                     iconContainer.classList.add('event-icon-container');
                     iconContainer.innerHTML = `<i class="${event.icon}"></i> `;
                     eventItem.appendChild(iconContainer);
-                    eventItem.style.setProperty('--icon-padding-right', 'calc(0.6rem + 1.5rem)');
                 } else {
-                    eventItem.style.setProperty('--icon-padding-right', '0');
                 }
                 eventItem.appendChild(mainContentDiv);
 
@@ -3088,6 +3559,14 @@ const initColorPalette = () => {
                 eventItem.addEventListener('click', (e) => {
                     e.stopPropagation();
                     openEventModal(event.id);
+                });
+
+                eventItem.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                    contextMenuEventId = event.id;
+                    eventContextMenu.style.left = `${e.clientX}px`;
+                    eventContextMenu.style.top = `${e.clientY}px`;
+                    eventContextMenu.style.display = 'flex';
                 });
 
                 eventItem.addEventListener('dragstart', (e) => {
@@ -3136,31 +3615,42 @@ const initColorPalette = () => {
                     const draggedEventIndex = holderEvents.findIndex(ev => ev.id === droppedEventId);
                     const targetEventIndex = holderEvents.findIndex(ev => ev.id === event.id);
 
-                    if (draggedEventIndex === -1 || targetEventIndex === -1) return;
+                    if (draggedEventIndex === -1 && events.findIndex(ev => ev.id === droppedEventId) === -1) return;
+                    if (targetEventIndex === -1 && events.findIndex(ev => ev.id === event.id) === -1) return;
 
-                    const draggedEvent = holderEvents.splice(draggedEventIndex, 1)[0];
-                    const rect = eventItem.getBoundingClientRect();
-                    const y = e.clientY - rect.top;
+                    let draggedEvent;
+                    let draggedFromCalendar = false;
 
-                    let newIndex = targetEventIndex;
-                    if (draggedEventIndex < targetEventIndex) {
-                        newIndex = holderEvents.findIndex(ev => ev.id === event.id);
-                        if (y > rect.height / 2) {
-                            newIndex++;
-                        }
+                    if (holderEvents.findIndex(ev => ev.id === droppedEventId) !== -1) {
+                        draggedEvent = holderEvents.splice(holderEvents.findIndex(ev => ev.id === droppedEventId), 1)[0];
                     } else {
-                        newIndex = holderEvents.findIndex(ev => ev.id === event.id);
-                        if (y > rect.height / 2) {
-                            newIndex++;
-                        }
+                        draggedEvent = events.splice(events.findIndex(ev => ev.id === droppedEventId), 1)[0];
+                        draggedFromCalendar = true;
                     }
-                    holderEvents.splice(newIndex, 0, draggedEvent);
+
+                    if (draggedEvent.date !== 'holder') {
+                        draggedEvent.date = 'holder';
+                        holderEvents.push(draggedEvent);
+                    } else {
+                        const rect = eventItem.getBoundingClientRect();
+                        const y = e.clientY - rect.top;
+                        const currentEventsInHolder = holderEvents;
+                        const targetIndexInHolder = currentEventsInHolder.findIndex(ev => ev.id === event.id);
+
+                        let newPositionIndex = holderEvents.indexOf(currentEventsInHolder[targetIndexInHolder]);
+                        if (y > rect.height / 2) {
+                            newPositionIndex++;
+                        }
+                        holderEvents.splice(newPositionIndex, 0, draggedEvent);
+                    }
                     saveEvents();
                     renderHolderEvents();
+                    renderCalendar();
                 });
                 holderContentEl.appendChild(eventItem);
             });
             applyAnimationsState();
+            applyAddEventButtonVisibility();
         };
 
         const openEventModal = (eventId = null, date = null) => {
@@ -3182,9 +3672,10 @@ const initColorPalette = () => {
             effectGlisteningStars.checked = false;
             effectGradient.checked = false;
             effectAnimatedStripes.checked = false;
+            effectAnimatedVerticalRainbow.checked = false;
 
             document.querySelectorAll('#colorPalette .color-box').forEach(box => box.classList.remove('selected'));
-            document.querySelectorAll('#iconGrid .icon-item').forEach(item => item.classList.remove('selected'));
+            document.querySelectorAll('.icon-item').forEach(item => item.classList.remove('selected'));
 
             eventIconDisplay.innerHTML = '<i class="fas fa-plus"></i>'; 
             eventIconDisplay.classList.remove('selected'); 
@@ -3255,13 +3746,14 @@ const initColorPalette = () => {
                     effectGlisteningStars.checked = eventToEdit.effects.glisteningStars || false;
                     effectGradient.checked = eventToEdit.effects.gradientEffect || false;
                     effectAnimatedStripes.checked = eventToEdit.effects.animatedStripes || false;
+                    effectAnimatedVerticalRainbow.checked = eventToEdit.effects.animatedVerticalRainbow || false;
                 }
             } else {
                 modalTitle.textContent = 'Add New Event';
                 saveEventButton.textContent = 'Save Event';
                 deleteEventButton.classList.add('hidden');
                 eventDateInput.value = date;
-                eventDateInput.disabled = false;
+                eventDateInput.disabled = (date === 'holder'); 
                 initColorPalette();
                 initIconGrid();
             }
@@ -3270,323 +3762,6 @@ const initColorPalette = () => {
         const closeEventModal = () => {
             eventModal.classList.add('hidden');
             editingEventId = null;
-        };
-
-        const getCustomThemeColorsFromInputs = () => {
-            return {
-                bodyBg: themeBodyBgInput.value,
-                mainText: themeTextColorInput.value,
-                headerBg: themeHeaderBgInput.value,
-                mainContainerBg: themeMainContainerBgInput.value,
-                dayCellBg: themeDayCellBgInput.value,
-                dayCellHoverBg: themeDayCellHoverBgInput.value,
-                currentDayBg: themeCurrentDayBgInput.value,
-                primaryButtonBg: themePrimaryButtonBgInput.value,
-                primaryButtonText: themePrimaryButtonTextInput.value,
-                secondaryButtonBg: themeSecondaryButtonBgInput.value,
-                secondaryButtonText: themeSecondaryButtonTextInput.value,
-                accentColor: themeAccentColorInput.value,
-                dayCellBorder: themeDayCellBorderColorInput.value,
-                arrowButtonBg: getComputedStyle(document.documentElement).getPropertyValue('--arrow-button-bg'),
-                arrowButtonHoverBg: getComputedStyle(document.documentElement).getPropertyValue('--arrow-button-hover-bg'),
-                arrowButtonText: getComputedStyle(document.documentElement).getPropertyValue('--arrow-button-text'),
-                headerBorderColor: getComputedStyle(document.documentElement).getPropertyValue('--header-border-color')
-            };
-        };
-
-        const setCustomColorPickerState = (locked) => {
-            areCustomColorPickersLocked = locked;
-            
-            const inputs = [
-                themeBodyBgInput, themeTextColorInput, themeHeaderBgInput, themeMainContainerBgInput,
-                themeDayCellBgInput, themeDayCellHoverBgInput, themeCurrentDayBgInput,
-                themePrimaryButtonBgInput, themePrimaryButtonTextInput,
-                themeSecondaryButtonBgInput, themeSecondaryButtonTextInput,
-                themeAccentColorInput, themeDayCellBorderColorInput
-            ];
-
-            inputs.forEach(input => {
-                input.disabled = locked;
-            });
-
-            if (locked) {
-                colorPickersOverlay.classList.remove('hidden');
-                watchAdButton.classList.remove('hidden');
-                adLoadingSpinner.classList.add('hidden');
-            } else {
-                colorPickersOverlay.classList.add('hidden');
-            }
-        };
-
-        const renderSavedThemes = () => {
-            savedThemePreviewsEl.innerHTML = '';
-            savedCustomThemes.forEach((theme, index) => {
-                const themePreviewDiv = document.createElement('div');
-                themePreviewDiv.classList.add('last-saved-theme-preview', 'flex-shrink-0');
-                themePreviewDiv.style.flexBasis = 'calc(20% - 8px)';
-
-                const colorSwatches = document.createElement('div');
-                colorSwatches.classList.add('color-swatches');
-                colorSwatches.style.borderRadius = getComputedStyle(document.documentElement).getPropertyValue('--ui-roundness');
-
-                const mainSwatch = document.createElement('div');
-                mainSwatch.classList.add('color-swatch-main');
-                mainSwatch.style.backgroundColor = theme.mainContainerBg;
-                mainSwatch.style.borderRadius = getComputedStyle(document.documentElement).getPropertyValue('--ui-roundness');
-                colorSwatches.appendChild(mainSwatch);
-
-                const headerSwatch = document.createElement('div');
-                headerSwatch.classList.add('color-swatch-header');
-                headerSwatch.style.backgroundColor = theme.headerBg;
-                headerSwatch.style.borderRadius = getComputedStyle(document.documentElement).getPropertyValue('--ui-roundness');
-                colorSwatches.appendChild(headerSwatch);
-
-                themePreviewDiv.appendChild(colorSwatches);
-
-                const themeName = document.createElement('div');
-                themeName.classList.add('theme-name');
-                themeName.textContent = theme.name || `Theme ${index + 1}`;
-                themePreviewDiv.appendChild(themeName);
-
-                const applyButton = document.createElement('button');
-                applyButton.classList.add('apply-button');
-                applyButton.textContent = 'Apply';
-                applyButton.addEventListener('click', async (e) => {
-                    e.stopPropagation();
-                    currentBaseThemeKey = null;
-                    currentBaseTheme = theme;
-                    applyTheme(getEffectiveTheme(currentBaseThemeKey, isDarkModeActive), {
-                        themeBodyBgInput, themeTextColorInput, themeHeaderBgInput, themeMainContainerBgInput,
-                        themeDayCellBgInput, themeDayCellHoverBgInput, themeCurrentDayBgInput,
-                        themePrimaryButtonBgInput, themePrimaryButtonTextInput,
-                        themeSecondaryButtonBgInput, themeSecondaryButtonTextInput,
-                        themeAccentColorInput, themeDayCellBorderColorInput
-                    });
-                    await saveSettings(currentCustomFontName, null, currentBaseThemeKey, isDarkModeActive,
-                                 uiRoundnessInput.value, fontSizeInput.value,
-                                 eventRoundnessInput.value, eventBorderThicknessInput.value, dayCellMinWidthInput.value, currentBaseTheme, areCustomColorPickersLocked, unlockedSpecialThemesKeys, holderIconEnabled, noBackgroundMode, savedCustomThemes, disableSidebarAnimations);
-                });
-                themePreviewDiv.appendChild(applyButton);
-
-                savedThemePreviewsEl.appendChild(themePreviewDiv);
-            });
-        };
-
-        const showThemeNameModal = (defaultName, callback) => {
-            themeNameModal.classList.remove('hidden');
-            themeNameInput.value = defaultName;
-            themeNameInput.focus();
-
-            const handleSave = () => {
-                let name = themeNameInput.value.trim();
-                if (name === "") {
-                    name = defaultName;
-                }
-                themeNameModal.classList.add('hidden');
-                callback(name);
-                saveThemeNameButton.removeEventListener('click', handleSave);
-                cancelThemeNameButton.removeEventListener('click', handleCancel);
-            };
-
-            const handleCancel = () => {
-                themeNameModal.classList.add('hidden');
-                callback(null);
-                saveThemeNameButton.removeEventListener('click', handleSave);
-                cancelThemeNameButton.removeEventListener('click', handleCancel);
-            };
-
-            saveThemeNameButton.addEventListener('click', handleSave);
-            cancelThemeNameButton.addEventListener('click', handleCancel);
-
-            themeNameInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    handleSave();
-                } else if (e.key === 'Escape') {
-                    handleCancel();
-                }
-            }, { once: true });
-        };
-
-
-        const handleSaveCustomTheme = async () => {
-            showThemeNameModal(`Custom Theme ${savedCustomThemes.length + 1}`, async (themeName) => {
-                if (themeName === null) {
-                    return;
-                }
-
-                const currentCustomColors = getCustomThemeColorsFromInputs();
-                currentCustomColors.name = themeName;
-
-                savedCustomThemes.unshift(currentCustomColors);
-
-                if (savedCustomThemes.length > MAX_SAVED_THEMES) {
-                    savedCustomThemes = savedCustomThemes.slice(0, MAX_SAVED_THEMES);
-                }
-
-                renderSavedThemes();
-                await saveSettings(currentCustomFontName, null, currentBaseThemeKey, isDarkModeActive,
-                             uiRoundnessInput.value, fontSizeInput.value,
-                             eventRoundnessInput.value, eventBorderThicknessInput.value, dayCellMinWidthInput.value, currentBaseTheme, areCustomColorPickersLocked, unlockedSpecialThemesKeys, holderIconEnabled, noBackgroundMode, savedCustomThemes, disableSidebarAnimations);
-
-                const messageBox = document.createElement('div');
-                messageBox.innerHTML = `
-                    <div class="fixed inset-0" style="background-color: var(--modal-overlay-bg); display: flex; align-items: center; justify-content: center; z-index: 1000;">
-                        <div class="p-6 rounded-lg shadow-xl text-center" style="border-radius: var(--ui-roundness-lg); background-color: var(--main-container-bg); color: var(--text-color);">
-                            <p class="text-lg font-semibold mb-4" style="color: var(--text-color);">Custom theme "${themeName}" saved!</p>
-                            <button class="px-4 py-2 themed-button" onclick="this.parentNode.parentNode.remove()">OK</button>
-                        </div>
-                    </div>
-                `;
-                document.body.appendChild(messageBox);
-            });
-        };
-
-        const handleRemoveAllEvents = () => {
-            const confirmBox = document.createElement('div');
-            confirmBox.innerHTML = `
-                <div class="fixed inset-0" style="background-color: var(--modal-overlay-bg); display: flex; align-items: center; justify-content: center; z-index: 1000;">
-                    <div class="p-6 rounded-lg shadow-xl text-center" style="border-radius: var(--ui-roundness-lg); background-color: var(--main-container-bg); color: var(--text-color);">
-                        <p class="text-lg font-semibold mb-4" style="color: var(--text-color);">Are you sure you want to remove ALL calendar events?</p>
-                        <p class="text-sm text-gray-600 mb-6">This action cannot be undone.</p>
-                        <div class="flex justify-center space-x-4">
-                            <button class="themed-button danger" id="confirmRemoveEventsYes">Yes, Remove All</button>
-                            <button class="themed-button secondary" id="confirmRemoveEventsNo">Cancel</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(confirmBox);
-
-            document.getElementById('confirmRemoveEventsYes').onclick = async () => {
-                events = [];
-                holderEvents = [];
-                await saveEvents();
-                renderCalendar();
-                renderHolderEvents();
-                confirmBox.remove();
-            };
-            document.getElementById('confirmRemoveEventsNo').onclick = () => {
-                confirmBox.remove();
-            };
-        };
-
-        const handleRemoveAllCustomThemes = () => {
-            const confirmBox = document.createElement('div');
-            confirmBox.innerHTML = `
-                <div class="fixed inset-0" style="background-color: var(--modal-overlay-bg); display: flex; align-items: center; justify-content: center; z-index: 1000;">
-                    <div class="p-6 rounded-lg shadow-xl text-center" style="border-radius: var(--ui-roundness-lg); background-color: var(--main-container-bg); color: var(--text-color);">
-                        <p class="text-lg font-semibold mb-4" style="color: var(--text-color);">Are you sure you want to remove ALL saved custom themes?</p>
-                        <p class="text-sm text-gray-600 mb-6">This action cannot be undone.</p>
-                        <div class="flex justify-center space-x-4">
-                            <button class="themed-button danger" id="confirmRemoveThemesYes">Yes, Remove All</button>
-                            <button class="themed-button secondary" id="confirmRemoveThemesNo">Cancel</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(confirmBox);
-
-            document.getElementById('confirmRemoveThemesYes').onclick = async () => {
-                savedCustomThemes = [];
-                renderSavedThemes();
-                await saveSettings(currentCustomFontName, null, currentBaseThemeKey, isDarkModeActive,
-                             uiRoundnessInput.value, fontSizeInput.value,
-                             eventRoundnessInput.value, eventBorderThicknessInput.value, dayCellMinWidthInput.value, currentBaseTheme, areCustomColorPickersLocked, unlockedSpecialThemesKeys, holderIconEnabled, noBackgroundMode, savedCustomThemes, disableSidebarAnimations);
-                confirmBox.remove();
-            };
-            document.getElementById('confirmRemoveThemesNo').onclick = () => {
-                confirmBox.remove();
-            };
-        };
-
-
-        const handleResetApplication = () => {
-            const confirmBox = document.createElement('div');
-            confirmBox.innerHTML = `
-                <div class="fixed inset-0" style="background-color: var(--modal-overlay-bg); display: flex; align-items: center; justify-content: center; z-index: 1000;">
-                    <div class="p-6 rounded-lg shadow-xl text-center" style="border-radius: var(--ui-roundness-lg); background-color: var(--main-container-bg); color: var(--text-color);">
-                        <p class="text-lg font-semibold mb-4" style="color: var(--text-color);">Are you sure you want to reset the entire application?</p>
-                        <p class="text-sm text-gray-600 mb-6">This will remove all events and settings. This action cannot be undone.</p>
-                        <div class="flex justify-center space-x-4">
-                            <button class="themed-button danger" id="confirmResetAppYes">Yes, Reset App</button>
-                            <button class="themed-button secondary" id="confirmResetAppNo">Cancel</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(confirmBox);
-
-            document.getElementById('confirmResetAppYes').onclick = async () => {
-                await Preferences.clear();
-                location.reload();
-                confirmBox.remove();
-            };
-            document.getElementById('confirmResetAppNo').onclick = () => {
-                confirmBox.remove();
-            };
-        };
-
-
-        const openSettingsModal = async () => {
-            settingsModal.classList.remove('hidden');
-
-            const loadedSettings = await loadSettings();
-
-            if (loadedSettings.currentBaseThemeKey === null) {
-                currentBaseTheme = loadedSettings.customThemeColors || { ...DEFAULT_LIGHT_THEME };
-            } else {
-                currentBaseTheme = null;
-            }
-
-            applyTheme(getEffectiveTheme(loadedSettings.currentBaseThemeKey, loadedSettings.isDarkModeActive), {
-                themeBodyBgInput, themeTextColorInput, themeHeaderBgInput, themeMainContainerBgInput,
-                themeDayCellBgInput, themeDayCellHoverBgInput, themeCurrentDayBgInput,
-                themePrimaryButtonBgInput, themePrimaryButtonTextInput,
-                themeSecondaryButtonBgInput, themeSecondaryButtonTextInput,
-                themeAccentColorInput, themeDayCellBorderColorInput
-            });
-
-            uiRoundnessInput.value = loadedSettings.currentUiRoundness;
-            uiRoundnessValueDisplay.textContent = `${loadedSettings.currentUiRoundness}px`;
-            uiRoundnessValueDisplay.style.fontSize = `${14 + (parseInt(loadedSettings.currentUiRoundness) / 24) * 8}px`;
-
-            fontSizeInput.value = loadedSettings.currentFontSize;
-            fontSizeValueDisplay.textContent = `${loadedSettings.currentFontSize}px`;
-
-            eventRoundnessInput.value = loadedSettings.currentEventRoundness;
-            eventRoundnessValueDisplay.textContent = `${loadedSettings.currentEventRoundness}px`;
-            eventRoundnessValueDisplay.style.fontSize = `${14 + (parseInt(loadedSettings.currentEventRoundness) / 24) * 8}px`;
-
-            eventBorderThicknessInput.value = loadedSettings.currentEventBorderThickness;
-            eventBorderThicknessValueDisplay.textContent = `${loadedSettings.currentEventBorderThickness}px`;
-            eventBorderThicknessValueDisplay.style.fontSize = `${14 + (parseInt(loadedSettings.currentEventBorderThickness) / 5) * 4}px`;
-
-            dayCellMinWidthInput.value = loadedSettings.currentDayCellMinWidth;
-            dayCellMinWidthValueDisplay.textContent = `${loadedSettings.currentDayCellMinWidth}px`;
-
-            darkModeToggle.checked = loadedSettings.isDarkModeActive;
-            isDarkModeActive = loadedSettings.isDarkModeActive;
-            holderIconToggle.checked = loadedSettings.holderIconEnabled;
-            holderIconEnabled = loadedSettings.holderIconEnabled;
-            noBackgroundToggle.checked = loadedSettings.noBackgroundMode;
-            noBackgroundMode = loadedSettings.noBackgroundMode;
-            disableSidebarAnimationsToggle.checked = loadedSettings.disableSidebarAnimations;
-            disableSidebarAnimations = loadedSettings.disableSidebarAnimations;
-            setCustomColorPickerState(areCustomColorPickersLocked);
-
-            document.querySelectorAll('.theme-box').forEach(box => {
-                if (box.dataset.themeKey === currentBaseThemeKey) {
-                    box.classList.add('selected');
-                } else {
-                    box.classList.remove('selected');
-                }
-            });
-
-            renderSavedThemes();
-        };
-
-        const closeSettingsModal = () => {
-            settingsModal.classList.add('hidden');
         };
 
         const generateUniqueId = () => {
@@ -3609,7 +3784,8 @@ const initColorPalette = () => {
             snowFalling: effectSnowFalling.checked,
             glisteningStars: effectGlisteningStars.checked,
             gradientEffect: effectGradient.checked,
-            animatedStripes: effectAnimatedStripes.checked
+            animatedStripes: effectAnimatedStripes.checked,
+            animatedVerticalRainbow: effectAnimatedVerticalRainbow.checked
         };
 
             if (eventDateInput.disabled && editingEventId) {
@@ -3617,7 +3793,10 @@ const initColorPalette = () => {
                 if (existingEvent && existingEvent.date === 'holder') {
                     date = 'holder';
                 }
+            } else if (eventDateInput.disabled && !editingEventId) {
+                date = 'holder';
             }
+
 
             if (!title || (!date && !eventDateInput.disabled)) { 
                 const messageBox = document.createElement('div');
@@ -3680,6 +3859,9 @@ const initColorPalette = () => {
         };
 
         const handleDeleteEvent = () => {
+            if (contextMenuEventId) {
+                editingEventId = contextMenuEventId;
+            }
             if (editingEventId) {
                 const confirmBox = document.createElement('div');
                 confirmBox.innerHTML = `
@@ -3716,12 +3898,328 @@ const initColorPalette = () => {
                         closeEventModal();
                     }
                     confirmBox.remove();
+                    contextMenuEventId = null;
                 };
                 document.getElementById('confirmDeleteNo').onclick = () => {
                     confirmBox.remove();
+                    contextMenuEventId = null;
                 };
             }
         };
+
+        const handleDuplicateEvent = async () => {
+            if (contextMenuEventId) {
+                let eventToDuplicate = events.find(e => e.id === contextMenuEventId) || holderEvents.find(e => e.id === contextMenuEventId);
+                if (eventToDuplicate) {
+                    const newEvent = { ...eventToDuplicate, id: generateUniqueId() };
+                    if (newEvent.date === 'holder') {
+                        holderEvents.push(newEvent);
+                    } else {
+                        events.push(newEvent);
+                    }
+                    await saveEvents();
+                    renderCalendar();
+                    renderHolderEvents();
+                }
+                contextMenuEventId = null;
+            }
+        };
+
+        //  open settings modal!
+        const openSettingsModal = () => {
+            settingsModal.classList.remove('hidden');
+            // Initialization stuff
+            uiRoundnessInput.value = getComputedStyle(document.documentElement).getPropertyValue('--ui-roundness').replace('px', '');
+            uiRoundnessValueDisplay.textContent = `${uiRoundnessInput.value}px`;
+            fontSizeInput.value = getComputedStyle(document.documentElement).getPropertyValue('--base-font-size').replace('px', '');
+            fontSizeValueDisplay.textContent = `${fontSizeInput.value}px`;
+            eventRoundnessInput.value = getComputedStyle(document.documentElement).getPropertyValue('--event-item-roundness').replace('px', '');
+            eventRoundnessValueDisplay.textContent = `${eventRoundnessInput.value}px`;
+            eventBorderThicknessInput.value = getComputedStyle(document.documentElement).getPropertyValue('--event-item-border-thickness').replace('px', '');
+            eventBorderThicknessValueDisplay.textContent = `${eventBorderThicknessInput.value}px`;
+            dayCellMinWidthInput.value = getComputedStyle(document.documentElement).getPropertyValue('--day-cell-min-width').replace('px', '');
+            dayCellMinWidthValueDisplay.textContent = `${dayCellMinWidthInput.value}px`;
+
+            holderIconToggle.checked = holderIconEnabled;
+            noBackgroundToggle.checked = noBackgroundMode;
+            disableSidebarAnimationsToggle.checked = disableSidebarAnimations;
+            hideScrollbarsToggle.checked = hideScrollbars;
+            foldDayCellsToggle.checked = foldDayCellsEnabled;
+            showHolderByDefaultToggle.checked = showHolderByDefault;
+            use24HourFormatToggle.checked = use24HourFormat;
+            hideAddEventButtonInHolderToggle.checked = hideAddEventButtonInHolder; 
+
+
+            updateThemeSelectionInSettings();
+            renderSavedThemes();
+            
+            // MAKE color picker have values of current theme
+            const rootStyles = getComputedStyle(document.documentElement);
+            themeBodyBgInput.value = rootStyles.getPropertyValue('--body-bg');
+            themeTextColorInput.value = rootStyles.getPropertyValue('--text-color');
+            themeHeaderBgInput.value = rootStyles.getPropertyValue('--header-bg');
+            themeMainContainerBgInput.value = rootStyles.getPropertyValue('--main-container-bg');
+            themeDayCellBgInput.value = rootStyles.getPropertyValue('--day-cell-bg');
+            themeDayCellHoverBgInput.value = rootStyles.getPropertyValue('--day-cell-hover-bg-color');
+            themeCurrentDayBgInput.value = rootStyles.getPropertyValue('--current-day-bg');
+            themePrimaryButtonBgInput.value = rootStyles.getPropertyValue('--primary-button-bg');
+            themePrimaryButtonTextInput.value = rootStyles.getPropertyValue('--primary-button-text');
+            themeSecondaryButtonBgInput.value = rootStyles.getPropertyValue('--secondary-button-bg');
+            themeSecondaryButtonTextInput.value = rootStyles.getPropertyValue('--secondary-button-text');
+            themeAccentColorInput.value = rootStyles.getPropertyValue('--accent-color');
+            themeDayCellBorderColorInput.value = rootStyles.getPropertyValue('--day-cell-border-color');
+        };
+
+        // close settings modal
+        const closeSettingsModal = () => {
+            settingsModal.classList.add('hidden');
+        };
+
+        const getCustomThemeColorsFromInputs = () => {
+            return {
+                name: "Custom",
+                bodyBg: themeBodyBgInput.value,
+                mainText: themeTextColorInput.value,
+                headerBg: themeHeaderBgInput.value,
+                mainContainerBg: themeMainContainerBgInput.value,
+                dayCellBg: themeDayCellBgInput.value,
+                dayCellHoverBg: themeDayCellHoverBgInput.value,
+                currentDayBg: themeCurrentDayBgInput.value,
+                primaryButtonBg: themePrimaryButtonBgInput.value,
+                primaryButtonText: themePrimaryButtonTextInput.value,
+                secondaryButtonBg: themeSecondaryButtonBgInput.value,
+                secondaryButtonText: themeSecondaryButtonTextInput.value,
+                accentColor: themeAccentColorInput.value,
+                dayCellBorder: themeDayCellBorderColorInput.value
+            };
+        };
+
+        const handleSaveCustomTheme = () => {
+            openThemeNameModal();
+        };
+
+        const openThemeNameModal = () => {
+            themeNameModal.classList.remove('hidden');
+            themeNameInput.value = '';
+        };
+
+        const closeThemeNameModal = () => {
+            themeNameModal.classList.add('hidden');
+        };
+
+        const handleSaveThemeName = async () => {
+            const themeName = themeNameInput.value.trim();
+            if (!themeName) {
+                // Show error message
+                return;
+            }
+
+            const customTheme = getCustomThemeColorsFromInputs();
+            customTheme.name = themeName;
+
+            // Ensure we don't exceed max saved themes
+            if (savedCustomThemes.length >= MAX_SAVED_THEMES) {
+                savedCustomThemes.shift();
+            }
+            
+            // Check if theme with same name exists
+            const existingIndex = savedCustomThemes.findIndex(t => t.name === themeName);
+            if (existingIndex >= 0) {
+                savedCustomThemes[existingIndex] = customTheme;
+            } else {
+                savedCustomThemes.push(customTheme);
+            }
+
+            await saveSettings(currentCustomFontName, null, currentBaseThemeKey, isDarkModeActive,
+                        uiRoundnessInput.value, fontSizeInput.value,
+                        eventRoundnessInput.value, eventBorderThicknessInput.value, 
+                        dayCellMinWidthInput.value, currentBaseTheme, unlockedSpecialThemesKeys, 
+                        holderIconEnabled, noBackgroundMode, savedCustomThemes, 
+                        disableSidebarAnimations, hideScrollbars, foldDayCellsEnabled, 
+                        showHolderByDefault, use24HourFormat, holderSidebarWidth, 
+                        hideAddEventButtonInHolder);
+                        
+            renderSavedThemes();
+            closeThemeNameModal();
+        };
+
+        const renderSavedThemes = () => {
+            savedThemePreviewsEl.innerHTML = '';
+            if (savedCustomThemes.length === 0) {
+                savedThemePreviewsEl.textContent = 'No custom themes saved yet.';
+                savedThemePreviewsEl.style.color = getComputedStyle(document.documentElement).getPropertyValue('--text-color');
+                savedThemePreviewsEl.style.fontSize = '0.9em';
+                savedThemePreviewsEl.style.textAlign = 'center';
+                return;
+            }
+
+            savedCustomThemes.forEach((theme, index) => {
+                const themePreview = document.createElement('div');
+                themePreview.classList.add('last-saved-theme-preview');
+
+                const colorSwatches = document.createElement('div');
+                colorSwatches.classList.add('color-swatches');
+
+                const mainSwatch = document.createElement('div');
+                mainSwatch.classList.add('color-swatch-main');
+                mainSwatch.style.backgroundColor = theme.mainContainerBg;
+                colorSwatches.appendChild(mainSwatch);
+
+                const headerSwatch = document.createElement('div');
+                headerSwatch.classList.add('color-swatch-header');
+                headerSwatch.style.backgroundColor = theme.headerBg;
+                colorSwatches.appendChild(headerSwatch);
+
+                themePreview.appendChild(colorSwatches);
+
+                const themeName = document.createElement('div');
+                themeName.classList.add('theme-name');
+                themeName.textContent = theme.name;
+                themePreview.appendChild(themeName);
+
+                const applyButton = document.createElement('button');
+                applyButton.classList.add('apply-button');
+                applyButton.textContent = 'Apply';
+                applyButton.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    currentBaseThemeKey = null;
+                    currentBaseTheme = theme;
+                    applyTheme(getEffectiveTheme(currentBaseThemeKey, isDarkModeActive), {
+                        themeBodyBgInput, themeTextColorInput, themeHeaderBgInput, themeMainContainerBgInput,
+                        themeDayCellBgInput, themeDayCellHoverBgInput, themeCurrentDayBgInput,
+                        themePrimaryButtonBgInput, themePrimaryButtonTextInput,
+                        themeSecondaryButtonBgInput, themeSecondaryButtonTextInput,
+                        themeAccentColorInput, themeDayCellBorderColorInput
+                    });
+                    updateThemeSelectionInSettings();
+                    await saveSettings(currentCustomFontName, null, currentBaseThemeKey, isDarkModeActive,
+                                 uiRoundnessInput.value, fontSizeInput.value,
+                                 eventRoundnessInput.value, eventBorderThicknessInput.value, dayCellMinWidthInput.value, theme, unlockedSpecialThemesKeys, holderIconEnabled, noBackgroundMode, savedCustomThemes, disableSidebarAnimations, hideScrollbars, foldDayCellsEnabled, showHolderByDefault, use24HourFormat, holderSidebarWidth, hideAddEventButtonInHolder);
+                });
+                themePreview.appendChild(applyButton);
+
+                const deleteButton = document.createElement('button');
+                deleteButton.classList.add('themed-button', 'danger', 'mt-2', 'w-full', 'py-1', 'text-xs');
+                deleteButton.textContent = 'Delete';
+                deleteButton.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    deleteCustomTheme(index);
+                });
+                themePreview.appendChild(deleteButton);
+
+                savedThemePreviewsEl.appendChild(themePreview);
+            });
+        };
+
+        const deleteCustomTheme = async (index) => {
+            const confirmBox = document.createElement('div');
+            confirmBox.innerHTML = `
+                <div class="fixed inset-0" style="background-color: var(--modal-overlay-bg); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+                    <div class="p-6 rounded-lg shadow-xl text-center" style="border-radius: var(--ui-roundness-lg); background-color: var(--main-container-bg); color: var(--text-color);">
+                        <p class="text-lg font-semibold mb-4" style="color: var(--text-color);">Are you sure you want to delete this custom theme?</p>
+                        <div class="flex justify-center space-x-4">
+                            <button class="themed-button" id="confirmDeleteThemeYes">Yes</button>
+                            <button class="themed-button secondary" id="confirmDeleteThemeNo">No</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(confirmBox);
+
+            document.getElementById('confirmDeleteThemeYes').onclick = async () => {
+                savedCustomThemes.splice(index, 1);
+                await saveSettings(currentCustomFontName, null, currentBaseThemeKey, isDarkModeActive,
+                             uiRoundnessInput.value, fontSizeInput.value,
+                             eventRoundnessInput.value, eventBorderThicknessInput.value, dayCellMinWidthInput.value, currentBaseTheme, unlockedSpecialThemesKeys, holderIconEnabled, noBackgroundMode, savedCustomThemes, disableSidebarAnimations, hideScrollbars, foldDayCellsEnabled, showHolderByDefault, use24HourFormat, holderSidebarWidth, hideAddEventButtonInHolder);
+                renderSavedThemes();
+                confirmBox.remove();
+            };
+            document.getElementById('confirmDeleteThemeNo').onclick = () => {
+                confirmBox.remove();
+            };
+        };
+
+        const handleRemoveAllEvents = () => {
+            const confirmBox = document.createElement('div');
+            confirmBox.innerHTML = `
+                <div class="fixed inset-0" style="background-color: var(--modal-overlay-bg); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+                    <div class="p-6 rounded-lg shadow-xl text-center" style="border-radius: var(--ui-roundness-lg); background-color: var(--main-container-bg); color: var(--text-color);">
+                        <p class="text-lg font-semibold mb-4" style="color: var(--text-color);">Are you sure you want to remove all events?</p>
+                        <div class="flex justify-center space-x-4">
+                            <button class="themed-button" id="confirmRemoveAllEventsYes">Yes</button>
+                            <button class="themed-button secondary" id="confirmRemoveAllEventsNo">No</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(confirmBox);
+
+            document.getElementById('confirmRemoveAllEventsYes').onclick = async () => {
+                events = [];
+                holderEvents = [];
+                await saveEvents();
+                renderCalendar();
+                renderHolderEvents();
+                confirmBox.remove();
+            };
+            document.getElementById('confirmRemoveAllEventsNo').onclick = () => {
+                confirmBox.remove();
+            };
+        };
+
+        const handleRemoveAllCustomThemes = () => {
+            const confirmBox = document.createElement('div');
+            confirmBox.innerHTML = `
+                <div class="fixed inset-0" style="background-color: var(--modal-overlay-bg); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+                    <div class="p-6 rounded-lg shadow-xl text-center" style="border-radius: var(--ui-roundness-lg); background-color: var(--main-container-bg); color: var(--text-color);">
+                        <p class="text-lg font-semibold mb-4" style="color: var(--text-color);">Are you sure you want to remove all custom themes?</p>
+                        <div class="flex justify-center space-x-4">
+                            <button class="themed-button" id="confirmRemoveAllThemesYes">Yes</button>
+                            <button class="themed-button secondary" id="confirmRemoveAllThemesNo">No</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(confirmBox);
+
+            document.getElementById('confirmRemoveAllThemesYes').onclick = async () => {
+                savedCustomThemes = [];
+                await saveSettings(currentCustomFontName, null, currentBaseThemeKey, isDarkModeActive,
+                             uiRoundnessInput.value, fontSizeInput.value,
+                             eventRoundnessInput.value, eventBorderThicknessInput.value, dayCellMinWidthInput.value, currentBaseTheme, unlockedSpecialThemesKeys, holderIconEnabled, noBackgroundMode, savedCustomThemes, disableSidebarAnimations, hideScrollbars, foldDayCellsEnabled, showHolderByDefault, use24HourFormat, holderSidebarWidth, hideAddEventButtonInHolder);
+                renderSavedThemes();
+                confirmBox.remove();
+            };
+            document.getElementById('confirmRemoveAllThemesNo').onclick = () => {
+                confirmBox.remove();
+            };
+        };
+
+        const handleResetApplication = () => {
+            const confirmBox = document.createElement('div');
+            confirmBox.innerHTML = `
+                <div class="fixed inset-0" style="background-color: var(--modal-overlay-bg); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+                    <div class="p-6 rounded-lg shadow-xl text-center" style="border-radius: var(--ui-roundness-lg); background-color: var(--main-container-bg); color: var(--text-color);">
+                        <p class="text-lg font-semibold mb-4" style="color: var(--text-color);">Are you sure you want to reset the entire application?</p>
+                        <p class="text-sm text-gray-500 mb-4">(This will delete all events, custom themes, and reset all settings)</p>
+                        <div class="flex justify-center space-x-4">
+                            <button class="themed-button danger" id="confirmResetAppYes">Yes, Reset All</button>
+                            <button class="themed-button secondary" id="confirmResetAppNo">No</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(confirmBox);
+
+            document.getElementById('confirmResetAppYes').onclick = async () => {
+                await Preferences.clear();
+                location.reload();
+            };
+            document.getElementById('confirmResetAppNo').onclick = () => {
+                confirmBox.remove();
+            };
+        };
+
 
         const handleSaveSettings = async () => {
             const uiRoundness = uiRoundnessInput.value;
@@ -3729,18 +4227,24 @@ const initColorPalette = () => {
             const eventRoundness = eventRoundnessInput.value;
             const eventBorderThickness = eventBorderThicknessInput.value;
             const dayCellMinWidth = dayCellMinWidthInput.value;
-            const isDarkMode = darkModeToggle.checked;
             const newHolderIconEnabled = holderIconToggle.checked;
             const newNoBackgroundMode = noBackgroundToggle.checked;
             const newDisableSidebarAnimations = disableSidebarAnimationsToggle.checked;
+            const newHideScrollbars = hideScrollbarsToggle.checked;
+            const newFoldDayCellsEnabled = foldDayCellsToggle.checked;
+            const newShowHolderByDefault = showHolderByDefaultToggle.checked;
+            const newUse24HourFormat = use24HourFormatToggle.checked;
+            const newHideAddEventButtonInHolder = hideAddEventButtonInHolderToggle.checked;
 
             let customThemeColorsToSave = null;
             if (currentBaseThemeKey === null) {
                 customThemeColorsToSave = getCustomThemeColorsFromInputs();
                 currentBaseTheme = customThemeColorsToSave;
+            } else {
+                currentBaseTheme = isDarkModeActive ? THEMES[currentBaseThemeKey].dark : THEMES[currentBaseThemeKey].light;
             }
 
-            applyTheme(getEffectiveTheme(currentBaseThemeKey, isDarkMode), {
+            applyTheme(getEffectiveTheme(currentBaseThemeKey, isDarkModeActive), {
                 themeBodyBgInput, themeTextColorInput, themeHeaderBgInput, themeMainContainerBgInput,
                 themeDayCellBgInput, themeDayCellHoverBgInput, themeCurrentDayBgInput,
                 themePrimaryButtonBgInput, themePrimaryButtonTextInput,
@@ -3773,32 +4277,26 @@ const initColorPalette = () => {
             disableSidebarAnimations = newDisableSidebarAnimations;
             applyAnimationsState();
 
-            await saveSettings(fontToSave, fontDataToSave, currentBaseThemeKey, isDarkMode, uiRoundness, fontSize, eventRoundness, eventBorderThickness, dayCellMinWidth, customThemeColorsToSave, areCustomColorPickersLocked, unlockedSpecialThemesKeys, newHolderIconEnabled, newNoBackgroundMode, savedCustomThemes, newDisableSidebarAnimations);
+            hideScrollbars = newHideScrollbars;
+            applyScrollbarVisibility();
+
+            foldDayCellsEnabled = newFoldDayCellsEnabled;
+            showHolderByDefault = newShowHolderByDefault;
+            use24HourFormat = newUse24HourFormat;
+            hideAddEventButtonInHolder = newHideAddEventButtonInHolder; 
+            applyAddEventButtonVisibility(); 
+
+            await saveSettings(fontToSave, fontDataToSave, currentBaseThemeKey, isDarkModeActive, uiRoundness, fontSize, eventRoundness, eventBorderThickness, dayCellMinWidth, customThemeColorsToSave, unlockedSpecialThemesKeys, newHolderIconEnabled, newNoBackgroundMode, savedCustomThemes, newDisableSidebarAnimations, newHideScrollbars, newFoldDayCellsEnabled, newShowHolderByDefault, newUse24HourFormat, holderSidebarWidth, newHideAddEventButtonInHolder);
             holderIconEnabled = newHolderIconEnabled;
             noBackgroundMode = newNoBackgroundMode;
             updateHamburgerIconVisibility();
             updateMainContainerLayout();
+            if (showHolderByDefault && !holderSidebar.classList.contains('active')) {
+                toggleHolderSidebar();
+            } else if (!showHolderByDefault && holderSidebar.classList.contains('active')) {
+                toggleHolderSidebar();
+            }
             closeSettingsModal();
-        };
-
-        const showAdMobPlaceholder = () => {
-            adMobPlaceholder.classList.remove('hidden');
-        };
-
-        const handleWatchAd = async () => {
-            watchAdButton.classList.add('hidden');
-            adLoadingSpinner.classList.remove('hidden');
-            showAdMobPlaceholder();
-
-            setTimeout(async () => {
-                adMobPlaceholder.classList.add('hidden');
-                adLoadingSpinner.classList.add('hidden');
-                areCustomColorPickersLocked = false;
-                setCustomColorPickerState(false);
-                await saveSettings(currentCustomFontName, null, currentBaseThemeKey, isDarkModeActive,
-                                 uiRoundnessInput.value, fontSizeInput.value,
-                                 eventRoundnessInput.value, eventBorderThicknessInput.value, dayCellMinWidthInput.value, currentBaseTheme, false, unlockedSpecialThemesKeys, holderIconEnabled, noBackgroundMode, savedCustomThemes, disableSidebarAnimations);
-            }, 3000);
         };
 
         const updateHamburgerIconVisibility = () => {
@@ -3817,7 +4315,7 @@ const initColorPalette = () => {
             if (disableSidebarAnimations) {
                 sidebar.style.transition = 'none';
             } else {
-                sidebar.style.transition = 'left 0.3s ease-in-out, background-color 0.3s ease-in-out, border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out';
+                sidebar.style.transition = 'left 0.3s ease-in-out, background-color 0.3s ease-in-out, border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out, width 0.3s ease-in-out';
             }
 
             if (sidebar.classList.contains('active')) {
@@ -3871,9 +4369,63 @@ const initColorPalette = () => {
                 sidebar.style.transition = 'none';
                 mainContainer.style.transition = 'none';
             } else {
-                sidebar.style.transition = 'left 0.3s ease-in-out, background-color 0.3s ease-in-out, border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out';
+                sidebar.style.transition = 'left 0.3s ease-in-out, background-color 0.3s ease-in-out, border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out, width 0.3s ease-in-out';
                 mainContainer.style.transition = 'all 0.2s ease-out';
             }
+        };
+
+        const applyScrollbarVisibility = () => {
+            const scrollContainers = document.querySelectorAll('.calendar-scroll-container, .modal-content-scrollable, .icon-grid, #holder-content');
+            if (hideScrollbars) {
+                scrollContainers.forEach(container => container.classList.add('hide-scrollbars'));
+                document.querySelectorAll('.day-cell.folded').forEach(cell => cell.classList.add('hide-scrollbars'));
+            } else {
+                scrollContainers.forEach(container => container.classList.remove('hide-scrollbars'));
+                document.querySelectorAll('.day-cell.folded').forEach(cell => cell.classList.remove('hide-scrollbars'));
+            }
+        };
+
+        const applyAddEventButtonVisibility = () => {
+            if (addHolderEventButton) {
+                if (hideAddEventButtonInHolder) {
+                    addHolderEventButton.classList.add('hidden');
+                } else {
+                    addHolderEventButton.classList.remove('hidden');
+                }
+            }
+        };
+
+        const setupHolderResizing = () => {
+            holderResizeHandle.addEventListener('mousedown', (e) => {
+                isResizingHolder = true;
+                initialMouseX = e.clientX;
+                initialHolderWidth = holderSidebar.offsetWidth;
+                document.body.style.cursor = 'ew-resize';
+                document.body.style.userSelect = 'none'; 
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isResizingHolder) return;
+
+                let newWidth = initialHolderWidth + (e.clientX - initialMouseX);
+                newWidth = Math.max(MIN_HOLDER_WIDTH, Math.min(MAX_HOLDER_WIDTH, newWidth));
+
+                holderSidebar.style.width = `${newWidth}px`;
+                document.documentElement.style.setProperty('--holder-sidebar-width', `${newWidth}px`);
+                holderSidebarWidth = newWidth;
+                updateMainContainerLayout();
+            });
+
+            document.addEventListener('mouseup', async () => {
+                if (isResizingHolder) {
+                    isResizingHolder = false;
+                    document.body.style.cursor = 'default';
+                    document.body.style.userSelect = 'auto';
+                    await saveSettings(currentCustomFontName, null, currentBaseThemeKey, isDarkModeActive,
+                                 uiRoundnessInput.value, fontSizeInput.value,
+                                 eventRoundnessInput.value, eventBorderThicknessInput.value, dayCellMinWidthInput.value, currentBaseTheme, unlockedSpecialThemesKeys, holderIconEnabled, noBackgroundMode, savedCustomThemes, disableSidebarAnimations, hideScrollbars, foldDayCellsEnabled, showHolderByDefault, use24HourFormat, holderSidebarWidth, hideAddEventButtonInHolder);
+                }
+            });
         };
 
 
@@ -3909,12 +4461,14 @@ const initColorPalette = () => {
             effectGlisteningStars = document.getElementById('effectGlisteningStars');
             effectGradient = document.getElementById('effectGradient');
             effectAnimatedStripes = document.getElementById('effectAnimatedStripes');
+            effectAnimatedVerticalRainbow = document.getElementById('effectAnimatedVerticalRainbow');
 
 
             settingsModal = document.getElementById('settings-modal');
             customFontUploadInput = document.getElementById('customFontUpload');
             customFontNameDisplay = document.getElementById('customFontNameDisplay');
             resetCustomFontButton = document.getElementById('resetCustomFont');
+            premadeThemeBoxesContainer = document.getElementById('premadeThemeBoxesContainer');
             premadeThemeBoxesEl = document.getElementById('premadeThemeBoxes');
             specialThemeBoxesEl = document.getElementById('specialThemeBoxes');
 
@@ -3922,10 +4476,14 @@ const initColorPalette = () => {
             uiRoundnessValueDisplay = document.getElementById('uiRoundnessValue');
             fontSizeInput = document.getElementById('fontSize');
             fontSizeValueDisplay = document.getElementById('fontSizeValue');
-            darkModeToggle = document.getElementById('darkModeToggle');
             holderIconToggle = document.getElementById('holderIconToggle');
             noBackgroundToggle = document.getElementById('noBackgroundToggle');
             disableSidebarAnimationsToggle = document.getElementById('disableSidebarAnimationsToggle');
+            hideScrollbarsToggle = document.getElementById('hideScrollbarsToggle');
+            foldDayCellsToggle = document.getElementById('foldDayCellsToggle');
+            showHolderByDefaultToggle = document.getElementById('showHolderByDefaultToggle');
+            use24HourFormatToggle = document.getElementById('use24HourFormatToggle');
+            hideAddEventButtonInHolderToggle = document.getElementById('hideAddEventButtonInHolderToggle');
 
             eventRoundnessInput = document.getElementById('eventRoundness');
             eventRoundnessValueDisplay = document.getElementById('eventRoundnessValue');
@@ -3952,12 +4510,6 @@ const initColorPalette = () => {
             saveSettingsButton = document.getElementById('saveSettings');
             cancelSettingsButton = document.getElementById('cancelSettings');
 
-            adMobPlaceholder = document.getElementById('adMobPlaceholder');
-            customColorPickersContainer = document.getElementById('customColorPickersContainer');
-            colorPickersOverlay = document.getElementById('colorPickersOverlay');
-            watchAdButton = document.getElementById('watchAdButton');
-            adLoadingSpinner = document.getElementById('adLoadingSpinner');
-
             saveCustomThemeButton = document.getElementById('saveCustomThemeButton');
             savedThemePreviewsEl = document.getElementById('savedThemePreviews');
             removeAllEventsButton = document.getElementById('removeAllEventsButton');
@@ -3968,12 +4520,49 @@ const initColorPalette = () => {
             themeNameInput = document.getElementById('themeNameInput');
             cancelThemeNameButton = document.getElementById('cancelThemeName');
             saveThemeNameButton = document.getElementById('saveThemeName');
+            cancelThemeNameButton.addEventListener('click', closeThemeNameModal);
+            saveThemeNameButton.addEventListener('click', handleSaveThemeName);
 
             holderContentEl = document.getElementById('holder-content');
             hamburgerIcon = document.getElementById('hamburgerIcon');
             holderSidebar = document.getElementById('holder-sidebar');
             mainContainerEl = document.getElementById('main-container');
+            holderSidebarCloseButton = document.getElementById('holderSidebarCloseButton');
+            addHolderEventButton = document.getElementById('addHolderEventButton');
+            holderResizeHandle = document.querySelector('.resize-handle');
 
+
+            eventContextMenu = document.getElementById('eventContextMenu');
+            contextEditEventButton = document.getElementById('contextEditEvent');
+            contextDuplicateEventButton = document.getElementById('contextDuplicateEvent');
+            contextDeleteEventButton = document.getElementById('contextDeleteEvent');
+
+            darkModeButton = document.getElementById('darkModeButton');
+            
+            darkModeButton.addEventListener('click', async () => {
+                isDarkModeActive = !isDarkModeActive;
+                
+                // dark mode button on off thingy switchy
+                darkModeButton.innerHTML = `Dark Mode <span class="small-text">(${isDarkModeActive ? 'On' : 'Off'})</span>`;
+                
+                darkModeButton.classList.toggle('selected');
+                
+                applyTheme(getEffectiveTheme(currentBaseThemeKey, isDarkModeActive), {
+                    themeBodyBgInput, themeTextColorInput, themeHeaderBgInput, themeMainContainerBgInput,
+                    themeDayCellBgInput, themeDayCellHoverBgInput, themeCurrentDayBgInput,
+                    themePrimaryButtonBgInput, themePrimaryButtonTextInput,
+                    themeSecondaryButtonBgInput, themeSecondaryButtonTextInput,
+                    themeAccentColorInput, themeDayCellBorderColorInput
+                });
+                
+                // SAVE SETTINGS RAAAAAAAAAAAAHHHHHHH
+                await saveSettings(currentCustomFontName, null, currentBaseThemeKey, isDarkModeActive,
+                    uiRoundnessInput.value, fontSizeInput.value,
+                    eventRoundnessInput.value, eventBorderThicknessInput.value, dayCellMinWidthInput.value, 
+                    currentBaseTheme, unlockedSpecialThemesKeys, holderIconEnabled, noBackgroundMode, 
+                    savedCustomThemes, disableSidebarAnimations, hideScrollbars, foldDayCellsEnabled, 
+                    showHolderByDefault, use24HourFormat, holderSidebarWidth, hideAddEventButtonInHolder);
+            });
 
             const loadedSettings = await loadSettings();
 
@@ -3987,7 +4576,6 @@ const initColorPalette = () => {
             }
             currentCustomFontName = loadedSettings.currentCustomFontName;
 
-            darkModeToggle.checked = loadedSettings.isDarkModeActive;
             isDarkModeActive = loadedSettings.isDarkModeActive;
             holderIconToggle.checked = loadedSettings.holderIconEnabled;
             holderIconEnabled = loadedSettings.holderIconEnabled;
@@ -3995,21 +4583,37 @@ const initColorPalette = () => {
             noBackgroundMode = loadedSettings.noBackgroundMode;
             disableSidebarAnimationsToggle.checked = loadedSettings.disableSidebarAnimations;
             disableSidebarAnimations = loadedSettings.disableSidebarAnimations;
+            hideScrollbarsToggle.checked = loadedSettings.hideScrollbars;
+            hideScrollbars = loadedSettings.hideScrollbars;
+            foldDayCellsToggle.checked = loadedSettings.foldDayCellsEnabled;
+            foldDayCellsEnabled = loadedSettings.foldDayCellsEnabled;
+            showHolderByDefaultToggle.checked = loadedSettings.showHolderByDefault;
+            showHolderByDefault = loadedSettings.showHolderByDefault;
+            use24HourFormatToggle.checked = loadedSettings.use24HourFormat;
+            use24HourFormat = loadedSettings.use24HourFormat;
+            hideAddEventButtonInHolderToggle.checked = loadedSettings.hideAddEventButtonInHolder;
+            hideAddEventButtonInHolder = loadedSettings.hideAddEventButtonInHolder;
+            holderSidebarWidth = loadedSettings.holderSidebarWidth;
+            document.documentElement.style.setProperty('--holder-sidebar-width', `${holderSidebarWidth}px`);
 
-
-            areCustomColorPickersLocked = loadedSettings.customColorPickersLocked;
-            setCustomColorPickerState(areCustomColorPickersLocked);
 
             currentBaseThemeKey = loadedSettings.currentBaseThemeKey;
             if (currentBaseThemeKey === null) {
-                currentBaseTheme = loadedSettings.customThemeColors || { ...DEFAULT_LIGHT_THEME };
+                currentBaseTheme = loadedSettings.customThemeColors || { ...THEMES.pastelBlue.light };
             } else {
-                currentBaseTheme = null;
+                if (THEMES[currentBaseThemeKey]) {
+                    currentBaseTheme = isDarkModeActive ? THEMES[currentBaseThemeKey].dark : THEMES[currentBaseThemeKey].light;
+                } else {
+                    currentBaseTheme = THEMES.pastelBlue.light;
+                    currentBaseThemeKey = 'pastelBlue';
+                }
             }
 
 
             initPremadeThemeBoxes();
             initSpecialThemeBoxes();
+
+            updateThemeSelectionInSettings();
 
             uiRoundnessInput.value = loadedSettings.currentUiRoundness;
             uiRoundnessValueDisplay.textContent = `${loadedSettings.currentUiRoundness}px`;
@@ -4058,8 +4662,15 @@ const initColorPalette = () => {
             renderCalendar();
             renderHolderEvents();
             applyAnimationsState();
+            applyScrollbarVisibility();
+            applyAddEventButtonVisibility(); 
+
 
             updateHamburgerIconVisibility();
+            if (showHolderByDefault && !holderSidebar.classList.contains('active')) {
+                toggleHolderSidebar();
+            }
+            setupHolderResizing();
 
 
             prevMonthButton.addEventListener('click', () => {
@@ -4158,27 +4769,12 @@ const initColorPalette = () => {
                 document.documentElement.style.setProperty('--day-cell-min-width', `${value}px`);
             });
 
-            darkModeToggle.addEventListener('change', async () => {
-                isDarkModeActive = darkModeToggle.checked;
-                applyTheme(getEffectiveTheme(currentBaseThemeKey, isDarkModeActive), {
-                    themeBodyBgInput, themeTextColorInput, themeHeaderBgInput, themeMainContainerBgInput,
-                    themeDayCellBgInput, themeDayCellHoverBgInput, themeCurrentDayBgInput,
-                    themePrimaryButtonBgInput, themePrimaryButtonTextInput,
-                    themeSecondaryButtonBgInput, themeSecondaryButtonTextInput,
-                    themeAccentColorInput, themeDayCellBorderColorInput
-                });
-                initColorPalette();
-                await saveSettings(currentCustomFontName, null, currentBaseThemeKey, isDarkModeActive,
-                             uiRoundnessInput.value, fontSizeInput.value,
-                             eventRoundnessInput.value, eventBorderThicknessInput.value, dayCellMinWidthInput.value, currentBaseTheme, areCustomColorPickersLocked, unlockedSpecialThemesKeys, holderIconEnabled, noBackgroundMode, savedCustomThemes, disableSidebarAnimations);
-            });
-
             holderIconToggle.addEventListener('change', async () => {
                 holderIconEnabled = holderIconToggle.checked;
                 updateHamburgerIconVisibility();
                 await saveSettings(currentCustomFontName, null, currentBaseThemeKey, isDarkModeActive,
                              uiRoundnessInput.value, fontSizeInput.value,
-                             eventRoundnessInput.value, eventBorderThicknessInput.value, dayCellMinWidthInput.value, currentBaseTheme, areCustomColorPickersLocked, unlockedSpecialThemesKeys, holderIconEnabled, noBackgroundMode, savedCustomThemes, disableSidebarAnimations);
+                             eventRoundnessInput.value, eventBorderThicknessInput.value, dayCellMinWidthInput.value, currentBaseTheme, unlockedSpecialThemesKeys, holderIconEnabled, noBackgroundMode, savedCustomThemes, disableSidebarAnimations, hideScrollbars, foldDayCellsEnabled, showHolderByDefault, use24HourFormat, holderSidebarWidth, hideAddEventButtonInHolder);
             });
 
             noBackgroundToggle.addEventListener('change', async () => {
@@ -4186,7 +4782,7 @@ const initColorPalette = () => {
                 updateMainContainerLayout();
                 await saveSettings(currentCustomFontName, null, currentBaseThemeKey, isDarkModeActive,
                              uiRoundnessInput.value, fontSizeInput.value,
-                             eventRoundnessInput.value, eventBorderThicknessInput.value, dayCellMinWidthInput.value, currentBaseTheme, areCustomColorPickersLocked, unlockedSpecialThemesKeys, holderIconEnabled, noBackgroundMode, savedCustomThemes, disableSidebarAnimations);
+                             eventRoundnessInput.value, eventBorderThicknessInput.value, dayCellMinWidthInput.value, currentBaseTheme, unlockedSpecialThemesKeys, holderIconEnabled, noBackgroundMode, savedCustomThemes, disableSidebarAnimations, hideScrollbars, foldDayCellsEnabled, showHolderByDefault, use24HourFormat, holderSidebarWidth, hideAddEventButtonInHolder);
             });
 
             disableSidebarAnimationsToggle.addEventListener('change', async () => {
@@ -4194,11 +4790,48 @@ const initColorPalette = () => {
                 applyAnimationsState();
                 await saveSettings(currentCustomFontName, null, currentBaseThemeKey, isDarkModeActive,
                              uiRoundnessInput.value, fontSizeInput.value,
-                             eventRoundnessInput.value, eventBorderThicknessInput.value, dayCellMinWidthInput.value, currentBaseTheme, areCustomColorPickersLocked, unlockedSpecialThemesKeys, holderIconEnabled, noBackgroundMode, savedCustomThemes, disableSidebarAnimations);
+                             eventRoundnessInput.value, eventBorderThicknessInput.value, dayCellMinWidthInput.value, currentBaseTheme, unlockedSpecialThemesKeys, holderIconEnabled, noBackgroundMode, savedCustomThemes, disableSidebarAnimations, hideScrollbars, foldDayCellsEnabled, showHolderByDefault, use24HourFormat, holderSidebarWidth);
+            });
+
+            hideScrollbarsToggle.addEventListener('change', async () => {
+                hideScrollbars = hideScrollbarsToggle.checked;
+                applyScrollbarVisibility();
+                await saveSettings(currentCustomFontName, null, currentBaseThemeKey, isDarkModeActive,
+                             uiRoundnessInput.value, fontSizeInput.value,
+                             eventRoundnessInput.value, eventBorderThicknessInput.value, dayCellMinWidthInput.value, currentBaseTheme, unlockedSpecialThemesKeys, holderIconEnabled, noBackgroundMode, savedCustomThemes, disableSidebarAnimations, hideScrollbars, foldDayCellsEnabled, showHolderByDefault, use24HourFormat, holderSidebarWidth);
+            });
+
+            foldDayCellsToggle.addEventListener('change', async () => {
+                foldDayCellsEnabled = foldDayCellsToggle.checked;
+                renderCalendar();
+                applyScrollbarVisibility();
+                await saveSettings(currentCustomFontName, null, currentBaseThemeKey, isDarkModeActive,
+                             uiRoundnessInput.value, fontSizeInput.value,
+                             eventRoundnessInput.value, eventBorderThicknessInput.value, dayCellMinWidthInput.value, currentBaseTheme, unlockedSpecialThemesKeys, holderIconEnabled, noBackgroundMode, savedCustomThemes, disableSidebarAnimations, hideScrollbars, foldDayCellsEnabled, showHolderByDefault, use24HourFormat, holderSidebarWidth);
+            });
+
+            showHolderByDefaultToggle.addEventListener('change', async () => {
+                showHolderByDefault = showHolderByDefaultToggle.checked;
+                await saveSettings(currentCustomFontName, null, currentBaseThemeKey, isDarkModeActive,
+                             uiRoundnessInput.value, fontSizeInput.value,
+                             eventRoundnessInput.value, eventBorderThicknessInput.value, dayCellMinWidthInput.value, currentBaseTheme, unlockedSpecialThemesKeys, holderIconEnabled, noBackgroundMode, savedCustomThemes, disableSidebarAnimations, hideScrollbars, foldDayCellsEnabled, showHolderByDefault, use24HourFormat, holderSidebarWidth);
+            });
+
+            use24HourFormatToggle.addEventListener('change', async () => {
+                use24HourFormat = use24HourFormatToggle.checked;
+                renderCalendar();
+                renderHolderEvents();
+                await saveSettings(currentCustomFontName, null, currentBaseThemeKey, isDarkModeActive,
+                             uiRoundnessInput.value, fontSizeInput.value,
+                             eventRoundnessInput.value, eventBorderThicknessInput.value, dayCellMinWidthInput.value, currentBaseTheme, unlockedSpecialThemesKeys, holderIconEnabled, noBackgroundMode, savedCustomThemes, disableSidebarAnimations, hideScrollbars, foldDayCellsEnabled, showHolderByDefault, use24HourFormat, holderSidebarWidth);
             });
 
 
             hamburgerIcon.addEventListener('click', toggleHolderSidebar);
+            holderSidebarCloseButton.addEventListener('click', toggleHolderSidebar);
+            addHolderEventButton.addEventListener('click', () => {
+                openEventModal(null, 'holder');
+            });
 
             const updateThemeAndApply = async () => {
                 currentBaseThemeKey = null;
@@ -4211,6 +4844,7 @@ const initColorPalette = () => {
                     themeSecondaryButtonBgInput, themeSecondaryButtonTextInput,
                     themeAccentColorInput, themeDayCellBorderColorInput
                 });
+                updateThemeSelectionInSettings();
             };
 
             themeBodyBgInput.addEventListener('input', updateThemeAndApply);
@@ -4226,8 +4860,6 @@ const initColorPalette = () => {
             themeSecondaryButtonTextInput.addEventListener('input', updateThemeAndApply);
             themeAccentColorInput.addEventListener('input', updateThemeAndApply);
             themeDayCellBorderColorInput.addEventListener('input', updateThemeAndApply);
-
-            watchAdButton.addEventListener('click', handleWatchAd);
 
             eventModal.addEventListener('click', (e) => {
                 if (e.target === eventModal) {
@@ -4272,6 +4904,37 @@ const initColorPalette = () => {
             removeAllCustomThemesButton.addEventListener('click', handleRemoveAllCustomThemes);
             resetApplicationButton.addEventListener('click', handleResetApplication);
             saveCustomThemeButton.addEventListener('click', handleSaveCustomTheme); 
+
+            contextEditEventButton.addEventListener('click', () => {
+                eventContextMenu.style.display = 'none';
+                if (contextMenuEventId) {
+                    openEventModal(contextMenuEventId);
+                }
+            });
+
+            contextDuplicateEventButton.addEventListener('click', () => {
+                eventContextMenu.style.display = 'none';
+                handleDuplicateEvent();
+            });
+
+            contextDeleteEventButton.addEventListener('click', () => {
+                eventContextMenu.style.display = 'none';
+                handleDeleteEvent();
+            });
+
+            document.addEventListener('click', (e) => {
+                if (eventContextMenu.style.display === 'flex' && !eventContextMenu.contains(e.target)) {
+                    eventContextMenu.style.display = 'none';
+                    contextMenuEventId = null;
+                }
+            });
+
+            document.addEventListener('contextmenu', (e) => {
+                if (eventContextMenu.style.display === 'flex' && !eventContextMenu.contains(e.target)) {
+                    eventContextMenu.style.display = 'none';
+                    contextMenuEventId = null;
+                }
+            });
         };
     </script>
 </body>
