@@ -760,13 +760,21 @@
             animation: fadeInScale 0.3s ease-out forwards;
             max-height: 90vh;
             overflow-y: hidden;
-            border-radius: var(--ui-roundness-lg);
+            border-radius: var(--ui-roundness);
             transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out, border-color 0.3s ease-in-out;
             display: flex;
             flex-direction: column;
             padding-bottom: 0;
-            border-radius: var(--ui-roundness-lg);
+            border: 3px solid var(--day-cell-border-color);
         }
+
+        body.dark-mode .modal-content {
+            border: 3px solid var(--day-cell-border-color);
+        }
+        body.dark-mode .modal-content {
+            border-color: var(--day-cell-border-color);
+        }
+        
         @keyframes fadeInScale {
             from {
                 opacity: 0;
@@ -779,6 +787,14 @@
         }
         #settings-modal .modal-content {
             max-width: 720px;
+            border-radius: var(--ui-roundness) !important;
+            border: 3px solid var(--day-cell-border-color) !important;
+        }
+
+        body.dark-mode #settings-modal .modal-content {
+            border-radius: var(--ui-roundness) !important;
+            border: 3px solid var(--day-cell-border-color) !important;
+            border-color: var(--day-cell-border-color) !important;
         }
 
         .modal-content-scrollable {
@@ -1553,6 +1569,25 @@
             
         }
 
+                @media (max-width: 500px) {
+                  .modal-footer {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 0.5rem;
+                    justify-content: stretch;
+                  }
+                  .modal-footer .themed-button {
+                    padding: 0.5rem 0.7rem;
+                    font-size: 0.95em;
+                    flex: 1 1 40%;
+                    min-width: 110px;
+                    max-width: 100%;
+                    width: auto;
+                    box-sizing: border-box;
+                    margin: 0;
+                  }
+                }
+
         .resize-handle {
             width: 1.5px;
             height: 100%;
@@ -2255,7 +2290,7 @@
                 },
                 dark: {
                     name: "Blue (Dark)", bodyBg: '#060b14', mainText: '#90caf9', headerBg: '#3A4B5C', mainContainerBg: '#12152b',
-                    dayCellBg: '#18203a', dayCellHoverBg: '#18437c', currentDayBg: '#1a2854',
+                    dayCellBg: '#18203a', dayCellHoverBg: '#090c1c', currentDayBg: '#12173b',
                     primaryButtonBg: '#18587e', primaryButtonText: '#85d6ff',
                     secondaryButtonBg: '#12152b',
                     secondaryButtonText: '#90CAF9', accentColor: '#81D4FA', dayCellBorder: '#2a4f7e',
@@ -2357,12 +2392,24 @@
                     arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#EC407A', headerBorderColor: '#F06292'
                 },
                 dark: {
-                    name: "Pink (Dark)", bodyBg: '#29071e', mainText: '#ff93c8', headerBg: '#523A40', mainContainerBg: '#350825',
-                    dayCellBg: '#400c2e', dayCellHoverBg: '#2f0422', currentDayBg: '#3d0a2b',
-                    primaryButtonBg: '#891857', primaryButtonText: '#f56eb6',
-                    secondaryButtonBg: '#4c1238',
-                    secondaryButtonText: '#F48FB1', accentColor: '#ef70b9', dayCellBorder: '#731f53',
-                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(255,255,255,0.1)', arrowButtonText: '#ff93c8', headerBorderColor: 'rgba(255,255,255,0.15)'
+                    name: "Pink (Dark)",
+                    bodyBg: '#1a0e18',
+                    mainText: '#eb81ab',
+                    headerBg: '#3d1c2b',
+                    mainContainerBg: '#260a15',
+                    dayCellBg: '#420123',
+                    dayCellHoverBg: '#1f0010',
+                    currentDayBg: '#820c3b',
+                    primaryButtonBg: '#820c3b',
+                    primaryButtonText: '#eb81ab',
+                    secondaryButtonBg: '#29111c',
+                    secondaryButtonText: '#eb81ab',
+                    accentColor: '#eb81ab',
+                    dayCellBorder: '#80264a',
+                    arrowButtonBg: 'transparent',
+                    arrowButtonHoverBg: 'rgba(255,255,255,0.1)',
+                    arrowButtonText: '#eb81ab',
+                    headerBorderColor: '#5a2a3a'
                 }
             },
             pureBlack: {
@@ -2422,14 +2469,24 @@
                     arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(0,0,0,0.05)', arrowButtonText: '#44475A', headerBorderColor: '#EAEAEA'
                 },
                 dark: {
-                    name: "Dracula", bodyBg: '#282A36', mainText: '#F8F8F2', headerBg: '#3A3A4A', mainContainerBg: '#3A3A4A',
-                    dayCellBg: '#44475A', dayCellHoverBg: '#505364', currentDayBg: '#6272A4',
-                    primaryButtonBg: '#FF79C6', 
-                    primaryButtonText: '#FFFFFF', 
-                    secondaryButtonBg: '#6272A4', 
-                    secondaryButtonText: '#F8F8F2', 
-                    accentColor: '#FF79C6', dayCellBorder: '#5d6283',
-                    arrowButtonBg: 'transparent', arrowButtonHoverBg: 'rgba(255,255,255,0.1)', arrowButtonText: '#F8F8F2', headerBorderColor: '#44475A'
+                    name: "Dracula",
+                    bodyBg: '#282A36',
+                    mainText: '#f8f8f2',
+                    headerBg: '#21222c',
+                    mainContainerBg: '#282a36',
+                    dayCellBg: '#21222d',
+                    dayCellHoverBg: '#1e1f29',
+                    currentDayBg: '#44475a',
+                    primaryButtonBg: '#ff79c6',
+                    primaryButtonText: '#282a37',
+                    secondaryButtonBg: '#bd93f9',
+                    secondaryButtonText: '#36394a',
+                    accentColor: '#ffb86c',
+                    dayCellBorder: '#62617b',
+                    arrowButtonBg: 'transparent',
+                    arrowButtonHoverBg: 'rgba(255,255,255,0.12)',
+                    arrowButtonText: '#5c5c74',
+                    headerBorderColor: '#44475a'
                 }
             },
             nord: {
@@ -2446,8 +2503,8 @@
                 dark: {
                     name: "Nord", bodyBg: '#2E3440', mainText: '#ECEFF4', headerBg: '#3B4252', mainContainerBg: '#3B4252',
                     dayCellBg: '#4C566A', dayCellHoverBg: '#5E81AC', currentDayBg: '#81A1C1',
-                    primaryButtonBg: '#88C0D0', 
-                    primaryButtonText: '#FFFFFF',
+                    primaryButtonBg: '#4c566a', 
+                    primaryButtonText: '#89bdcc',
                     secondaryButtonBg: '#4C566A', 
                     secondaryButtonText: '#ECEFF4',
                     accentColor: '#88C0D0', dayCellBorder: '#4C566A',
@@ -2725,7 +2782,7 @@
         let holderIconEnabled = true;
         let noBackgroundMode = false;
         let disableSidebarAnimations = true;
-        let hideScrollbars = false;
+        let hideScrollbars = true;
         let foldDayCellsEnabled = false;
         let showHolderByDefault = false;
         let use24HourFormat = false;
@@ -4904,7 +4961,7 @@ const initColorPalette = () => {
             const mainContainerRadius = noBackgroundMode && holderSidebar.classList.contains('active') ? '0px' : `${uiRoundness * 1.5}px`;
             document.querySelector('#main-container').style.borderRadius = mainContainerRadius;
             document.querySelector('#event-modal .modal-content').style.borderRadius = `${uiRoundness * 1.5}px`;
-            document.querySelector('#settings-modal .modal-content').style.borderRadius = `${uiRoundness * 1.5}px`;
+            document.querySelector('#settings-modal .modal-content').style.borderRadius = `var(--ui-roundness)`;
 
             document.documentElement.style.setProperty('--base-font-size', `${fontSize}px`);
             document.documentElement.style.setProperty('--event-item-roundness', `${eventRoundness}px`);
@@ -5391,14 +5448,11 @@ const initColorPalette = () => {
             uiRoundnessInput.addEventListener('input', (e) => {
                 const value = e.target.value;
                 uiRoundnessValueDisplay.textContent = `${value}px`;
-                uiRoundnessValueDisplay.style.fontSize = `${14 + (parseInt(value) / 24) * 8}px`;
                 document.documentElement.style.setProperty('--ui-roundness', `${value}px`);
                 document.documentElement.style.setProperty('--ui-roundness-lg', `${value * 1.5}px`);
-                
                 const currentMainContainerRadius = noBackgroundMode && holderSidebar.classList.contains('active') ? '0px' : `${value * 1.5}px`;
                 document.documentElement.style.setProperty('--main-container-border-radius-actual', currentMainContainerRadius);
                 mainContainerEl.style.borderRadius = currentMainContainerRadius;
-
                 document.querySelector('#event-modal .modal-content').style.borderRadius = `${value * 1.5}px`;
                 document.querySelector('#settings-modal .modal-content').style.borderRadius = `${value * 1.5}px`;
                 renderSavedThemes();
@@ -5407,14 +5461,12 @@ const initColorPalette = () => {
             eventRoundnessInput.addEventListener('input', (e) => {
                 const value = e.target.value;
                 eventRoundnessValueDisplay.textContent = `${value}px`;
-                eventRoundnessValueDisplay.style.fontSize = `${14 + (parseInt(value) / 24) * 8}px`;
                 document.documentElement.style.setProperty('--event-item-roundness', `${value}px`);
             });
 
             eventBorderThicknessInput.addEventListener('input', (e) => {
                 const value = e.target.value;
                 eventBorderThicknessValueDisplay.textContent = `${value}px`;
-                eventBorderThicknessValueDisplay.style.fontSize = `${14 + (parseInt(value) / 5) * 4}px`;
                 document.documentElement.style.setProperty('--event-item-border-thickness', `${value}px`);
             });
 
