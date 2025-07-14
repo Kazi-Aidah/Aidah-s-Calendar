@@ -4010,26 +4010,38 @@ const initColorPalette = () => {
                 }
 
                 if (event.effects) {
-                    if (event.effects.glowing) eventItem.classList.add('glowing');
-                    if (event.effects.striped) eventItem.classList.add('striped-effect');
-                    if (event.effects.dotted) eventItem.classList.add('dotted-effect');
-                    if (event.effects.particles) eventItem.classList.add('particles');
-                    if (event.effects.snowFalling) eventItem.classList.add('snow-falling');
-                    if (event.effects.glisteningStars) eventItem.classList.add('glistening-stars');
-                    if (event.effects.gradientEffect) eventItem.classList.add('gradient-effect');
-                    if (event.effects.animatedStripes) eventItem.classList.add('animated-stripes');
-                    
-                    if (event.effects.animatedVerticalRainbow) {
-                        eventItem.classList.add('animated-vertical-rainbow');
-                        const [h, s, l] = hexToHsl(eventColorData.text);
-                        const gradientColors = [];
-                        for (let i = 0; i < 7; i++) {
-                            const hue = (h + (i * (360 / 6))) % 360;
-                            gradientColors.push(hslToHex(hue, s, l));
+                        if (event.effects.glowing) eventItem.classList.add('glowing');
+                        if (event.effects.striped1) eventItem.classList.add('striped2-effect');
+                        if (event.effects.striped2) eventItem.classList.add('striped-effect');
+                        if (event.effects.thinStripes) eventItem.classList.add('thin-stripes-effect');
+                        if (event.effects.dotted) eventItem.classList.add('dotted-effect');
+                        if (event.effects.crosshatched) eventItem.classList.add('crosshatched-effect');
+                        if (event.effects.checkerboard) eventItem.classList.add('checkerboard-effect');
+                        if (event.effects.argyle) eventItem.classList.add('argyle-effect');
+                        if (event.effects.zigzag) eventItem.classList.add('zigzag-lines-effect');
+                        if (event.effects.wavyLines) eventItem.classList.add('wavy-lines-effect');
+                        if (event.effects.embossed) eventItem.classList.add('embossed-effect');
+
+                        if (event.effects.moveEffectHorizontally) eventItem.classList.add('move-effect-horizontal');
+                        if (event.effects.moveEffectVertically) eventItem.classList.add('move-effect-vertical');
+
+                        if (event.effects.particles) eventItem.classList.add('particles');
+                        if (event.effects.snowFalling) eventItem.classList.add('snow-falling');
+                        if (event.effects.glisteningStars) eventItem.classList.add('glistening-stars');
+                        if (event.effects.gradientEffect) eventItem.classList.add('gradient-effect');
+                        if (event.effects.animatedStripes) eventItem.classList.add('animated-stripes');
+
+                        if (event.effects.animatedVerticalRainbow) {
+                            eventItem.classList.add('animated-vertical-rainbow');
+                            const [h, s, l] = hexToHsl(eventColorData.text);
+                            const gradientColors = [];
+                            for (let i = 0; i < 7; i++) {
+                                const hue = (h + (i * (360 / 6))) % 360;
+                                gradientColors.push(hslToHex(hue, s, l));
+                            }
+                            eventItem.style.backgroundImage = `linear-gradient(to bottom, ${gradientColors.join(', ')})`;
                         }
-                        eventItem.style.backgroundImage = `linear-gradient(to bottom, ${gradientColors.join(', ')})`;
                     }
-                }
 
                 const mainContentDiv = document.createElement('div');
                 mainContentDiv.classList.add('main-content');
