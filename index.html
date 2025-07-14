@@ -211,6 +211,7 @@
             transition: background 0.2s, border-color 0.2s;
             position: relative;
             transition: 0.3ms all ease;
+            right: 3px;
         }
         .custom-checkbox .checkmark-svg {
             opacity: 0;
@@ -260,7 +261,7 @@
             border-bottom: 3px solid var(--accent-color);
         }
 
-        .event-item.striped-effect {
+        .event-item.striped2-effect {
             background-image: linear-gradient(
                 45deg,
                 var(--event-item-text-color-rgba-25) 25%,
@@ -271,7 +272,12 @@
                 transparent 75%,
                 transparent
             );
-            background-size: 20px 20px;
+            background-size: 16px 16px;
+        }
+
+        .event-item.striped-effect {
+            background-image: linear-gradient(135deg, var(--event-item-text-color-rgba-25) 25%, transparent 25%, transparent 50%, var(--event-item-text-color-rgba-25) 50%, var(--event-item-text-color-rgba-25) 75%, transparent 75%, transparent);
+            background-size: 16px 16px;
         }
 
         .event-item.dotted-effect {
@@ -282,6 +288,180 @@
         .event-item.glowing {
             box-shadow: 0 0 8px var(--event-item-text-color), 0 0 15px var(--event-item-text-color);
         }
+
+        .event-item.crosshatched-effect {
+            background-image:
+                repeating-linear-gradient(45deg, var(--event-item-text-color-rgba-25) 0 2px, transparent 2px 8px),
+                repeating-linear-gradient(-45deg, var(--event-item-text-color-rgba-25) 0 2px, transparent 2px 8px);
+            background-size: 12px 12px;
+        }
+
+        .event-item.checkerboard-effect {
+            background-image: 
+                repeating-conic-gradient(
+                    var(--event-item-text-color-rgba-25) 0deg 90deg,
+                    transparent 90deg 180deg,
+                    var(--event-item-text-color-rgba-25) 180deg 270deg,
+                    transparent 270deg 360deg
+                );
+            background-size: 16px 16px;
+        }
+
+        .event-item.argyle-effect {
+            background-image: repeating-linear-gradient(45deg, var(--event-item-text-color-rgba-25) 0 8px, transparent 8px 16px),
+                            repeating-linear-gradient(-45deg, var(--event-item-text-color-rgba-25) 0 8px, transparent 8px 16px);
+            background-size: 16px 16px;
+        }
+
+
+        .event-item.thin-stripes-effect {
+            background-image: repeating-linear-gradient(45deg, var(--event-item-text-color-rgba-25) 0 2px, transparent 2px 8px);
+            background-size: 10px 10px;
+        }
+
+
+        .event-item.zigzag-lines-effect {
+            --zigzag-color: var(--event-item-text-color-rgba-25);
+
+            background-image: linear-gradient(
+                to right,
+                var(--zigzag-color) 25%,
+                transparent 25%,
+                transparent 75%,
+                var(--zigzag-color) 75%
+            );
+            background-size: 10px 100%;
+            position: relative;
+        }
+
+        .event-item.zigzag-lines-effect::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background:
+                linear-gradient(
+                    -45deg,
+                    transparent 75%,
+                    var(--zigzag-color) 75%
+                ),
+                linear-gradient(
+                    45deg,
+                    transparent 75%,
+                    var(--zigzag-color) 75%
+                );
+            background-size: 10px 8px;
+            background-repeat: repeat-x;
+        }
+
+
+        .event-item.wavy-lines-effect {
+            color: var(--event-item-border-color-rgba-25);
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='8'><path d='M0 4 Q 10 0 20 4 T 40 4' stroke='currentColor' stroke-width='2' fill='none' opacity='0.25'/></svg>");
+            background-repeat: repeat;
+            background-size: 40px 8px;
+        }
+
+
+        .event-item.embossed-effect {
+            box-shadow: 0 2px 4px 0 rgba(255,255,255,0.5) inset, 0 -2px 4px 0 rgba(0,0,0,0.15) inset;
+            border: var(--event-item-border-thickness) solid rgba(0,0,0,0.07); /* EMBOSSED EFFECT PX CHANGE */
+        }
+
+        /* ANIMATED EFFECTS AHAHHAHAHA */
+        .event-item.move-effect-horizontal {
+            animation: move-effect-horizontal 2s linear infinite;
+        }
+        @keyframes move-effect-horizontal {
+            0% { background-position-x: 0; }
+            100% { background-position-x: 40px; }
+        }
+
+        .event-item.move-effect-vertical {
+            animation: move-effect-vertical 2s linear infinite;
+        }
+        @keyframes move-effect-vertical {
+            0% { background-position-y: 0; }
+            100% { background-position-y: 40px; }
+        }
+
+        /* MOVEMENT BROKEN SO WE MUST CRY */
+        .event-item.striped-effect,
+        .event-item.striped2-effect {
+            background-size: 16px 16px;
+        }
+        .event-item.striped-effect.move-effect-horizontal,
+        .event-item.striped2-effect.move-effect-horizontal {
+            animation: move-effect-horizontal-16 2s linear infinite;
+        }
+        @keyframes move-effect-horizontal-16 {
+            0% { background-position-x: 0; }
+            100% { background-position-x: 16px; }
+        }
+
+        .event-item.crosshatched-effect {
+            background-size: 12px 12px;
+        }
+        .event-item.crosshatched-effect.move-effect-horizontal {
+            animation: move-effect-horizontal-12 2s linear infinite;
+        }
+        @keyframes move-effect-horizontal-12 {
+            0% { background-position-x: 0; }
+            100% { background-position-x: 12px; }
+        }
+
+        .event-item.checkerboard-effect {
+            background-size: 16px 16px;
+        }
+        .event-item.checkerboard-effect.move-effect-horizontal {
+            animation: move-effect-horizontal-16 2s linear infinite;
+        }
+        @keyframes move-effect-horizontal-16 {
+            0% { background-position-x: 0; }
+            100% { background-position-x: 16px; }
+        }
+
+        .event-item.argyle-effect {
+            background-size: 16px 16px;
+        }
+        .event-item.argyle-effect.move-effect-horizontal {
+            animation: move-effect-horizontal-16 2s linear infinite;
+        }
+        @keyframes move-effect-horizontal-16 {
+            0% { background-position-x: 0; }
+            100% { background-position-x: 16px; }
+        }
+
+        /* vertical movements */
+        .event-item.checkerboard-effect.move-effect-vertical,
+        .event-item.striped-effect.move-effect-vertical,
+        .event-item.striped2-effect.move-effect-vertical,
+        .event-item.argyle-effect.move-effect-vertical {
+            animation: move-effect-vertical-16 2s linear infinite;
+        }
+        @keyframes move-effect-vertical-16 {
+            0% { background-position-y: 0; }
+            100% { background-position-y: 16px; }
+        }
+
+        /* Crosshatched vertical movement */
+        .event-item.crosshatched-effect.move-effect-vertical {
+            animation: move-effect-vertical-12 2s linear infinite;
+        }
+        @keyframes move-effect-vertical-12 {
+            0% { background-position-y: 0; }
+            100% { background-position-y: 12px; }
+        }
+
+
+
+
+
+        /* WORKS AS INTENDED */
+
+
 
         .event-item.particles::before {
             content: '';
@@ -522,7 +702,7 @@
         }
         .event-item .text-content .time-title-wrapper .title-part {
             flex-grow: 1;
-            white-space: normal; /* Allow title to wrap */
+            white-space: normal;
             word-break: break-word;
             overflow: hidden;
             min-width: 0;
@@ -1395,7 +1575,7 @@
             appearance: none;
             width: 18px;
             height: 18px;
-            border: 2px solid currentColor; /* Use event item's text color */
+            border: 2px solid currentColor; 
             border-radius: 4px;
             cursor: pointer;
             outline: none;
@@ -1403,18 +1583,18 @@
             flex-shrink: 0;
             margin-right: 0.5rem;
             position: relative;
-            top: 1px; /* Adjust vertical alignment */
+            top: 1px;
         }
 
         .event-item .event-checkbox:checked {
-            background-color: currentColor; /* Fill with text color when checked */
+            background-color: currentColor; 
             border-color: currentColor;
         }
 
         .event-item .event-checkbox:checked::after {
             content: '\2713'; /* Checkmark character */
             display: block;
-            color: var(--event-item-primary-color); /* Use event item's primary color for checkmark */
+            color: var(--event-item-primary-color); 
             font-size: 14px;
             line-height: 1;
             text-align: center;
@@ -1527,12 +1707,44 @@
                             <span class="toggle-label">Glowing</span>
                         </label>
                         <label class="toggle-container">
-                            <input type="checkbox" id="effectStriped">
-                            <span class="toggle-label">Striped</span>
+                            <input type="checkbox" id="effectStriped1">
+                            <span class="toggle-label">Striped 1 (\\\\\)</span>
+                        </label>
+                        <label class="toggle-container">
+                            <input type="checkbox" id="effectStriped2">
+                            <span class="toggle-label">Striped 2 (/////)</span>
+                        </label>
+                        <label class="toggle-container">
+                            <input type="checkbox" id="effectThinStripes">
+                            <span class="toggle-label">Thin Textured Stripes</span>
                         </label>
                         <label class="toggle-container">
                             <input type="checkbox" id="effectDotted">
                             <span class="toggle-label">Dotted</span>
+                        </label>
+                        <label class="toggle-container">
+                            <input type="checkbox" id="effectCrosshatched">
+                            <span class="toggle-label">Crosshatched</span>
+                        </label>
+                        <label class="toggle-container">
+                            <input type="checkbox" id="effectCheckerboard">
+                            <span class="toggle-label">Checkerboard</span>
+                        </label>
+                        <label class="toggle-container">
+                            <input type="checkbox" id="effectArgyle">
+                            <span class="toggle-label">Argyle</span>
+                        </label>
+                        <label class="toggle-container">
+                            <input type="checkbox" id="effectZigzag">
+                            <span class="toggle-label">Teeth </span>
+                        </label>
+                        <label class="toggle-container">
+                            <input type="checkbox" id="effectWavyLines">
+                            <span class="toggle-label">Wavy Lines</span>
+                        </label>
+                        <label class="toggle-container">
+                            <input type="checkbox" id="effectEmbossed">
+                            <span class="toggle-label">Embossed</span>
                         </label>
                     </div>
                 </div>
@@ -1540,6 +1752,14 @@
                 <div class="mb-6">
                     <label class="block text-sm font-medium text-gray-700 mb-2" style="color: var(--text-color);">Animated Effects</label>
                     <div class="flex flex-col space-y-2">
+                        <label class="toggle-container">
+                            <input type="checkbox" id="effectMoveHorizontally">
+                            <span class="toggle-label">Move Horizontally</span>
+                        </label>
+                        <label class="toggle-container">
+                            <input type="checkbox" id="effectMoveVertically">
+                            <span class="toggle-label">Move Vertically</span>
+                        </label>
                         <label class="toggle-container">
                             <input type="checkbox" id="effectParticles">
                             <span class="toggle-label">Particles</span>
@@ -1562,7 +1782,7 @@
                         </label>
                         <label class="toggle-container">
                             <input type="checkbox" id="effectAnimatedVerticalRainbow">
-                            <span class="toggle-label">Animated Vertical Rainbow</span>
+                            <span class="toggle-label">Animated Rainbow</span>
                         </label>
                     </div>
                 </div>
@@ -3494,8 +3714,15 @@ const initColorPalette = () => {
             eventItem.style.setProperty('--event-item-text-color', eventColorData.text);
             eventItem.style.setProperty('--event-item-primary-color', eventColorData.primary); // For checkbox checkmark!!
 
+            const borderColor = eventColorData.border || eventColorData.text;
+            const borderColorRgba25 = hexToRgba(borderColor, 0.25);
+            eventItem.style.setProperty('--event-item-border-color-rgba-25', borderColorRgba25);
+
             const textColorRgba25 = hexToRgba(eventColorData.text, 0.25);
             eventItem.style.setProperty('--event-item-text-color-rgba-25', textColorRgba25);
+
+
+
 
 
             eventItem.classList.add('event-item');
@@ -3509,14 +3736,26 @@ const initColorPalette = () => {
 
             if (event.effects) {
                 if (event.effects.glowing) eventItem.classList.add('glowing');
-                if (event.effects.striped) eventItem.classList.add('striped-effect');
+                if (event.effects.striped1) eventItem.classList.add('striped2-effect');
+                if (event.effects.striped2) eventItem.classList.add('striped-effect');
+                if (event.effects.thinStripes) eventItem.classList.add('thin-stripes-effect');
                 if (event.effects.dotted) eventItem.classList.add('dotted-effect');
+                if (event.effects.crosshatched) eventItem.classList.add('crosshatched-effect');
+                if (event.effects.checkerboard) eventItem.classList.add('checkerboard-effect');
+                if (event.effects.argyle) eventItem.classList.add('argyle-effect');
+                if (event.effects.zigzag) eventItem.classList.add('zigzag-lines-effect');
+                if (event.effects.wavyLines) eventItem.classList.add('wavy-lines-effect');
+                if (event.effects.embossed) eventItem.classList.add('embossed-effect');
+
+                if (event.effects.moveEffectHorizontally) eventItem.classList.add('move-effect-horizontal');
+                if (event.effects.moveEffectVertically) eventItem.classList.add('move-effect-vertical');
+
                 if (event.effects.particles) eventItem.classList.add('particles');
                 if (event.effects.snowFalling) eventItem.classList.add('snow-falling');
                 if (event.effects.glisteningStars) eventItem.classList.add('glistening-stars');
                 if (event.effects.gradientEffect) eventItem.classList.add('gradient-effect');
                 if (event.effects.animatedStripes) eventItem.classList.add('animated-stripes');
-                
+            
                 if (event.effects.animatedVerticalRainbow) {
                     eventItem.classList.add('animated-vertical-rainbow');
                     const [h, s, l] = hexToHsl(eventColorData.text);
@@ -3528,6 +3767,7 @@ const initColorPalette = () => {
                     eventItem.style.backgroundImage = `linear-gradient(to bottom, ${gradientColors.join(', ')})`;
                 }
             }
+            
 
 
             const mainContentDiv = document.createElement('div');
@@ -4014,14 +4254,27 @@ const initColorPalette = () => {
             iconSearchInput.value = '';
             effectShowCheckbox.checked = false;
             effectGlowing.checked = false;
-            effectStriped.checked = false;
+            effectStriped1.checked = false;
+            effectStriped2.checked = false;
+            effectThinStripes.checked = false;
             effectDotted.checked = false;
+            effectCrosshatched.checked = false;
+            effectCheckerboard.checked = false;
+            effectArgyle.checked = false;
+            effectZigzag.checked = false;
+            effectWavyLines.checked = false;
+            effectEmbossed.checked = false;
+
+            effectMoveHorizontally.checked = false;
+            effectMoveVertically.checked = false;
+
             effectParticles.checked = false;
             effectSnowFalling.checked = false;
             effectGlisteningStars.checked = false;
             effectGradient.checked = false;
             effectAnimatedStripes.checked = false;
             effectAnimatedVerticalRainbow.checked = false;
+
 
             document.querySelectorAll('#colorPalette .color-box').forEach(box => box.classList.remove('selected'));
             document.querySelectorAll('.icon-item').forEach(item => item.classList.remove('selected'));
@@ -4087,17 +4340,29 @@ const initColorPalette = () => {
 
 
                 if (eventToEdit.effects) {
-                    effectAnimatedVerticalRainbow.checked = eventToEdit.effects.animatedVerticalRainbow || false;
-                    effectShowCheckbox.checked = eventToEdit.effects.showCheckbox || false;
-                    effectGlowing.checked = eventToEdit.effects.glowing || false;
-                    effectStriped.checked = eventToEdit.effects.striped || false;
-                    effectDotted.checked = eventToEdit.effects.dotted || false;
-                    effectParticles.checked = eventToEdit.effects.particles || false;
-                    effectSnowFalling.checked = eventToEdit.effects.snowFalling || false;
-                    effectGlisteningStars.checked = eventToEdit.effects.glisteningStars || false;
-                    effectGradient.checked = eventToEdit.effects.gradientEffect || false;
-                    effectAnimatedStripes.checked = eventToEdit.effects.animatedStripes || false;
-                    effectAnimatedVerticalRainbow.checked = eventToEdit.effects.animatedVerticalRainbow || false;
+                        effectShowCheckbox.checked = eventToEdit.effects.showCheckbox || false;
+                        effectGlowing.checked = eventToEdit.effects.glowing || false;
+                        effectStriped1.checked = eventToEdit.effects.striped1 || false;
+                        effectStriped2.checked = eventToEdit.effects.striped2 || false;
+                        effectThinStripes.checked = eventToEdit.effects.thinStripes || false;
+                        effectDotted.checked = eventToEdit.effects.dotted || false;
+                        effectCrosshatched.checked = eventToEdit.effects.crosshatched || false;
+                        effectCheckerboard.checked = eventToEdit.effects.checkerboard || false;
+                        effectArgyle.checked = eventToEdit.effects.argyle || false;
+                        effectZigzag.checked = eventToEdit.effects.zigzag || false;
+                        effectWavyLines.checked = eventToEdit.effects.wavyLines || false;
+                        effectEmbossed.checked = eventToEdit.effects.embossed || false;
+
+                        effectMoveHorizontally.checked = eventToEdit.effects.moveEffectHorizontally || false;
+                        effectMoveVertically.checked = eventToEdit.effects.moveEffectVertically || false;
+
+                        effectParticles.checked = eventToEdit.effects.particles || false;
+                        effectSnowFalling.checked = eventToEdit.effects.snowFalling || false;
+                        effectGlisteningStars.checked = eventToEdit.effects.glisteningStars || false;
+                        effectGradient.checked = eventToEdit.effects.gradientEffect || false;
+                        effectAnimatedStripes.checked = eventToEdit.effects.animatedStripes || false;
+                        effectAnimatedVerticalRainbow.checked = eventToEdit.effects.animatedVerticalRainbow || false;
+
                 }
             } else {
                 modalTitle.textContent = 'Add New Event';
@@ -4128,16 +4393,27 @@ const initColorPalette = () => {
             const icon = eventIconInput.value;
 
             const effects = {
-                glowing: effectGlowing.checked,
-                striped: effectStriped.checked,
-                dotted: effectDotted.checked,
-                particles: effectParticles.checked,
-                snowFalling: effectSnowFalling.checked,
-                glisteningStars: effectGlisteningStars.checked,
-                gradientEffect: effectGradient.checked,
-                animatedStripes: effectAnimatedStripes.checked,
-                animatedVerticalRainbow: effectAnimatedVerticalRainbow.checked,
-                showCheckbox: effectShowCheckbox.checked
+            showCheckbox: effectShowCheckbox.checked,
+            glowing: effectGlowing.checked,
+            striped1: effectStriped1.checked,
+            striped2: effectStriped2.checked,
+            thinStripes: effectThinStripes.checked,
+            dotted: effectDotted.checked,
+            crosshatched: effectCrosshatched.checked,
+            checkerboard: effectCheckerboard.checked,
+            argyle: effectArgyle.checked,
+            zigzag: effectZigzag.checked,
+            wavyLines: effectWavyLines.checked,
+            embossed: effectEmbossed.checked,
+            moveEffectHorizontally: effectMoveHorizontally.checked,
+            moveEffectVertically: effectMoveVertically.checked,
+            particles: effectParticles.checked,
+            snowFalling: effectSnowFalling.checked,
+            glisteningStars: effectGlisteningStars.checked,
+            gradientEffect: effectGradient.checked,
+            animatedStripes: effectAnimatedStripes.checked,
+            animatedVerticalRainbow: effectAnimatedVerticalRainbow.checked
+
             };
 
             if (eventDateInput.disabled && editingEventId) {
@@ -4813,14 +5089,27 @@ const initColorPalette = () => {
             
             effectShowCheckbox = document.getElementById('effectShowCheckbox');
             effectGlowing = document.getElementById('effectGlowing');
-            effectStriped = document.getElementById('effectStriped');
+            effectStriped1 = document.getElementById('effectStriped1');
+            effectStriped2 = document.getElementById('effectStriped2');
+            effectThinStripes = document.getElementById('effectThinStripes');
             effectDotted = document.getElementById('effectDotted');
+            effectCrosshatched = document.getElementById('effectCrosshatched');
+            effectCheckerboard = document.getElementById('effectCheckerboard');
+            effectArgyle = document.getElementById('effectArgyle');
+            effectZigzag = document.getElementById('effectZigzag');
+            effectWavyLines = document.getElementById('effectWavyLines');
+            effectEmbossed = document.getElementById('effectEmbossed');
+
+            effectMoveHorizontally = document.getElementById('effectMoveHorizontally');
+            effectMoveVertically = document.getElementById('effectMoveVertically');
+
             effectParticles = document.getElementById('effectParticles');
             effectSnowFalling = document.getElementById('effectSnowFalling');
             effectGlisteningStars = document.getElementById('effectGlisteningStars');
-            effectGradient = document.getElementById('effectGradient');
             effectAnimatedStripes = document.getElementById('effectAnimatedStripes');
+            effectGradient = document.getElementById('effectGradient');
             effectAnimatedVerticalRainbow = document.getElementById('effectAnimatedVerticalRainbow');
+
 
 
             settingsModal = document.getElementById('settings-modal');
