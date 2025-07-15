@@ -10,6 +10,121 @@
     <link rel="icon" type="image/png" href="favicon.png">
     <style>
         :root {
+        --select-bg: var(--secondary-button-bg);
+        --select-text: var(--secondary-button-text);
+        --select-border: var(--day-cell-border-color);
+        --select-radius: var(--ui-roundness);
+        --select-arrow-color: #8B4B66;
+        --select-arrow: url("data:image/svg+xml;utf8,<svg fill='none' stroke='REPLACEME' stroke-width='2' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'><path d='M6 9l6 6 6-6'/></svg>");
+        
+        .slider-group {
+            margin-bottom: 1.5em;
+            position: relative;
+            min-height: 48px;
+        }
+        .slider-group .slider-value {
+            height: 2em;
+            font-size: calc(var(--base-font-size) * 0.8);
+
+            display: block;
+        }
+
+        /* Accordion Styles */
+            .accordion {
+            border-radius: 8px;
+            background: var(--main-container-bg);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            margin-bottom: 1rem;
+            }
+            .accordion-header {
+            cursor: pointer;
+            padding: 1rem 1.2rem;
+            font-weight: 900;
+            color: var(--accent-color);
+            background: var(--main-container-bg);
+            border-radius: 8px 8px 0 0;
+            transition: background 0.2s;
+            border: 3px solid var(--accent-color);
+            text-align: center;
+            transition: 0.3ms all ease;
+            }
+            .accordion-header:hover {
+            background: var(--day-cell-hover-bg);
+            color: var(--main-text-color);
+            border-color: var(--main-text-color); 
+            transition: 0.3ms all ease;
+            }
+            .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s cubic-bezier(0.4,0,0.2,1);
+            background: var(--main-container-bg);
+            border-radius: 0 0 8px 8px;
+            padding: -10px 1.2rem;
+            transition: 0.3ms all ease;
+            }
+            .accordion.open .accordion-content {
+            max-height: 1000px;
+            padding: 1.2rem;
+            transition: 0.3ms all ease;
+            }
+
+        /* Pretty select dropdown */
+        select#weekStartDropdown {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-color: var(--select-bg);
+            color: var(--select-text);
+            border: 3px solid var(--select-border);
+            border-radius: var(--select-radius);
+            padding: 0.2rem 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background-image: var(--select-arrow);
+            background-repeat: no-repeat;
+            background-position: right 0.8rem center;
+            background-size: 1.2em;
+
+        .theme-arrow-update {
+            --select-arrow: url("data:image/svg+xml;utf8,<svg fill='none' stroke='REPLACEME' stroke-width='2' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'><path d='M6 9l6 6 6-6'/></svg>");
+        }
+            cursor: pointer;
+            min-width: 140px;
+        }
+        select#weekStartDropdown:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(224,133,176,0.15);
+        }
+        select#weekStartDropdown option {
+            color: var(--text-color);
+            background: var(--main-container-bg);
+            font-weight: 500;
+        }
+        .dropdown-container label[for="weekStartDropdown"] {
+            font-weight: 400; 
+            color: var(--text-color);
+            margin-right: 0.5rem;
+        }
+
+        .dropdown-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+        .dropdown-container label[for="weekStartDropdown"] {
+            font-weight: 400;
+            color: var(--text-color);
+            margin-right: 0.5rem;
+            text-align: left;
+            flex: 1;
+        }
+        .dropdown-container select#weekStartDropdown {
+            flex: 0;
+        }
             --base-font-size: 16px;
             --ui-roundness: 8px;
             --ui-roundness-lg: calc(var(--ui-roundness) * 1.5);
@@ -82,21 +197,21 @@
             padding: 1.5rem;
             transition: all 0.2s ease-out;
         }
+        
 
         @media (max-width: 768px) {
-            body {
-                overflow-y: auto;
-                padding: 0;
-            }
-            #main-container {
-                width: 100vw;
-                max-width: 100vw;
-                height: 100vh;
-                max-height: 100vh;
-                margin: 0;
+        .modal-footer,
+        #add-event-footer,
+        #edit-event-footer {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 0.5rem 1rem 0.5rem;
                 border-radius: 0 !important;
                 padding: 1rem;
-            }
+        }
             #main-container > div.modal-content, #settings-modal > div.modal-content {
                 border-radius: 0 !important;
             }
@@ -358,11 +473,40 @@
 
 
         .event-item.wavy-lines-effect {
-            color: var(--event-item-border-color-rgba-25);
+            color: var(--event-item-text-color);
             background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='8'><path d='M0 4 Q 10 0 20 4 T 40 4' stroke='currentColor' stroke-width='2' fill='none' opacity='0.25'/></svg>");
             background-repeat: repeat;
             background-size: 40px 8px;
         }
+
+.event-item.win95-button-effect {
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  color: var(--event-item-text-color, #000);
+
+  background: linear-gradient(
+    180deg,
+    var(--event-item-primary-color, #e0e0e0) 0%,
+    #c0c0c040 100%
+  );
+
+  border: 0px solid #808080;
+  border-top-color: #ffffff;
+  border-left-color: #ffffff;
+
+  box-shadow:
+    inset 2px 2px 0 #ffffff90,
+    inset -3px -3px 0 #00000080;
+
+  border-radius: 2px;
+  padding: 4px 10px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.1s ease-in-out;
+  text-align: center;
+}
+
+
 
 
         .event-item.embossed-effect {
@@ -455,14 +599,7 @@
             100% { background-position-y: 12px; }
         }
 
-
-
-
-
         /* WORKS AS INTENDED */
-
-
-
         .event-item.particles::before {
             content: '';
             position: absolute;
@@ -738,17 +875,22 @@
             width: 100%;
             word-break: break-word;
         }
+
+        
         .modal-overlay {
             position: fixed;
             top: 0;
-            left: 0;
-            width: 100%;
+            right: 0;
+            width: 500px; 
             height: 100%;
-            background-color: var(--modal-overlay-bg);
+            background: none; 
+            box-shadow: -4px 0 16px rgba(0,0,0,0.08); 
             display: flex;
-            justify-content: center;
-            align-items: center;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: stretch;
             z-index: 999;
+            transition: transform 0.3s ease;
         }
         .modal-content {
             background-color: var(--main-container-bg);
@@ -785,11 +927,53 @@
                 transform: scale(1);
             }
         }
+
         #settings-modal .modal-content {
-            max-width: 720px;
-            border-radius: var(--ui-roundness) !important;
-            border: 3px solid var(--day-cell-border-color) !important;
+            width: 100%;
+            max-width: 500px;
+            height: 100vh;
+            min-height: 100vh;
+            border-radius: 0 !important; /* Here is our Settings modal radius adjustments, okie?*/
+            border-top-left-radius: var(--ui-roundness) !important;
+            border-bottom-left-radius: var(--ui-roundness) !important;
+            border: 3px solid var(--day-cell-border-color);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            position: relative;
+            margin: 0 auto;
+            top: 0;
+            left: 0;
+            transform: none;
         }
+
+        #settings-modal .modal-content h3 .fas,
+        #settings-modal .modal-content h4 .fas {
+            padding-right: 0.2em;
+        }
+
+
+        #settings-modal .modal-content h3 {
+            margin-bottom: 0.5rem; 
+            margin-top: 0.5rem; 
+            padding-left: 0.2rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-align: center;
+            color: var(--text-color);
+            border-bottom: 2px solid var(--day-cell-border)
+        }
+
+        .h4-settings {
+            margin-top: 0rem !important;  
+            margin-bottom: 0.3rem !important; 
+            padding-left: 0.2rem;
+            font-size: 1.15rem;
+            font-weight: 600;
+            text-align: left;
+        }
+
 
         body.dark-mode #settings-modal .modal-content {
             border-radius: var(--ui-roundness) !important;
@@ -834,6 +1018,63 @@
             border-bottom-left-radius: var(--ui-roundness-lg);
             border-bottom-right-radius: var(--ui-roundness-lg);
             transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+
+        @media (max-width: 500px) {
+        .modal-footer .themed-button,
+        #add-event-footer .themed-button,
+        #edit-event-footer .themed-button {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+            box-sizing: border-box;
+            margin: 0;
+            min-width: 0;
+            padding: 0.4rem 0.4rem;
+        }
+        .modal-footer,
+        #add-event-footer,
+        #edit-event-footer {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: stretch;
+            gap: 0.5rem;
+            padding: 1rem 0.5rem 1rem 0.5rem;
+        }
+        #add-event-footer .themed-button:first-child {
+            flex: 0 1 45%;
+            min-width: 80px;
+            max-width: 140px;
+        }
+        #add-event-footer .themed-button:nth-child(2) {
+            flex: 0 1 55%;
+            min-width: 100px;
+            max-width: 200px;
+        }
+        #edit-event-footer .themed-button:first-child {
+            flex: 0 1 20%;
+            min-width: 60px;
+            max-width: 80px;
+            padding: 0.2rem !important;
+        }
+        #edit-event-footer .themed-button:nth-child(2) {
+            flex: 0 1 35%;
+            min-width: 80px;
+            max-width: 140px;
+        }
+        #edit-event-footer .themed-button:nth-child(3) {
+            flex: 0 1 45%;
+            min-width: 100px;
+            max-width: 200px;
+        }
+
+        }
+        #edit-event-footer .themed-button {
+            pointer-events: auto;
+            z-index: 1;
         }
 
         .icon-grid {
@@ -902,7 +1143,7 @@
             border-radius: var(--ui-roundness);
         }
         .color-box.selected {
-            border-color: #3b82f6;
+            border-color: var(--accent-color);
             transform: scale(1.1);
         }
         .color-box:hover {
@@ -954,12 +1195,12 @@
         }
 
         .custom-file-input {
-            width: 0.1px;
-            height: 0.1px;
+            position: fixed;
+            left: -9999px;
+            width: 0;
+            height: 0;
             opacity: 0;
             overflow: hidden;
-            position: absolute;
-            z-index: -1;
         }
         .custom-file-input + label {
             padding: 0.75rem 1rem;
@@ -1034,11 +1275,20 @@
             border: 3px solid var(--day-cell-border-color);
             transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.2s ease-in-out, color 0.2s ease-in-out;
         }
+        input[type="text"]::placeholder, textarea::placeholder {
+            color: var(--day-cell-border-color);
+            opacity: 1;
+        }
         input[type="text"]:focus, textarea:focus {
             outline: none;
-            border-color: var(--accent-color);
+            border: 3px solid var(--text-color);
             box-shadow: 0 0 0 2px rgba(var(--accent-color-rgb), 0.3);
         }
+        /* input:focus, textarea:focus {
+            outline: none;
+            border: 3px solid var(--text-color);
+            box-shadow: 0 0 0 2px rgba(var(--accent-color-rgb), 0.3);
+        } */
         #iconSearchInput {
             border: 3px solid var(--day-cell-border-color);
         }
@@ -1094,6 +1344,7 @@
             opacity: 0.9;
             transition: opacity .2s, background-color .2s, box-shadow .2s;
             border-radius: var(--ui-roundness);
+            border: 0px solid transparent !important;
             box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
         }
         input[type="range"]:hover {
@@ -1137,6 +1388,8 @@
         input[type="range"]::-moz-range:active {
             transform: scale(1.1);
             cursor: grabbing;
+            border: 0px !important;
+            border: 0px solid transparent !important;
         }
 
 
@@ -1196,7 +1449,7 @@
             min-width: 44px;
             width: 44px;
             height: 26px;
-            background-color: var(--secondary-button-bg);
+            background-color: var(--primary-button-bg);
             border-radius: var(--ui-roundness);
             position: relative;
             cursor: pointer;
@@ -1269,7 +1522,7 @@
         }
 
         .h4-settings {
-            font-size: calc(var(--base-font-size) * 1.125);
+            font-size: calc(var(--base-font-size) * 1.2);
             font-weight: 600;
             color: var(--text-color);
             margin-bottom: 0.5rem;
@@ -1459,6 +1712,32 @@
             }
         }
 
+        /* EDIT EVENT FOOTER BUTTONS ADJUST BIG
+      #edit-event-footer button,
+      .modal-footer button {
+        flex-direction: row;
+        gap: 0.5rem;
+        justify-content: center;
+        align-items: stretch;
+      }
+
+      #edit-event-footer,
+      .modal-footer {
+        display: flex;
+        flex-direction: row;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        width: 100%;
+      }
+
+      #deleteEvent.themed-button.secondary {
+        align-self: center;
+        justify-content: center;
+        text-align: center;
+        height: 100%;
+      } */
+
+
         .dark-mode-toggle-button {
             display: flex;
             flex-direction: column;
@@ -1479,9 +1758,9 @@
             flex-shrink: 0; 
         }
         .dark-mode-toggle-button.selected {
-            background-color: var(--primary-button-text);
-            color: var(--primary-button-bg);
-            border-color: var(--primary-button-text);
+            background-color: var(--primary-button-bg);
+            color: var(--primary-button-text);
+            border-color: var(--secondary-button-text);
             border-width: 4px;
         }
         .dark-mode-toggle-button:hover {
@@ -1494,24 +1773,11 @@
             margin-top: 0.25rem;
         }
 
-        #premadeThemeBoxesContainer {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.75rem;
-            width: 100%; 
-        }
 
-        #premadeThemeBoxes {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.75rem;
-            flex-grow: 1; 
-            justify-content: flex-start;
-        }
 
         @media (min-width: 768px) {
 
-            .modal-content {
+            /* .modal-content {
                 max-height: 80vh;
                 overflow-y: auto;
             }
@@ -1543,7 +1809,7 @@
             .dark-mode-toggle-button {
                 height: auto;
                 min-height: calc(85px * 2 + 0.75rem);
-            }
+            } */
             
         }
 
@@ -1568,25 +1834,185 @@
             }
             
         }
+        #premadeThemeBoxesContainer {
+            flex-direction: column;
+            align-items: center;
+        }
+        .dark-mode-toggle-button {
+            width: 100%;
+            height: auto;
+            margin-bottom: 0.75rem;
+        }
+        #premadeThemeBoxes {
+            width: 100%;
+            justify-content: center;
+        }
+        #premadeThemeBoxes .theme-box,
+        #specialThemeBoxes .theme-box {
+            flex-basis: calc(50% - 0.375rem);
+            max-width: calc(50% - 0.375rem);
+        }
 
+    @media (min-width: 501px) {
+        .modal-overlay:not(#settings-modal):not(.hidden) {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            background: var(--modal-overlay-bg, rgba(0,0,0,0.5));
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+        .modal-overlay:not(#settings-modal) .modal-content {
+            margin: 0 auto;
+            left: 0 !important;
+            right: 0 !important;
+            top: 0 !important;
+            bottom: 0 !important;
+            position: relative !important;
+            transform: none !important;
+            border-radius: var(--ui-roundness-lg) !important;
+            width: 100%;
+            max-width: 500px;
+            min-width: 320px;
+            height: auto;
+            max-height: 90vh;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        }
+
+        @media (max-width: 500px) {
                 @media (max-width: 500px) {
-                  .modal-footer {
-                    display: flex;
-                    flex-wrap: wrap;
-                    gap: 0.5rem;
-                    justify-content: stretch;
-                  }
-                  .modal-footer .themed-button {
-                    padding: 0.5rem 0.7rem;
-                    font-size: 0.95em;
-                    flex: 1 1 40%;
-                    min-width: 110px;
-                    max-width: 100%;
-                    width: auto;
-                    box-sizing: border-box;
-                    margin: 0;
-                  }
-                }
+      #add-event-footer button,
+      #edit-event-footer button,
+      .modal-footer button {
+        display: flex;
+        flex-direction: row;
+        gap: 0.5rem;
+        justify-content: center;
+        align-items: stretch;
+      }
+
+      #add-event-footer,
+      #edit-event-footer,
+      .modal-footer {
+        display: flex;
+        flex-direction: row;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        width: 100%;
+      }
+
+
+      .modal-footer {
+        display: flex;
+        flex-direction: row;
+        gap: 0.5rem;
+        justify-content: center;
+        align-items: stretch;
+      }
+        .modal-footer .themed-button {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.4rem 0.4rem;
+        font-size: 0.95em;
+        box-sizing: border-box;
+        margin: 0;
+        width: 100%;
+        min-width: 0;
+        }
+          .modal-footer .themed-button:first-child {
+            flex: 1 1 20%;
+            padding: 0.2rem !important;
+          }
+          .modal-footer .themed-button:nth-child(2) {
+            flex: 2 1 35%;
+          }
+          .modal-footer .themed-button:nth-child(3) {
+            flex: 3 1 45%;
+          }
+          .modal-footer.two-buttons .themed-button:first-child {
+            flex: 2 1 40%;
+          }
+          .modal-footer.two-buttons .themed-button:nth-child(2) {
+            flex: 3 1 60%;
+          }
+    
+            #settings-modal.modal-overlay:not(.hidden) {
+                position: fixed;
+                inset: 0;
+                width: 100vw;
+                height: 100vh;
+                background: var(--modal-overlay-bg, rgba(0,0,0,0.5));
+                display: flex !important;
+                align-items: center;
+                justify-content: center;
+                z-index: 999;
+            }
+            #settings-modal .modal-content {
+                width: 100vw !important;
+                max-width: 100vw !important;
+                min-width: 100vw !important;
+                border-radius: 0 !important;
+                left: 0 !important;
+                top: 0 !important;
+                margin: 0 !important;
+                height: 100vh !important;
+                min-height: 100vh !important;
+                max-height: 100vh !important;
+                position: static !important;
+                transform: none !important;
+                box-shadow: none !important;
+            }
+    
+            .modal-overlay:not(#settings-modal):not(.hidden) {
+                position: fixed;
+                inset: 0;
+                width: 100vw;
+                height: 100vh;
+                background: var(--modal-overlay-bg, rgba(0,0,0,0.5));
+                display: flex !important;
+                align-items: center;
+                justify-content: center;
+                z-index: 999;
+            }
+            .modal-overlay:not(#settings-modal) .modal-content {
+                width: 100vw !important;
+                max-width: 100vw !important;
+                min-width: 100vw !important;
+                border-radius: 0 !important;
+                left: 0 !important;
+                top: 0 !important;
+                margin: 0 !important;
+                height: auto !important;
+                min-height: 0 !important;
+                max-height: 90vh !important;
+                position: static !important;
+                transform: none !important;
+                box-shadow: none !important;
+            }
+    
+            .modal-content {
+                padding: 1rem 1.5rem !important;
+                border-radius: 0.5rem !important;
+                height: 100vh;
+            }
+            .modal-content-scrollable {
+                padding: 0.7rem !important;
+                overflow-x: hidden !important;
+                padding-right: 0.2rem !important;
+            }
+            .modal-footer {
+                padding: 0.7rem !important;
+                gap: 0.4rem !important;
+                border-bottom-left-radius: 0.5rem !important;
+                border-bottom-right-radius: 0.5rem !important;
+            }
+        }
 
         .resize-handle {
             width: 1.5px;
@@ -1642,6 +2068,15 @@
         .event-item.completed {
             opacity: 0.7;
         }
+        /* FOCUS TAILWIND OVERRIDE */
+        input[type="text"]:focus,
+        input[type="time"]:focus,
+        input[type="date"]:focus,
+        textarea:focus {
+            --tw-ring-color: var(--accent-color) !important;
+            border-color: var(--accent-color) !important;
+            box-shadow: 0 0 0 1px var(--accent-color) !important;
+        }
     </style>
 </head>
 <body>
@@ -1695,7 +2130,19 @@
 
     <div id="event-modal" class="modal-overlay hidden">
         <div class="modal-content">
-            <h3 id="modal-title" class="text-2xl font-bold mb-4" style="color: var(--text-color);">Add New Event</h3>
+            <h3 id="modal-title" class="text-2xl font-bold mb-4 flex justify-between items-center">
+            <span>Edit Event</span>
+            <button
+                id="duplicateEventBtn"
+                title="Duplicate"
+                type="button"
+                class="text-base text-pink-500 hover:text-pink-700"
+                style="display: none;"
+            >
+                <i class="fas fa-copy"></i>
+            </button>
+            </h3>
+            <hr class="mb-0" style="border: 2px solid var(--day-cell-border-color);">
             <div class="modal-content-scrollable">
                 <div class="mb-4">
                     <label for="eventTitle" class="block text-sm font-medium text-gray-700 mb-1" style="color: var(--text-color);"> Event Icon & Title</label>
@@ -1703,7 +2150,8 @@
                         <div id="eventIconDisplay" class="event-icon-display">
                             <i class="fas fa-plus"></i> 
                         </div>
-                        <input type="text" id="eventTitle" class="w-full p-3 focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200 flex-grow">
+                        <input type="text" id="eventTitle" class="w-full p-3 focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200 flex-grow" style="color: var(--text-color); background-color: var(--day-cell-bg); border: 3px solid var(--day-cell-border-color);"
+                               placeholder="Enter event title...">
                     </div>
                 </div>
 
@@ -1731,61 +2179,78 @@
                 </div>
 
                 <div class="mb-6">
-                    <label class="block text-sm font-medium text-gray-700 mb-2" style="color: var(--text-color);">Effects</label>
-                    <div class="flex flex-col space-y-2">
-                        <label class="toggle-container">
-                            <input type="checkbox" id="effectShowCheckbox">
-                            <span class="toggle-label">Show Checkbox</span>
-                        </label>
-                        <label class="toggle-container">
-                            <input type="checkbox" id="effectGlowing">
-                            <span class="toggle-label">Glowing</span>
-                        </label>
-                        <label class="toggle-container">
-                            <input type="checkbox" id="effectStriped1">
-                            <span class="toggle-label">Striped 1 (\\\\\)</span>
-                        </label>
-                        <label class="toggle-container">
-                            <input type="checkbox" id="effectStriped2">
-                            <span class="toggle-label">Striped 2 (/////)</span>
-                        </label>
-                        <label class="toggle-container">
-                            <input type="checkbox" id="effectThinStripes">
-                            <span class="toggle-label">Thin Textured Stripes</span>
-                        </label>
-                        <label class="toggle-container">
-                            <input type="checkbox" id="effectDotted">
-                            <span class="toggle-label">Dotted</span>
-                        </label>
-                        <label class="toggle-container">
-                            <input type="checkbox" id="effectCrosshatched">
-                            <span class="toggle-label">Crosshatched</span>
-                        </label>
-                        <label class="toggle-container">
-                            <input type="checkbox" id="effectCheckerboard">
-                            <span class="toggle-label">Checkerboard</span>
-                        </label>
-                        <label class="toggle-container">
-                            <input type="checkbox" id="effectArgyle">
-                            <span class="toggle-label">Argyle</span>
-                        </label>
-                        <label class="toggle-container">
-                            <input type="checkbox" id="effectZigzag">
-                            <span class="toggle-label">Teeth </span>
-                        </label>
-                        <label class="toggle-container">
-                            <input type="checkbox" id="effectWavyLines">
-                            <span class="toggle-label">Wavy Lines</span>
-                        </label>
-                        <label class="toggle-container">
-                            <input type="checkbox" id="effectEmbossed">
-                            <span class="toggle-label">Embossed</span>
-                        </label>
-                    </div>
+                <label class="block text-sm font-medium text-gray-700 mb-2" style="color: var(--text-color);">EFFECTS</label>
+                <div class="flex flex-col space-y-2">
+                    
+                    <!-- BASIC -->
+                    <label class="toggle-container">
+                    <input type="checkbox" id="effectShowCheckbox">
+                    <span class="toggle-label">Show Checkbox</span>
+                    </label>
+                    <label class="toggle-container">
+                    <input type="checkbox" id="effectGlowing">
+                    <span class="toggle-label">Glowing</span>
+                    </label>
+
+                    <!-- STRIPES -->
+                     <label class="block text-sm font-medium text-gray-700 mb-2" style="color: var(--text-color); padding-top: 10px;">STRIPES</label>
+                    <label class="toggle-container">
+                    <input type="checkbox" id="effectStriped1">
+                    <span class="toggle-label">Striped 1 (\\\\\)</span>
+                    </label>
+                    <label class="toggle-container">
+                    <input type="checkbox" id="effectStriped2">
+                    <span class="toggle-label">Striped 2 (/////)</span>
+                    </label>
+                    <label class="toggle-container">
+                    <input type="checkbox" id="effectThinStripes">
+                    <span class="toggle-label">Thin Textured Stripes</span>
+                    </label>
+
+                    <!-- PATTERNS -->
+                     <label class="block text-sm font-medium text-gray-700 mb-2" style="color: var(--text-color); padding-top: 10px;">PATTERNS</label>
+                    <label class="toggle-container">
+                    <input type="checkbox" id="effectCrosshatched">
+                    <span class="toggle-label">Crosshatched</span>
+                    </label>
+                    <label class="toggle-container">
+                    <input type="checkbox" id="effectCheckerboard">
+                    <span class="toggle-label">Checkerboard</span>
+                    </label>
+                    <label class="toggle-container">
+                    <input type="checkbox" id="effectWavyLines">
+                    <span class="toggle-label">Wavy Lines</span>
+                    </label>
+                    <label class="toggle-container">
+                    <input type="checkbox" id="effectDotted">
+                    <span class="toggle-label">Dotted</span>
+                    </label>
+                    <label class="toggle-container">
+                    <input type="checkbox" id="effectArgyle">
+                    <span class="toggle-label">Argyle</span>
+                    </label>
+                    <label class="toggle-container">
+                    <input type="checkbox" id="effectZigzag">
+                    <span class="toggle-label">Teeth</span>
+                    </label>
+
+                    <!-- BUTTON STYLES -->
+                     <label class="block text-sm font-medium text-gray-700 mb-2" style="color: var(--text-color); padding-top: 10px;">BUTTON STYLES</label>
+                    <label class="toggle-container">
+                    <input type="checkbox" id="effectEmbossed">
+                    <span class="toggle-label">Embossed</span>
+                    </label>
+                    <label class="toggle-container">
+                    <input type="checkbox" id="effectWin95Button">
+                    <span class="toggle-label">Retro Button</span>
+                    </label>
+
+                </div>
                 </div>
 
+
                 <div class="mb-6">
-                    <label class="block text-sm font-medium text-gray-700 mb-2" style="color: var(--text-color);">Animated Effects</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2" style="color: var(--text-color);">ANIMATED EFFECTS</label>
                     <div class="flex flex-col space-y-2">
                         <label class="toggle-container">
                             <input type="checkbox" id="effectMoveHorizontally">
@@ -1832,202 +2297,174 @@
             </div>
 
             <div class="modal-footer">
-                <button id="deleteEvent" class="themed-button secondary hidden">Delete</button>
-                <button id="cancelEvent" class="themed-button secondary">Cancel</button>
-                <button id="saveEvent" class="themed-button">Save Event</button>
+                <!-- Add Event Footer (default visible) -->
+                <div id="add-event-footer">
+                    <button id="cancelEvent" class="themed-button secondary">Cancel</button>
+                    <button id="saveEvent" class="themed-button">Save Event</button>
+                </div>
+                <!-- Edit Event Footer (hidden by default, shown in edit mode) -->
+                <div id="edit-event-footer" style="display:none;">
+                    <button id="deleteEvent" class="themed-button secondary"><i class="fas fa-trash"></i></button>
+                    <button id="cancelEditEvent" class="themed-button secondary">Cancel</button>
+                    <button id="updateEvent" class="themed-button">Update Event</button>
+                </div>
             </div>
         </div>
     </div>
 
     <div id="settings-modal" class="modal-overlay hidden">
         <div class="modal-content">
-            <h3 class="text-2xl font-bold mb-4" style="color: var(--text-color);">Settings</h3>
-
+            <h3 class="text-2xl font-bold mt-4 mb-1 mr-2" style="color: var(--text-color);"><b>SETTINGS</b></h3>
+            <hr class="mb-0" style="border: 2px solid var(--day-cell-border-color);">
             <div class="modal-content-scrollable">
+                <!-- Application Settings -->
                 <div class="mb-6">
-                    <h4 class="h4-settings">Custom Font Upload</h4>
+                    <h4 class="h4-settings"><i class="fas fa-sliders-h"></i> <b>Application Settings</b></h4>
+                    <div class="dropdown-container"><label for="weekStartDropdown">Week Start Day</label><select id="weekStartDropdown"><option value="0">Sunday</option><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option></select></div>
+                    <div class="toggle-container"><input type="checkbox" id="use24HourFormatToggle"><label for="use24HourFormatToggle" class="toggle-label">Use 24-Hour Format</label></div>
+                    <div class="toggle-container"><input type="checkbox" id="hideScrollbarsToggle"><label for="hideScrollbarsToggle" class="toggle-label">Hide Scrollbars</label></div>
+                    <div class="toggle-container"><input type="checkbox" id="noBackgroundToggle"><label for="noBackgroundToggle" class="toggle-label">No Background (Full Screen)</label></div>
+                    <div class="toggle-container"><input type="checkbox" id="foldDayCellsToggle"><label for="foldDayCellsToggle" class="toggle-label">Fold Day Cells (Scrollable) </label></div>
+                </div>
+                <hr class="my-6" style="border: 2px solid var(--day-cell-border-color);">
+                <!-- UI Appearance -->
+                <div class="mb-6">
+                    <h4 class="h4-settings"><i class="fas fa-paint-brush"></i> <b>UI Appearance</b></h4>
+<div class="slider-group"><label for="uiRoundness">UI Roundness</label><input type="range" id="uiRoundness" min="0" max="24" value="8"><span id="uiRoundnessValue" class="slider-value">8px</span></div>
+<div class="slider-group"><label for="eventRoundness">Event Roundness</label><input type="range" id="eventRoundness" min="0" max="24" value="8"><span id="eventRoundnessValue" class="slider-value">8px</span></div>
+<div class="slider-group"><label for="eventBorderThickness">Event Border Thickness</label><input type="range" id="eventBorderThickness" min="0" max="5" value="3"><span id="eventBorderThicknessValue" class="slider-value">3px</span></div>
+<div class="slider-group"><label for="fontSize">Base Font Size</label><input type="range" id="fontSize" min="12" max="36" value="16"><span id="fontSizeValue" class="slider-value">16px</span></div>
+<div class="slider-group"><label for="dayCellMinWidth">Day Cell Minimum Width</label><input type="range" id="dayCellMinWidth" min="100" max="300" value="140"><span id="dayCellMinWidthValue" class="slider-value">140px</span></div>
+                </div>
+                <hr class="mb-6 mt-10" style="border: 2px solid var(--day-cell-border-color);">
+                <!-- Event Styling -->
+                <div class="mb-6">
+                    <h4 class="h4-settings"><i class="fas fa-edit"></i> <b>Event Styling</b></h4>
+                    <div class="toggle-container"><input type="checkbox" id="customizationCheckboxDashedBorderToggle"><label for="customizationCheckboxDashedBorderToggle" class="toggle-label">Checkbox Dashed Border (When Checked)</label></div>
+                    <div class="toggle-container"><input type="checkbox" id="customizationStrikethroughTextToggle"><label for="customizationStrikethroughTextToggle" class="toggle-label">Strikethrough Text (When Checked)</label></div>
+                    <div class="toggle-container"><input type="checkbox" id="customizationBoldTitleToggle"><label for="customizationBoldTitleToggle" class="toggle-label">Bold Event Titles</label></div>
+                </div>
+                <hr class="my-6" style="border: 2px solid var(--day-cell-border-color);">
+                <!-- Holder Sidebar -->
+                <div class="mb-6">
+                    <h4 class="h4-settings"><i class="fas fa-columns"></i> <b>Holder Sidebar</b></h4>
+                    <div class="settings-description" style="margin-bottom:0.5rem;margin-top:-6px;color:var(--text-color);">A sidebar for events you haven’t scheduled yet.</div>
+                    <div class="toggle-container"><input type="checkbox" id="holderIconToggle"><label for="holderIconToggle" class="toggle-label">Show Holder Icon</label></div>
+                    <div class="toggle-container"><input type="checkbox" id="showHolderByDefaultToggle"><label for="showHolderByDefaultToggle" class="toggle-label">Show Holder Sidebar by Default</label></div>
+                    <div class="toggle-container"><input type="checkbox" id="disableSidebarAnimationsToggle"><label for="disableSidebarAnimationsToggle" class="toggle-label">Disable Sidebar Animations</label></div>
+                    <div class="toggle-container"><input type="checkbox" id="hideAddEventButtonInHolderToggle"><label for="hideAddEventButtonInHolderToggle" class="toggle-label">Hide Add Event Button in Holder</label></div>
+                </div>
+                <hr class="my-6" style="border: 2px solid var(--day-cell-border-color);">
+                <!-- Font Settings -->
+                <div class="mb-6">
+                    <h4 class="h4-settings"><i class="fas fa-font"></i> <b>Font Settings</b></h4>
                     <input type="file" id="customFontUpload" accept=".ttf,.otf,.woff,.woff2" class="custom-file-input">
-                    <label for="customFontUpload">
-                        <i class="fas fa-upload"></i>
-                        <span>Upload Font File</span>
-                    </label>
-                    <div id="currentCustomFontDisplay" class="mt-2 text-sm text-gray-600" style="color: var(--text-color);">
-                        <span class="font-semibold">Current:</span> <span id="customFontNameDisplay">Inter (Default)</span>
-                    </div>
+                    <label for="customFontUpload"><i class="fas fa-upload"></i> Upload Font File</label>
+                    <div id="currentCustomFontDisplay" style="padding-top: 6px;"><span class="font-semibold">Current:</span> <span id="customFontNameDisplay">Inter (Default)</span></div>
                     <button id="resetCustomFont" class="themed-button secondary mt-2">Reset to Default</button>
                 </div>
-
+                <hr class="my-6" style="border: 2px solid var(--day-cell-border-color);">
+                <!-- Themes -->
                 <div class="mb-6">
-                    <h4 class="h4-settings">UI Roundness</h4>
-                    <input type="range" id="uiRoundness" min="0" max="24" value="8" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
-                    <span id="uiRoundnessValue" class="block text-sm text-gray-600 mt-2 text-right" style="color: var(--text-color);">8px</span>
+                    <h4 class="h4-settings"><i class="fas fa-palette"></i> <b>Themes</b></h4>
+                    <div><h4 class="h3-settings" style="margin: 0px 0px 10px 0px;"><b>Pre-made Themes</b></h4><button id="darkModeButton" class="dark-mode-toggle-button"><i class="fas fa-moon"></i> Dark Mode <span class="small-text">(Off)</span></button><div id="premadeThemeBoxes" class="flex flex-wrap gap-3 mt-2 justify-center"></div></div>
+                    <div class="mb-4 mt-4"><h4 class="h3-settings"><b>Special Themes</b></h4>
+                      <div id="specialThemeBoxes" class="flex flex-wrap gap-3 mt-2 justify-center special-theme-list collapsed" style="position:relative;">
+                        <div class="special-theme-box">Theme 1</div>
+                        <div class="special-theme-box">Theme 2</div>
+                        <div class="special-theme-box">Theme 3</div>
+                        <div class="special-theme-box">Theme 4</div>
+                        <!-- More themes -->
+                        <div class="special-theme-gradient" style="position:absolute;left:0;right:0;bottom:0;height:40px;background:linear-gradient(to bottom,rgba(255,255,255,0),var(--main-container-bg) 80%);display:flex;align-items:flex-end;justify-content:center;pointer-events:none;"></div>
+                        <div class="show-more-btn" id="showMoreThemesBtn" style="position:absolute;left:0;right:0;bottom:0;height:40px;background:none;color:var(--accent-color);font-weight:600;text-align:center;cursor:pointer;z-index:2;pointer-events:auto;">Show more...</div>
+                      </div>
+                    </div>
+                    <hr class="my-6" style="border: 2px solid var(--day-cell-border-color);">
+                    <div>
+                      <div class="accordion" id="customThemeAccordion">
+                        <div class="accordion-header" id="customThemeAccordionHeader">Custom Theming Options ></div>
+                        <div class="accordion-content" id="customThemeAccordionContent">
+                          <div id="customColorPickersContainer" class="relative">
+                            <h4 class="h4-settings"><b>Custom Theming</b></h4>
+                            <div class="color-input-group"><label for="themeBodyBg">Background Color</label><input type="color" id="themeBodyBg"></div>
+                            <div class="color-input-group"><label for="themeTextColor">Main Text Color</label><input type="color" id="themeTextColor"></div>
+                            <div class="color-input-group"><label for="themeHeaderBg">Header Background</label><input type="color" id="themeHeaderBg"></div>
+                            <div class="color-input-group"><label for="themeMainContainerBg">Main Container Background</label><input type="color" id="themeMainContainerBg"></div>
+                            <div class="color-input-group"><label for="themeDayCellBg">Day Cell Background</label><input type="color" id="themeDayCellBg"></div>
+                            <div class="color-input-group"><label for="themeDayCellHoverBg">Day Cell Hover Background</label><input type="color" id="themeDayCellHoverBg"></div>
+                            <div class="color-input-group"><label for="themeCurrentDayBg">Today's Day Cell Background</label><input type="color" id="themeCurrentDayBg"></div>
+                            <div class="color-input-group"><label for="themePrimaryButtonBg">Primary Button Background</label><input type="color" id="themePrimaryButtonBg"></div>
+                            <div class="color-input-group"><label for="themePrimaryButtonText">Primary Button Text</label><input type="color" id="themePrimaryButtonText"></div>
+                            <div class="color-input-group"><label for="themeSecondaryButtonBg">Secondary Button Background</label><input type="color" id="themeSecondaryButtonBg"></div>
+                            <div class="color-input-group"><label for="themeSecondaryButtonText">Secondary Button Text</label><input type="color" id="themeSecondaryButtonText"></div>
+                            <div class="color-input-group"><label for="themeAccentColor">Accent Color (Borders, Sliders)</label><input type="color" id="themeAccentColor"></div>
+                            <div class="color-input-group"><label for="themeDayCellBorderColor">Day Cell Border Color</label><input type="color" id="themeDayCellBorderColor"></div>
+                            <button id="saveCustomThemeButton" class="themed-button w-full mb-3">Save Current Custom Theme</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+    <script>
+    // Ensure global events array exists
+    if (!window.events) window.events = [];
+    // Accordion logic
+    document.addEventListener('DOMContentLoaded', function() {
+      var acc = document.getElementById('customThemeAccordion');
+      var header = document.getElementById('customThemeAccordionHeader');
+      if (header && acc) {
+        header.addEventListener('click', function() {
+          acc.classList.toggle('open');
+        });
+      }
+      // Show more special themes logic
+      var themeList = document.getElementById('specialThemeBoxes');
+      var showMoreBtn = document.getElementById('showMoreThemesBtn');
+      if (showMoreBtn && themeList) {
+        showMoreBtn.addEventListener('click', function() {
+          themeList.classList.remove('collapsed');
+          showMoreBtn.style.display = 'none';
+          var grad = themeList.querySelector('.special-theme-gradient');
+          if (grad) grad.style.display = 'none';
+        });
+      }
+    });
+    </script>
+                
+                    <div><h4 class="h4-settings"><i class="fas fa-download" style="padding-right: 8px;"></i><b>Saved Custom Themes</b></h4><div id="savedThemePreviews" class="flex flex-wrap gap-2 mt-2 justify-center"></div></div>
                 </div>
-
+                <hr class="my-6" style="border: 2px solid var(--day-cell-border-color);">
+                <!-- Event Export Options -->
                 <div class="mb-6">
-                    <h4 class="h4-settings">Event Roundness</h4>
-                    <input type="range" id="eventRoundness" min="0" max="24" value="8" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
-                    <span id="eventRoundnessValue" class="block text-sm text-gray-600 mt-2 text-right" style="color: var(--text-color);">8px</span>
-                </div>
-
-                <div class="mb-6">
-                    <h4 class="h4-settings">Event Border Thickness</h4>
-                    <input type="range" id="eventBorderThickness" min="0" max="5" value="3" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
-                    <span id="eventBorderThicknessValue" class="block text-sm text-gray-600 mt-2 text-right" style="color: var(--text-color);">3px</span>
-                </div>
-
-                <div class="mb-6">
-                    <h4 class="h4-settings">Base Font Size</h4>
-                    <input type="range" id="fontSize" min="12" max="36" value="16" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
-                    <span id="fontSizeValue" class="block text-sm text-gray-600 mt-2 text-right" style="color: var(--text-color);">16px</span>
-                </div>
-
-                <div class="mb-6">
-                    <h4 class="h4-settings">Day Cell Minimum Width</h4>
-                    <input type="range" id="dayCellMinWidth" min="100" max="300" value="140" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
-                    <span id="dayCellMinWidthValue" class="block text-sm text-gray-600 mt-2 text-right" style="color: var(--text-color);">140px</span>
-                </div>
-
-                <div class="mb-6">
-                    <h4 class="h4-settings">Application Settings</h4>
-                    <div class="toggle-container">
-                        <input type="checkbox" id="use24HourFormatToggle">
-                        <label for="use24HourFormatToggle" class="toggle-label">Use 24-Hour Format</label>
-                    </div>
-                    <div class="toggle-container">
-                        <input type="checkbox" id="hideScrollbarsToggle">
-                        <label for="hideScrollbarsToggle" class="toggle-label">Hide Scrollbars</label>
-                    </div>
-                    <div class="toggle-container">
-                        <input type="checkbox" id="noBackgroundToggle">
-                        <label for="noBackgroundToggle" class="toggle-label">No Background (Full Screen)</label>
-                    </div>
-                    <div class="toggle-container">
-                        <input type="checkbox" id="foldDayCellsToggle">
-                        <label for="foldDayCellsToggle" class="toggle-label">Fold Day Cells (on hover)</label>
-                    </div>
-                    
-                    <h4 class="h4-settings">Holder</h4>
-                    <div class="toggle-container">
-                        <input type="checkbox" id="holderIconToggle">
-                        <label for="holderIconToggle" class="toggle-label">Show Holder Icon</label>
-                    </div>
-                    <div class="toggle-container">
-                        <input type="checkbox" id="showHolderByDefaultToggle">
-                        <label for="showHolderByDefaultToggle" class="toggle-label">Show Holder Sidebar by Default</label>
-                    </div>
-                    <div class="toggle-container">
-                        <input type="checkbox" id="disableSidebarAnimationsToggle">
-                        <label for="disableSidebarAnimationsToggle" class="toggle-label">Disable Sidebar Animations</label>
-                    </div>
-                    <div class="toggle-container">
-                        <input type="checkbox" id="hideAddEventButtonInHolderToggle">
-                        <label for="hideAddEventButtonInHolderToggle" class="toggle-label">Hide Add Event Button in Holder</label>
-                    </div>
-                    <h4 class="h4-settings">Customization</h4>
-                    <div class="toggle-container">
-                        <input type="checkbox" id="customizationCheckboxDashedBorderToggle">
-                        <label for="customizationCheckboxDashedBorderToggle" class="toggle-label">Checkbox Dashed Border (When Checked)</label>
-                    </div>
-                    <div class="toggle-container">
-                        <input type="checkbox" id="customizationStrikethroughTextToggle">
-                        <label for="customizationStrikethroughTextToggle" class="toggle-label">Strikethrough Text (When Checked)</label>
-                    </div>
-                    <div class="toggle-container">
-                        <input type="checkbox" id="customizationBoldTitleToggle">
-                        <label for="customizationBoldTitleToggle" class="toggle-label">Bold Event Titles</label>
-                    </div>
-
-
-                    <div class="mb-4">
-                        <h4 class="h4-settings">Pre-made Themes</h4>
-                        <div id="premadeThemeBoxesContainer">
-                            <button id="darkModeButton" class="dark-mode-toggle-button">
-                                Dark Mode <span class="small-text">(Off)</span>
-                            </button>
-                            <div id="premadeThemeBoxes" class="flex flex-wrap gap-3 mt-2 justify-center">
-                            </div>
+                    <h4 class="h4-settings" style="padding-bottom: 6px;"><i class="fas fa-clipboard"></i> <b>Calendar Copy Options</b></h4>
+                    <div class="settings-description" style="margin-bottom:0.5rem;margin-top:-10px;color:var(--text-color);">Copies the Month & Event in a Markdown Table.</div>
+                    <div class="toggle-container"><input type="checkbox" id="exportTitles" checked><label for="exportTitles" class="toggle-label">Event Titles</label></div>
+                    <div class="toggle-container"><input type="checkbox" id="exportDescriptions" checked><label for="exportDescriptions" class="toggle-label">Event Descriptions</label></div>
+                    <button id="copyCurrentMonthBtn" class="themed-button w-full mb-3 mt-3"><i class="fas fa-copy"></i> COPY CURRENT MONTH</button>
+                    <hr class="my-4" style="border: 2px solid var(--day-cell-border-color);">
+                    <div id="calendarSyncSection">
+                        <h4 class="h4-settings" style="padding-bottom: 2px;"><i class="fas fa-sync-alt"></i> <b>Calendar Sync</b></h4>
+                        <div class="settings-description" style="margin-bottom:0.5rem;margin-top:-10px;color:var(--text-color);">Sync your calendar and theming to your Google account. Optionally sync events to Google Calendar.</div>
+                        <div style="display:flex;align-items:center;gap:1em;margin-bottom:0.5em;">
+                            <button id="googleSignInBtn" class="themed-button secondary" style="min-width:120px;"><i class="fab fa-google"></i> Sign In</button>
+                            <button id="googleSignOutBtn" class="themed-button secondary" style="min-width:120px;display:none;"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+                            <span id="googleSyncStatus" style="margin-left:1em;color:var(--accent-color);font-weight:600;">Not signed in</span>
                         </div>
-                    </div>
-
-                    <div class="mb-4">
-                        <h4 class="h4-settings">Special Themes</h4>
-                        <div id="specialThemeBoxes" class="flex flex-wrap gap-3 mt-2 justify-center">
-                            </div>
-                    </div>
-
-                    <div id="customColorPickersContainer" class="relative">
-                        <h4 class="h4-settings">Custom Theming</h4>
-                        <div class="color-input-group">
-                            <label for="themeBodyBg">Background Color</label>
-                            <input type="color" id="themeBodyBg">
-                        </div>
-                        <div class="color-input-group">
-                            <label for="themeTextColor">Main Text Color</label>
-                            <input type="color" id="themeTextColor">
-                        </div>
-                         <div class="color-input-group">
-                            <label for="themeHeaderBg">Header Background</label>
-                            <input type="color" id="themeHeaderBg">
-                        </div>
-                        <div class="color-input-group">
-                            <label for="themeMainContainerBg">Main Container Background</label>
-                            <input type="color" id="themeMainContainerBg">
-                        </div>
-                        <div class="color-input-group">
-                            <label for="themeDayCellBg">Day Cell Background</label>
-                            <input type="color" id="themeDayCellBg">
-                        </div>
-                        <div class="color-input-group">
-                            <label for="themeDayCellHoverBg">Day Cell Hover Background</label>
-                            <input type="color" id="themeDayCellHoverBg">
-                        </div>
-                         <div class="color-input-group">
-                            <label for="themeCurrentDayBg">Today's Day Cell Background</label>
-                            <input type="color" id="themeCurrentDayBg">
-                        </div>
-                        <div class="color-input-group">
-                            <label for="themePrimaryButtonBg">Primary Button Background</label>
-                            <input type="color" id="themePrimaryButtonBg">
-                        </div>
-                        <div class="color-input-group">
-                            <label for="themePrimaryButtonText">Primary Button Text</label>
-                            <input type="color" id="themePrimaryButtonText">
-                        </div>
-                         <div class="color-input-group">
-                            <label for="themeSecondaryButtonBg">Secondary Button Background</label>
-                            <input type="color" id="themeSecondaryButtonBg">
-                        </div>
-                        <div class="color-input-group">
-                            <label for="themeSecondaryButtonText">Secondary Button Text</label>
-                            <input type="color" id="themeSecondaryButtonText">
-                        </div>
-                        <div class="color-input-group">
-                            <label for="themeAccentColor">Accent Color (Borders, Sliders)</label>
-                            <input type="color" id="themeAccentColor">
-                        </div>
-                        <div class="color-input-group">
-                            <label for="themeDayCellBorderColor">Day Cell Border Color</label>
-                            <input type="color" id="themeDayCellBorderColor">
-                        </div>
-                        <button id="saveCustomThemeButton" class="themed-button w-full mb-3">Save Current Custom Theme</button>
-                    </div>
-
-                    <div class="mb-4 pt-4 border-t" style="border-color: var(--header-border-color);">
-                        <h4 class="h4-settings">Saved Custom Themes</h4>
-                        <div id="savedThemePreviews" class="flex flex-wrap gap-2 mt-2 justify-center">
+                        <div id="calendarLastSyncText" style="font-size:13px;color:#888;margin-top:4px;"></div>
+                        <div class="toggle-container">
+                            <input type="checkbox" id="googleCalendarSyncToggle">
+                            <label for="googleCalendarSyncToggle" class="toggle-label">Sync to Google Calendar</label>
                         </div>
                     </div>
                 </div>
-
-                <div class="mb-6 pt-4 border-t" style="border-color: var(--header-border-color);">
-                    <h4 class="h4-settings" style="color: #ef4444;">Danger Zone</h4>
-                    <button id="removeAllEventsButton" class="themed-button danger w-full mb-3">Remove All Events</button>
-                    <button id="removeAllCustomThemesButton" class="themed-button danger w-full mb-3">Remove All Custom Themes</button>
-                    <button id="resetApplicationButton" class="themed-button danger w-full">Reset the Application</button>
+                <hr class="my-6" style="border: 2px solid var(--day-cell-border-color);">
+                <!-- Danger Zone -->
+                <div>
+                    <h4 class="h4-settings" style="color: #ef4444;"><i class="fas fa-exclamation-triangle"></i> <b>Danger Zone</b></h4>
+                    <button id="removeAllEventsButton" class="themed-button danger w-full mb-3"><b>Remove All Events</b></button>
+                    <button id="removeAllCustomThemesButton" class="themed-button danger w-full mb-3"><b>Remove All Custom Themes</b></button>
+                    <button id="resetApplicationButton" class="themed-button danger w-full"><b>Reset the Application</b></button>
                 </div>
-
             </div>
-
             <div class="modal-footer">
                 <button id="cancelSettings" class="themed-button secondary">Cancel</button>
                 <button id="saveSettings" class="themed-button">Save Settings</button>
@@ -2063,12 +2500,13 @@
         <div class="resize-handle"></div>
     </div>
 
+
     <div id="eventContextMenu" class="hidden">
         <button id="contextEditEvent"><i class="fas fa-edit"></i> Edit Event</button>
+        <hr class="mb-0" style="border: 2px solid var(--day-cell-border-color);">
         <button id="contextDuplicateEvent"><i class="fas fa-copy"></i> Duplicate Event</button>
         <button id="contextDeleteEvent"><i class="fas fa-trash"></i> Delete Event</button>
     </div>
-
     <script>
         let currentDate = new Date();
         let events = [];
@@ -2792,7 +3230,7 @@
         let savedCustomThemes = [];
         let holderSidebarWidth = 250; 
 
-        const saveEvents = async () => {
+        let saveEvents = async () => {
             await Preferences.set({ key: 'calendarEvents', value: JSON.stringify(events) });
             await Preferences.set({ key: 'holderEvents', value: JSON.stringify(holderEvents) });
         };
@@ -2823,7 +3261,7 @@
             }
         };
 
-        const saveSettings = async (fontName, fontData, baseThemeKey, isDarkMode, uiRoundness, fontSize, eventRoundness, eventBorderThickness, dayCellMinWidth, customThemeColors = null, unlockedSpecialThemes = [], holderIconEnabledState = false, noBackgroundModeState = false, savedThemes = [], disableSidebarAnimationsState = false, hideScrollbarsState = false, foldDayCellsEnabledState = false, showHolderByDefaultState = false, use24HourFormatState = false, currentHolderSidebarWidth = 250, hideAddEventButtonInHolderState = false) => {
+        let saveSettings = async (fontName, fontData, baseThemeKey, isDarkMode, uiRoundness, fontSize, eventRoundness, eventBorderThickness, dayCellMinWidth, customThemeColors = null, unlockedSpecialThemes = [], holderIconEnabledState = false, noBackgroundModeState = false, savedThemes = [], disableSidebarAnimationsState = false, hideScrollbarsState = false, foldDayCellsEnabledState = false, showHolderByDefaultState = false, use24HourFormatState = false, currentHolderSidebarWidth = 250, hideAddEventButtonInHolderState = false) => {
             const settings = {
                 customFontName: fontName,
                 customFontData: fontData,
@@ -2867,9 +3305,68 @@
             removeAllCustomThemesButton, themeNameModal, themeNameInput, cancelThemeNameButton, saveThemeNameButton, effectShowCheckbox,
             effectGlowing, effectStriped, effectDotted, effectParticles, effectSnowFalling, effectGlisteningStars, effectGradient, effectAnimatedStripes, effectAnimatedVerticalRainbow, eventIconDisplay,
             holderContentEl, hamburgerIcon, holderSidebar, holderIconToggle, noBackgroundToggle, disableSidebarAnimationsToggle, mainContainerEl,
-            eventContextMenu, contextEditEventButton, contextDuplicateEventButton, contextDeleteEventButton, hideScrollbarsToggle, holderSidebarCloseButton,
+            hideScrollbarsToggle, holderSidebarCloseButton,
             darkModeButton, foldDayCellsToggle, showHolderByDefaultToggle, use24HourFormatToggle, addHolderEventButton, hideAddEventButtonInHolderToggle,
             holderResizeHandle, premadeThemeBoxesContainer;
+
+        // Ensure modal elements are initialized after DOMContentLoaded
+
+// --- Robust Edit Event Modal Button Listeners ---
+
+        
+
+        // --- Slider Value Live Update ---
+function setupSliderValueLiveUpdate() {
+  const sliders = document.querySelectorAll('.slider-group input[type="range"]');
+  sliders.forEach(slider => {
+    const valueDisplay = slider.nextElementSibling;
+    const unit = valueDisplay && valueDisplay.id.includes('MinWidth') ? 'px' : 'px';
+    if (valueDisplay) {
+      slider.parentElement.style.position = 'relative';
+      valueDisplay.style.position = 'absolute';
+      valueDisplay.style.bottom = '-60%';
+      valueDisplay.style.pointerEvents = 'none';
+      valueDisplay.style.minWidth = '32px';
+      valueDisplay.style.textAlign = 'center';
+      valueDisplay.style.userSelect = 'none';
+      valueDisplay.style.fontSize = '14px';
+      valueDisplay.style.zIndex = '2';
+    // SLIDER THUMB IS BEING FOLLOWED
+      const updateValue = () => {
+        valueDisplay.textContent = slider.value + unit;
+        const min = parseFloat(slider.min);
+        const max = parseFloat(slider.max);
+        const val = parseFloat(slider.value);
+        const percent = (val - min) / (max - min);
+        const sliderWidth = slider.offsetWidth;
+        const thumbWidth = 24;
+        const px = percent * (sliderWidth - thumbWidth) + thumbWidth / 2;
+        valueDisplay.style.left = px + 'px';
+        valueDisplay.style.transform = 'translateX(-50%)';
+      };
+      slider.addEventListener('input', updateValue);
+      slider.addEventListener('change', updateValue);
+      window.addEventListener('resize', updateValue);
+      // Ensure updateValue runs after layout is ready
+      setTimeout(updateValue, 0);
+      // Also update when the settings modal is shown (in case of display:none -> block)
+      const settingsModal = document.getElementById('settings-modal') || document.getElementById('settingsModal');
+      if (settingsModal) {
+        const observer = new MutationObserver(() => {
+          if (settingsModal.style.display !== 'none' && !settingsModal.classList.contains('hidden')) {
+            setTimeout(updateValue, 10);
+          }
+        });
+        observer.observe(settingsModal, { attributes: true, attributeFilter: ['style', 'class'] });
+      }
+    }
+  });
+}
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', setupSliderValueLiveUpdate);
+} else {
+  setupSliderValueLiveUpdate();
+}
 
         const loadSettings = async () => {
             const { value: storedSettings } = await Preferences.get({ key: 'calendarSettings' });
@@ -2985,52 +3482,72 @@
             };
         };
 
-        const eventColors = [
-            { name: 'red', primary: '#FFCDD2', text: '#b82121' },
-            { name: 'orange', primary: '#FFE0B2', text: '#d15e00' },
-            { name: 'dandelion', primary: '#FFF9C4', text: '#db9d02' },
-            { name: 'pale yellow', primary: '#FFFDE7', text: '#F9A825' },
-            { name: 'lime green', primary: '#DCEDC8', text: '#689F38' },
-            { name: 'green', primary: '#C8E6C9', text: '#2E7D32' },
-            { name: 'bluergreen', primary: '#a0dece', text: '#2e7d32' },
-            { name: 'cyan', primary: '#B2EBF2', text: '#0097A7' },
-            { name: 'aqua', primary: '#B2EBF2', text: '#0097A7' },
-            { name: 'sky blue', primary: '#B3E5FC', text: '#0277BD' },
-            { name: 'blue', primary: '#93c3ed', text: '#003b99' },
-            { name: 'indigo', primary: '#afb8ed', text: '#303F9F' },
-            { name: 'purple', primary: '#bbacff', text: '#2608a2' },
-            { name: 'violet', primary: '#e6adf0', text: '#7B1FA2' },
-            { name: 'magenta', primary: '#ffc4fa', text: '#b30098' },
-            { name: 'rose pink', primary: '#F8BBD0', text: '#C2185B' },
-            { name: 'pink', primary: '#FCE4EC', text: '#E91E63' },
-            { name: 'brown', primary: '#D7CCC8', text: '#5D4037' },
-            { name: 'grey', primary: '#E0E0E0', text: '#616161' },
-            { name: 'white', primary: '#FFFFFF', text: '#212121' },
+const eventColors = [
+  // Dark Colors
+  { name: 'red', primary: '#880e0e', text: '#FF8A80' },
+  { name: 'rose pink', primary: '#AD1457', text: '#F8BBD0' }, 
+  { name: 'magenta', primary: '#880E4F', text: '#F8BBD0' },
+  { name: 'violet', primary: '#6A1B9A', text: '#E1BEE7' },
+  { name: 'purple', primary: '#4527A0', text: '#B39DDB' },
+  { name: 'indigo', primary: '#1A237E', text: '#C5CAE9' },
+  { name: 'blue', primary: '#0D47A1', text: '#90CAF9' },
+  { name: 'sky blue', primary: '#01579B', text: '#81D4FA' },
+  { name: 'cyan', primary: '#006064', text: '#80DEEA' }, 
+  { name: 'bluergreen', primary: '#004D40', text: '#80CBC4' },
+  { name: 'green', primary: '#1B5E20', text: '#A5D6A7' },
+  { name: 'lime green', primary: '#558B2F', text: '#C5E1A5' },
+  { name: 'dandelion', primary: '#da9830', text: '#FFF59D' },
+  { name: 'orange', primary: '#ab3d02', text: '#FFD180' },
 
-            { name: 'red', primary: '#880e0e', text: '#FF8A80' },
-            { name: 'orange', primary: '#ab3d02', text: '#FFD180' },
-            { name: 'dandelion', primary: '#F57F17', text: '#FFF59D' },
-            { name: 'pale yellow', primary: '#edb207', text: '#FFFDE7' },
-            { name: 'lime green', primary: '#558B2F', text: '#C5E1A5' },
-            { name: 'green', primary: '#1B5E20', text: '#A5D6A7' },
-            { name: 'bluergreen', primary: '#004D40', text: '#80CBC4' },
-            { name: 'cyan', primary: '#006064', text: '#80DEEA' },
-            { name: 'aqua', primary: '#015870', text: '#82cded' },
-            { name: 'sky blue', primary: '#01579B', text: '#81D4FA' },
-            { name: 'blue', primary: '#0D47A1', text: '#90CAF9' },
-            { name: 'indigo', primary: '#1A237E', text: '#C5CAE9' },
-            { name: 'purple', primary: '#4527A0', text: '#B39DDB' },
-            { name: 'violet', primary: '#6A1B9A', text: '#E1BEE7' },
-            { name: 'magenta', primary: '#880E4F', text: '#F8BBD0' },
-            { name: 'rose pink', primary: '#AD1457', text: '#F8BBD0' },
-            { name: 'pink', primary: '#C2185B', text: '#FFCDD2' },
-            { name: 'biscuit', primary: '#bd956f', text: '#3b2613' },
-            { name: 'brown', primary: '#3E2723', text: '#BCAAA4' },
-            { name: 'grey', primary: '#424242', text: '#BDBDBD' },
-            { name: 'dark gray', primary: '#242424', text: '#b3b3b3' },
-            { name: 'darker gray', primary: '#1f1f1f', text: '#e3e3e3' },
-            { name: 'black', primary: '#000', text: '#fff' }
-        ];
+  // Bright Colors
+  { name: 'red', primary: '#E53935', text: '#FFB3B1' },
+  { name: 'rose pink', primary: '#D81B60', text: '#F48FB1' },
+  { name: 'magenta', primary: '#C2185B', text: '#F8BBD0' },
+  { name: 'violet', primary: '#8E24AA', text: '#E1BEE7' },
+  { name: 'purple', primary: '#673AB7', text: '#D1C4E9' },
+  { name: 'indigo', primary: '#3949AB', text: '#C5CAE9' },
+  { name: 'blue', primary: '#2196F3', text: '#BBDEFB' },
+  { name: 'sky blue', primary: '#03A9F4', text: '#B3E5FC' },
+  { name: 'cyan', primary: '#00BCD4', text: '#B2EBF2' },
+  { name: 'bluergreen', primary: '#009688', text: '#B2DFDB' },
+  { name: 'green', primary: '#4CAF50', text: '#C8E6C9' },
+  { name: 'lime green', primary: '#8BC34A', text: '#DCEDC8' },
+  { name: 'dandelion', primary: '#FFC107', text: '#3E3300' },
+  { name: 'orange', primary: '#FF9800', text: '#4E2600' },
+  { name: 'peach', primary: '#fa957f', text: '#6a2a1f' },
+
+  // Light Colors
+  { name: 'red', primary: '#FFCDD2', text: '#D32F2F' },
+  { name: 'rose pink', primary: '#F8BBD0', text: '#C2185B' },
+  { name: 'magenta', primary: '#ffc4fa', text: '#b30098' },
+  { name: 'violet', primary: '#e6adf0', text: '#7B1FA2' },
+  { name: 'purple', primary: '#bbacff', text: '#2608a2' },
+  { name: 'indigo', primary: '#afb8ed', text: '#303F9F' },
+  { name: 'blue', primary: '#93c3ed', text: '#003b99' },
+  { name: 'sky blue', primary: '#B3E5FC', text: '#0277BD' },
+  { name: 'cyan', primary: '#B2EBF2', text: '#0097A7' },
+  { name: 'bluergreen', primary: '#a0dece', text: '#2e7d32' },
+  { name: 'green', primary: '#C8E6C9', text: '#2E7D32' },
+  { name: 'lime green', primary: '#DCEDC8', text: '#689F38' },
+  { name: 'pale yellow', primary: '#FFFDE7', text: '#F9A825' },
+  { name: 'dandelion', primary: '#FFF9C4', text: '#db9d02' },
+  { name: 'orange', primary: '#FFE0B2', text: '#d15e00' },
+
+  // Neutral Colors (Brown, Biscuit, White, Greys, Black) - Appended at the end
+  { name: 'biscuit', primary: '#bd956f', text: '#3b2613' },
+  { name: 'lighter brown', primary: '#6D4C41', text: '#D7CCC8' },
+  { name: 'dark brown', primary: '#4E342E', text: '#D7CCC8' },
+  { name: 'brown', primary: '#3E2723', text: '#BCAAA4' },
+  { name: 'black', primary: '#171717', text: '#E0E0E0' },
+  { name: 'darker gray', primary: '#1f1f1f', text: '#e3e3e3' },
+  { name: 'dark gray', primary: '#242424', text: '#b3b3b3' },
+  { name: 'grey', primary: '#616161', text: '#FFFFFF' },
+  { name: 'light grey', primary: '#b3b3b3', text: '#454545' },
+  { name: 'lighter grey', primary: '#E0E0E0', text: '#616161' },
+  { name: 'white', primary: '#FFFFFF', text: '#212121' },
+  { name: 'light muted coffee', primary: '#D7CCC8', text: '#5D4037' },
+];
+
 
         // --- Customization Toggles Functionality ---
         const customizationCheckboxDashedBorderToggle = document.getElementById('customizationCheckboxDashedBorderToggle');
@@ -3118,8 +3635,368 @@
         `;
         document.head.appendChild(style);
 
+
+
+        // --- Calendar Copy Functionality ---
+        // Add toggle in settings modal
+        let copyEventTitlesOnly = false;
+        // Add toggle UI to settings modal
         window.addEventListener('DOMContentLoaded', () => {
             loadCustomizationSettings();
+            // Add all settings into three main accordions for clarity
+            let settingsModal = document.getElementById('settingsModal') || document.querySelector('.settings-modal');
+            if (settingsModal) {
+                // --- General Settings Accordion ---
+                if (!settingsModal.querySelector('#generalSettingsAccordion')) {
+                    let generalAccordion = document.createElement('div');
+                    generalAccordion.id = 'generalSettingsAccordion';
+                    generalAccordion.className = 'settings-section';
+                    generalAccordion.style.marginBottom = '18px';
+                    generalAccordion.innerHTML = `
+                        <button type="button" style="width:100%;text-align:left;font-size:16px;padding:8px 0;background:none;border:none;outline:none;cursor:pointer;font-weight:600;" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">General Settings ▼</button>
+                        <div style="display:block;padding:8px 0 0 0;" id="generalSettingsContent">
+                            <div class="settings-row" style="margin:8px 0;">
+                                <label style="display:flex;align-items:center;gap:8px;font-size:15px;cursor:pointer;">
+                                    <input type="checkbox" id="copyEventTitlesToggle" style="width:18px;height:18px;cursor:pointer;">
+                                    <span>Copy only event titles (not descriptions) when using Ctrl+A + Ctrl+C</span>
+                                </label>
+                            </div>
+                            <div class="settings-row" style="margin:8px 0;">
+                                <label style="display:flex;align-items:center;gap:8px;font-size:15px;cursor:pointer;">
+                                    <span>Week starts on:</span>
+                                    <select id="weekStartDropdown" style="font-size:15px;padding:2px 8px;">
+                                        <option value="0">Sunday</option>
+                                        <option value="1">Monday</option>
+                                        <option value="2">Tuesday</option>
+                                        <option value="3">Wednesday</option>
+                                        <option value="4">Thursday</option>
+                                        <option value="5">Friday</option>
+                                        <option value="6">Saturday</option>
+                                    </select>
+                                </label>
+                            </div>
+                            <div class="settings-row" style="margin:8px 0 0 0;">
+                                <button id="copyCurrentMonthBtn" style="font-size:15px;padding:6px 18px;cursor:pointer;">Copy Current Month</button>
+                            </div>
+                        </div>
+                    `;
+                    settingsModal.appendChild(generalAccordion);
+                }
+
+                // --- Custom Theming Accordion ---
+                if (!settingsModal.querySelector('#customThemeAccordion')) {
+                    let customThemeAccordion = document.createElement('div');
+                    customThemeAccordion.id = 'customThemeAccordion';
+                    customThemeAccordion.className = 'settings-section';
+                    customThemeAccordion.style.marginBottom = '18px';
+                    customThemeAccordion.innerHTML = `
+                        <button type="button" style="width:100%;text-align:left;font-size:16px;padding:8px 0;background:none;border:none;outline:none;cursor:pointer;font-weight:600;" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">Custom Theming ▼</button>
+                        <div style="display:none;padding:8px 0 0 0;" id="customThemeContent">
+                            <!-- Custom theme controls will be inserted here by your existing logic -->
+                        </div>
+                    `;
+                    settingsModal.appendChild(customThemeAccordion);
+                }
+
+                // --- Special Themes Accordion ---
+                if (!settingsModal.querySelector('#specialThemeAccordion')) {
+                    let specialThemeAccordion = document.createElement('div');
+                    specialThemeAccordion.id = 'specialThemeAccordion';
+                    specialThemeAccordion.className = 'settings-section';
+                    specialThemeAccordion.style.marginBottom = '18px';
+                    specialThemeAccordion.innerHTML = `
+                        <button type="button" style="width:100%;text-align:left;font-size:16px;padding:8px 0;background:none;border:none;outline:none;cursor:pointer;font-weight:600;" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">Special Themes ▼</button>
+                        <div style="display:none;padding:8px 0 0 0;" id="specialThemeContent">
+                            <!-- Special theme controls will be inserted here by your existing logic -->
+                        </div>
+                    `;
+                    settingsModal.appendChild(specialThemeAccordion);
+                }
+            }
+            // Listen for toggle changes
+            let toggle = document.getElementById('copyEventTitlesToggle');
+            if (toggle) {
+                let val = localStorage.getItem('copyEventTitlesOnly');
+                copyEventTitlesOnly = val === 'true';
+                toggle.checked = copyEventTitlesOnly;
+                toggle.addEventListener('change', function() {
+                    copyEventTitlesOnly = toggle.checked;
+                    localStorage.setItem('copyEventTitlesOnly', copyEventTitlesOnly ? 'true' : 'false');
+                });
+            }
+            // Listen for week start changes
+            let weekStartDropdown = document.getElementById('weekStartDropdown');
+            if (weekStartDropdown) {
+                let val = localStorage.getItem('weekStartDay');
+                if (val !== null) weekStartDropdown.value = val;
+                weekStartDropdown.addEventListener('change', function() {
+                    localStorage.setItem('weekStartDay', weekStartDropdown.value);
+                    if (typeof renderCalendar === 'function') renderCalendar();
+                });
+            }
+            // Listen for copy button
+            let copyBtn = document.getElementById('copyCurrentMonthBtn');
+            if (copyBtn) {
+                copyBtn.addEventListener('click', function() {
+                    const text = getCalendarMonthText();
+                    calendarCopyTextarea.value = text;
+                    calendarCopyTextarea.select();
+                    document.execCommand('copy');
+                });
+            }
+        });
+
+        // hidden textarea for copying
+        const calendarCopyTextarea = document.createElement('textarea');
+        calendarCopyTextarea.style.position = 'fixed';
+        calendarCopyTextarea.style.opacity = '0';
+        calendarCopyTextarea.style.pointerEvents = 'none';
+        calendarCopyTextarea.style.zIndex = '-1';
+        document.body.appendChild(calendarCopyTextarea);
+
+
+        // generate the this current month table as plain text
+        function getCalendarMonthText() {
+            // Try to get month/year heading
+            let heading = '';
+            const headingEl = document.querySelector('.calendar-month-label, .calendar-header, .calendar-title, .current-month-year');
+            if (headingEl) {
+                heading = headingEl.textContent.trim();
+            }
+
+            // Check export options
+            const exportTitlesCheckbox = document.getElementById('exportTitles');
+            const exportDescriptionsCheckbox = document.getElementById('exportDescriptions');
+            const includeTitles = exportTitlesCheckbox ? exportTitlesCheckbox.checked : true;
+            // Always include descriptions if present
+            const includeDescriptions = true;
+
+            // format a day cell
+            function formatDayCell(cell) {
+                let date = '';
+                let dateEl = cell.querySelector('.date, .day-number, .calendar-date, .date-label');
+                if (dateEl) {
+                    date = dateEl.textContent.trim();
+                } else {
+                    let match = cell.textContent.match(/\d+/);
+                    if (match) date = match[0];
+                }
+                let eventEls = cell.querySelectorAll('.event-item, .calendar-event, .event, .event-title');
+                let eventTexts = [];
+                eventEls.forEach(ev => {
+                    let title = '';
+                    let desc = '';
+                    let titleEl = ev.querySelector('.title, .event-title, .main-content .title-part');
+                    let descEl = ev.querySelector('.desc, .event-desc, .description, .event-description');
+                    if (titleEl) title = titleEl.textContent.trim();
+                    else title = ev.textContent.trim();
+                    if (descEl) desc = descEl.textContent.trim();
+                    // Always add description if present
+                    let cellText = '';
+                    if (includeTitles && title) cellText += title;
+                    if (desc) cellText += (cellText ? ' - ' : '') + desc;
+                    if (cellText) eventTexts.push(cellText);
+                });
+                if (eventTexts.length === 0 && cell.childNodes.length > 1) {
+                    let raw = cell.textContent.trim();
+                    if (date) raw = raw.replace(date, '').trim();
+                    if (raw) eventTexts.push(raw);
+                }
+                let result = '';
+                if (date) {
+                    result = date + (eventTexts.length ? '. ' + eventTexts.join(', ') : '');
+                } else {
+                    result = eventTexts.join(', ');
+                }
+                return result;
+            }
+
+            // Try to get table structure first
+            const calendarTable = document.querySelector('.calendar-table');
+            if (calendarTable) {
+                const rows = Array.from(calendarTable.querySelectorAll('tr'));
+                if (rows.length === 0) return '';
+                const headerCells = Array.from(rows[0].querySelectorAll('th,td'));
+                const headerRow = '| ' + headerCells.map(cell => cell.textContent.trim().replace(/\n/g, ' ')).join(' | ') + ' |';
+                const separatorRow = '| ' + headerCells.map(() => '---').join(' | ') + ' |';
+                const weekRows = rows.slice(1).map(row => {
+                    const cells = Array.from(row.querySelectorAll('th,td'));
+                    if (cells.length === 0 || cells.every(cell => cell.textContent.trim() === '')) return null;
+                    return '| ' + cells.map(cell => formatDayCell(cell)).join(' | ') + ' |';
+                }).filter(Boolean);
+                return (heading ? heading + '\n' : '') + [headerRow, separatorRow, ...weekRows].join('\n');
+            }
+
+            // If not a table, try to get from grid structure
+            // Assume: .calendar-grid-week for each week, .calendar-grid-day for each day
+            const weekEls = document.querySelectorAll('.calendar-grid-week');
+            if (weekEls.length > 0) {
+                let headerRow = '| Sun | Mon | Tue | Wed | Thu | Fri | Sat |';
+                let separatorRow = '| --- | --- | --- | --- | --- | --- | --- |';
+                let weekRows = [];
+                weekEls.forEach(weekEl => {
+                    const dayEls = weekEl.querySelectorAll('.calendar-grid-day');
+                    if (dayEls.length === 0) return;
+                    let row = '| ' + Array.from(dayEls).map(dayEl => formatDayCell(dayEl)).join(' | ') + ' |';
+                    weekRows.push(row);
+                });
+                return (heading ? heading + '\n' : '') + [headerRow, separatorRow, ...weekRows].join('\n');
+            }
+
+            // !!!Fallback: try to get all day cells in a list
+            const dayEls = document.querySelectorAll('.calendar-day, .calendar-cell, .day-cell');
+            if (dayEls.length > 0) {
+                let headerRow = '| Sun | Mon | Tue | Wed | Thu | Fri | Sat |';
+                let separatorRow = '| --- | --- | --- | --- | --- | --- | --- |';
+                let weekRows = [];
+                for (let i = 0; i < dayEls.length; i += 7) {
+                    let week = Array.from(dayEls).slice(i, i + 7).map(dayEl => formatDayCell(dayEl));
+                    let row = '| ' + week.join(' | ') + ' |';
+                    weekRows.push(row);
+                }
+                return (heading ? heading + '\n' : '') + [headerRow, separatorRow, ...weekRows].join('\n');
+            }
+
+            return '';
+        }
+
+
+        // STARE for Ctrl+A and Ctrl+C on the calendar
+        let calendarJustSelected = false;
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+A: select all calendar area
+            if (e.ctrlKey && e.key.toLowerCase() === 'a') {
+                let calendarArea = document.querySelector('.calendar-table, .calendar-grid, .calendar-main, .calendar-content, #calendar, .calendar');
+                if (calendarArea) {
+                    e.preventDefault();
+                    let range = document.createRange();
+                    range.selectNode(calendarArea);
+                    let sel = window.getSelection();
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                    calendarJustSelected = true;
+                }
+            }
+            // Ctrl+C: copy calendar as markdown table if just selected!!!
+            if (e.ctrlKey && e.key.toLowerCase() === 'c') {
+                if (calendarJustSelected) {
+                    e.preventDefault();
+                    const text = getCalendarMonthText();
+                    calendarCopyTextarea.value = text;
+                    calendarCopyTextarea.select();
+                    document.execCommand('copy');
+                    calendarJustSelected = false;
+                }
+            }
+        });
+        // Add Event Descriptions export option (checked by default) if not present
+        if (!document.getElementById('exportDescriptions')) {
+            const exportTitlesDiv = document.getElementById('exportTitles')?.parentNode;
+            if (exportTitlesDiv) {
+                const descToggle = document.createElement('div');
+                descToggle.className = 'toggle-container';
+                descToggle.innerHTML = '<input type="checkbox" id="exportDescriptions" checked><label for="exportDescriptions" class="toggle-label">Event Descriptions</label>';
+                exportTitlesDiv.parentNode.insertBefore(descToggle, exportTitlesDiv.nextSibling);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadCustomizationSettings();
+            // Add click handler for COPY CURRENT MONTH button
+            const copyCurrentMonthBtn = document.getElementById('copyCurrentMonthBtn');
+            if (copyCurrentMonthBtn) {
+                copyCurrentMonthBtn.addEventListener('click', () => {
+                    const text = getCalendarMonthText();
+                    navigator.clipboard.writeText(text).then(() => {
+                        copyCurrentMonthBtn.textContent = 'Copied!';
+                        setTimeout(() => copyCurrentMonthBtn.textContent = 'COPY CURRENT MONTH', 1200);
+                    });
+                });
+            }
+            // --- Edit Event Modal Logic ---
+            // Attach edit button listeners to all event items
+            function attachEventEditButtonListeners() {
+                // Try to find all event edit buttons (assume they have class 'edit-event-btn' and data-event-id)
+                const editBtns = document.querySelectorAll('.edit-event-btn[data-event-id]');
+                editBtns.forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        const eventId = btn.getAttribute('data-event-id');
+                        if (eventId) {
+                            window.openEditEventModal(eventId);
+                        } else {
+                            console.warn('Edit button clicked but no eventId found on button.');
+                        }
+                    });
+                });
+            }
+            // Call this after calendar render
+            if (typeof renderCalendar === 'function') {
+                const originalRenderCalendar = renderCalendar;
+                window.renderCalendar = function() {
+                    originalRenderCalendar.apply(this, arguments);
+                    attachEventEditButtonListeners();
+                };
+            } else {
+                // If renderCalendar not defined yet, attach after DOMContentLoaded
+                attachEventEditButtonListeners();
+            }
+            // Helper to attach click listeners robustly
+           // ...existing code...
+window.openEditEventModal = function(eventId) {
+    const editEventModal = document.getElementById('edit-event-modal');
+    if (!editEventModal) {
+        console.error('Edit event modal not found');
+        return;
+    }
+
+    // Clear previous event ID and set new one
+    editEventModal.dataset.eventId = eventId;
+
+    // Find the event by ID
+    const event = window.events.find(ev => String(ev.id) === String(eventId));
+    if (!event) {
+        console.error('Event not found:', eventId);
+        return;
+    }
+
+    // Delete button (edit mode)
+    const deleteBtn = editEventModal.querySelector('#deleteEvent, #deleteEventButton');
+    if (deleteBtn) {
+        deleteBtn.onclick = async () => {
+            const eventId = editEventModal.dataset.eventId;
+            const eventIndex = window.events.findIndex(ev => String(ev.id) === String(eventId));
+            if (eventIndex !== -1) {
+                window.events.splice(eventIndex, 1);
+                try {
+                    await saveEvents();
+                    renderCalendar();
+                    editEventModal.classList.add('hidden');
+                    editEventModal.style.display = 'none';
+                } catch (error) {
+                    console.error('Failed to delete event:', error);
+                }
+            }
+        };
+    }
+
+}
+            // If you have a function that opens the modal, call attachEditModalListeners() after opening
+                const removeAllEventsButton = document.getElementById('removeAllEventsButton');
+            if (removeAllEventsButton) {
+                removeAllEventsButton.addEventListener('click', handleRemoveAllEvents);
+            }
+
+            // Fix Remove All Custom Themes button
+            const removeAllCustomThemesButton = document.getElementById('removeAllCustomThemesButton');
+            if (removeAllCustomThemesButton) {
+                removeAllCustomThemesButton.addEventListener('click', handleRemoveAllCustomThemes);
+            }
+
+            // Fix Reset Application button
+            const resetApplicationButton = document.getElementById('resetApplicationButton');
+            if (resetApplicationButton) {
+                resetApplicationButton.addEventListener('click', handleResetApplication);
+            }
         });
 
 
@@ -3353,6 +4230,11 @@ const initColorPalette = () => {
 
 
         const applyTheme = (effectiveTheme, inputs) => {
+            // Update select arrow color based on theme
+            const arrowColor = effectiveTheme.secondaryButtonText || '#8B4B66';
+            const encodedColor = encodeURIComponent(arrowColor);
+            const arrowSvg = `url("data:image/svg+xml;utf8,<svg fill='none' stroke='${encodedColor}' stroke-width='2' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'><path d='M6 9l6 6 6-6'/></svg>")`;
+            document.documentElement.style.setProperty('--select-arrow', arrowSvg);
             document.body.style.backgroundColor = effectiveTheme.bodyBg;
 
             document.documentElement.style.setProperty('--text-color', effectiveTheme.mainText);
@@ -3368,6 +4250,7 @@ const initColorPalette = () => {
 
             document.documentElement.style.setProperty('--secondary-button-bg', effectiveTheme.secondaryButtonBg);
             document.documentElement.style.setProperty('--secondary-button-text', effectiveTheme.secondaryButtonText);
+            document.documentElement.style.setProperty('--select-arrow-color', arrowColor);
             const secondaryTextRgb = hexToRgb(effectiveTheme.secondaryButtonText);
             if (secondaryTextRgb) {
                 document.documentElement.style.setProperty('--secondary-button-text-rgb', `${secondaryTextRgb.r}, ${secondaryTextRgb.g}, ${secondaryTextRgb.b}`);
@@ -3634,55 +4517,79 @@ const initColorPalette = () => {
 
 
         const renderCalendar = () => {
-            calendarEl.innerHTML = '';
+    calendarEl.innerHTML = '';
 
-            const year = currentDate.getFullYear();
-            const month = currentDate.getMonth();
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
 
-            currentMonthYearEl.textContent = new Date(year, month).toLocaleString('en-US', {
-                month: 'long',
-                year: 'numeric'
-            });
+    currentMonthYearEl.textContent = new Date(year, month).toLocaleString('en-US', {
+        month: 'long',
+        year: 'numeric'
+    });
 
-            const firstDayOfMonth = new Date(year, month, 1).getDay();
-            const numDaysInMonth = new Date(year, month + 1, 0).getDate();
+    // Get week start from localStorage (default 0 = Sunday)
+    let weekStart = parseInt(localStorage.getItem('weekStartDay') || '0', 10);
+    if (isNaN(weekStart) || weekStart < 0 || weekStart > 6) weekStart = 0;
 
-            for (let i = 0; i < firstDayOfMonth; i++) {
-                const emptyCell = document.createElement('div');
-                emptyCell.classList.add('day-cell', 'p-2', 'inactive');
-                emptyCell.style.borderColor = `var(--day-cell-border-color)`;
-                emptyCell.style.color = `var(--text-color)`;
-                calendarEl.appendChild(emptyCell);
-            }
+    // Render weekday headers
+    const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const orderedWeekDays = weekDays.slice(weekStart).concat(weekDays.slice(0, weekStart));
+    const headerRow = document.createElement('div');
+    headerRow.className = 'calendar-grid text-center font-bold text-sm uppercase tracking-wide mb-2 mt-4';
+    headerRow.style.color = 'var(--text-color)';
+    for (let i = 0; i < 7; i++) {
+        const dayHeader = document.createElement('div');
+        dayHeader.className = 'p-2';
+        dayHeader.textContent = orderedWeekDays[i];
+        headerRow.appendChild(dayHeader);
+    }
+    // Remove any existing header row
+    const scrollContainer = calendarEl.parentElement;
+    const oldHeader = scrollContainer.querySelector('.calendar-grid.text-center.font-bold');
+    if (oldHeader) oldHeader.remove();
+    scrollContainer.insertBefore(headerRow, calendarEl);
 
-            for (let day = 1; day <= numDaysInMonth; day++) {
-                const dayCell = document.createElement('div');
-                dayCell.classList.add('day-cell', 'p-2');
-                const fullDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                dayCell.dataset.date = fullDate;
+    // Calculate the first day index for the month, adjusted for weekStart
+    const firstDayOfMonth = new Date(year, month, 1).getDay();
+    const numDaysInMonth = new Date(year, month + 1, 0).getDate();
+    let leadingEmpty = (firstDayOfMonth - weekStart + 7) % 7;
 
-                const dayNumber = document.createElement('div');
-                dayNumber.classList.add('text-left', 'font-bold', 'text-lg', 'mb-2');
-                dayNumber.textContent = day;
-                dayNumber.style.color = `var(--text-color)`;
-                dayCell.appendChild(dayNumber);
+    for (let i = 0; i < leadingEmpty; i++) {
+        const emptyCell = document.createElement('div');
+        emptyCell.classList.add('day-cell', 'p-2', 'inactive');
+        emptyCell.style.borderColor = `var(--day-cell-border-color)`;
+        emptyCell.style.color = `var(--text-color)`;
+        calendarEl.appendChild(emptyCell);
+    }
 
-                const today = new Date();
-                if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
-                    dayCell.classList.add('current-day');
-                }
+    for (let day = 1; day <= numDaysInMonth; day++) {
+        const dayCell = document.createElement('div');
+        dayCell.classList.add('day-cell', 'p-2');
+        const fullDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        dayCell.dataset.date = fullDate;
 
-                const dayEvents = events.filter(event => {
-                    const eventDate = new Date(event.date);
-                    return eventDate.getDate() === day &&
-                           eventDate.getMonth() === month &&
-                           eventDate.getFullYear() === year &&
-                           event.date !== 'holder';
-                });
+        const dayNumber = document.createElement('div');
+        dayNumber.classList.add('text-left', 'font-bold', 'text-lg', 'mb-2');
+        dayNumber.textContent = day;
+        dayNumber.style.color = `var(--text-color)`;
+        dayCell.appendChild(dayNumber);
 
-                const eventContainer = document.createElement('div');
-                eventContainer.classList.add('event-container');
-                dayCell.appendChild(eventContainer);
+        const today = new Date();
+        if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+            dayCell.classList.add('current-day');
+        }
+
+        const dayEvents = events.filter(event => {
+            const eventDate = new Date(event.date);
+            return eventDate.getDate() === day &&
+                   eventDate.getMonth() === month &&
+                   eventDate.getFullYear() === year &&
+                   event.date !== 'holder';
+        });
+
+        const eventContainer = document.createElement('div');
+        eventContainer.classList.add('event-container');
+        dayCell.appendChild(eventContainer);
 
                 if (foldDayCellsEnabled && dayEvents.length > MAX_VISIBLE_EVENTS_FOLDED) {
                     dayCell.classList.add('folded');
@@ -3803,6 +4710,7 @@ const initColorPalette = () => {
                 if (event.effects.zigzag) eventItem.classList.add('zigzag-lines-effect');
                 if (event.effects.wavyLines) eventItem.classList.add('wavy-lines-effect');
                 if (event.effects.embossed) eventItem.classList.add('embossed-effect');
+                if (event.effects.win95Button) eventItem.classList.add('win95-button-effect');
 
                 if (event.effects.moveEffectHorizontally) eventItem.classList.add('move-effect-horizontal');
                 if (event.effects.moveEffectVertically) eventItem.classList.add('move-effect-vertical');
@@ -4078,6 +4986,7 @@ const initColorPalette = () => {
                         if (event.effects.zigzag) eventItem.classList.add('zigzag-lines-effect');
                         if (event.effects.wavyLines) eventItem.classList.add('wavy-lines-effect');
                         if (event.effects.embossed) eventItem.classList.add('embossed-effect');
+                        if (event.effects.win95Button) eventItem.classList.add('win95-button-effect');
 
                         if (event.effects.moveEffectHorizontally) eventItem.classList.add('move-effect-horizontal');
                         if (event.effects.moveEffectVertically) eventItem.classList.add('move-effect-vertical');
@@ -4322,43 +5231,49 @@ const initColorPalette = () => {
             eventIconInput.value = '';
             iconSearchInput.value = '';
             effectShowCheckbox.checked = false;
-            effectGlowing.checked = false;
-            effectStriped1.checked = false;
-            effectStriped2.checked = false;
-            effectThinStripes.checked = false;
-            effectDotted.checked = false;
-            effectCrosshatched.checked = false;
-            effectCheckerboard.checked = false;
-            effectArgyle.checked = false;
-            effectZigzag.checked = false;
-            effectWavyLines.checked = false;
-            effectEmbossed.checked = false;
-
-            effectMoveHorizontally.checked = false;
-            effectMoveVertically.checked = false;
-
-            effectParticles.checked = false;
-            effectSnowFalling.checked = false;
-            effectGlisteningStars.checked = false;
-            effectGradient.checked = false;
-            effectAnimatedStripes.checked = false;
-            effectAnimatedVerticalRainbow.checked = false;
-
-
-            document.querySelectorAll('#colorPalette .color-box').forEach(box => box.classList.remove('selected'));
-            document.querySelectorAll('.icon-item').forEach(item => item.classList.remove('selected'));
-
-            eventIconDisplay.innerHTML = '<i class="fas fa-plus"></i>'; 
-            eventIconDisplay.classList.remove('selected'); 
-
+        // Always focus and select the event title input when modal opens
+        setTimeout(function() {
+            if (eventTitleInput) {
+                eventTitleInput.focus();
+                eventTitleInput.select();
+            }
+        }, 50);
+        // Show duplicate button only in edit mode
+        const duplicateBtn = document.getElementById('duplicateEventBtn');
+        if (duplicateBtn) {
+            if (eventId) {
+                duplicateBtn.style.display = '';
+            } else {
+                duplicateBtn.style.display = 'none';
+            }
+        }
             let eventToEdit = null;
             if (eventId) {
                 eventToEdit = events.find(e => e.id === eventId) || holderEvents.find(e => e.id === eventId);
             }
 
+                // Add scroll-to-icon-grid handler every time modal opens
+                const eventIconDisplay = document.getElementById('eventIconDisplay');
+                if (eventIconDisplay) {
+                    eventIconDisplay.onclick = function() {
+                        const scrollable = document.querySelector('#event-modal .modal-content-scrollable');
+                        const iconGrid = document.getElementById('iconGrid');
+                        if (scrollable && iconGrid) {
+                            const scrollableRect = scrollable.getBoundingClientRect();
+                            const iconGridRect = iconGrid.getBoundingClientRect();
+                            const offset = iconGridRect.top - scrollableRect.top + scrollable.scrollTop;
+                            scrollable.scrollTo({ top: offset, behavior: 'smooth' });
+                        }
+                    };
+                }
+            // Show/hide modal footers and delete button based on mode
+            const addEventFooter = document.getElementById('add-event-footer');
+            const editEventFooter = document.getElementById('edit-event-footer');
             if (eventToEdit) {
                 modalTitle.textContent = 'Edit Event';
                 saveEventButton.textContent = 'Update Event';
+                if (editEventFooter) editEventFooter.style.display = '';
+                if (addEventFooter) addEventFooter.style.display = 'none';
                 deleteEventButton.classList.remove('hidden');
 
                 eventTitleInput.value = eventToEdit.title;
@@ -4366,21 +5281,20 @@ const initColorPalette = () => {
                 eventDescriptionInput.value = eventToEdit.description || '';
 
                 if (eventToEdit.date === 'holder') {
-                    eventDateInput.value = ''; 
-                    eventDateInput.disabled = true; 
+                    eventDateInput.value = '';
+                    eventDateInput.disabled = true;
                 } else {
                     eventDateInput.value = eventToEdit.date;
                     eventDateInput.disabled = false;
                 }
-                
+
                 let selectedColorPrimary;
                 let selectedColorText;
                 try {
                     const eventColor = JSON.parse(eventToEdit.color);
                     selectedColorPrimary = eventColor.primary;
                     selectedColorText = eventColor.text;
-                } catch (e) {
-                }
+                } catch (e) {}
                 const colorBox = document.querySelector(`#colorPalette .color-box[data-primary="${selectedColorPrimary}"][data-text-color="${selectedColorText}"]`);
                 if (colorBox) {
                     colorBox.classList.add('selected');
@@ -4395,7 +5309,6 @@ const initColorPalette = () => {
                     if(defaultColorBox) defaultColorBox.classList.add('selected');
                 }
 
-
                 if (eventToEdit.icon) {
                     eventIconDisplay.innerHTML = `<i class="${eventToEdit.icon}"></i>`;
                     eventIconDisplay.classList.add('selected');
@@ -4406,12 +5319,60 @@ const initColorPalette = () => {
                     eventIconInput.value = '';
                 }
                 initIconGrid();
-
+                // Attach duplicate event handler
+                if (duplicateBtn) {
+                    duplicateBtn.onclick = function() {
+                        // Duplicate the event
+                        if (!eventToEdit) return;
+                        const newEvent = JSON.parse(JSON.stringify(eventToEdit));
+                        newEvent.id = generateUniqueId();
+                        newEvent.title = eventToEdit.title + ' (Copy)';
+                        // Optionally, set date to today or keep same date
+                        events.push(newEvent);
+                        saveEvents();
+                        renderCalendar();
+                        closeEventModal();
+                        // Optionally, show a toast/notification
+                    };
+                }
+                
 
                 if (eventToEdit.effects) {
-                        effectShowCheckbox.checked = eventToEdit.effects.showCheckbox || false;
-                        effectGlowing.checked = eventToEdit.effects.glowing || false;
-                        effectStriped1.checked = eventToEdit.effects.striped1 || false;
+                    effectShowCheckbox.checked = eventToEdit.effects.showCheckbox || false;
+                    effectGlowing.checked = eventToEdit.effects.glowing || false;
+                    effectStriped1.checked = eventToEdit.effects.striped1 || false;
+                    effectStriped2.checked = eventToEdit.effects.striped2 || false;
+                    effectThinStripes.checked = eventToEdit.effects.thinStripes || false;
+                    effectDotted.checked = eventToEdit.effects.dotted || false;
+                    effectCrosshatched.checked = eventToEdit.effects.crosshatched || false;
+                    effectCheckerboard.checked = eventToEdit.effects.checkerboard || false;
+                    effectArgyle.checked = eventToEdit.effects.argyle || false;
+                    effectZigzag.checked = eventToEdit.effects.zigzag || false;
+                    effectWavyLines.checked = eventToEdit.effects.wavyLines || false;
+                    effectEmbossed.checked = eventToEdit.effects.embossed || false;
+                    effectWin95Button.checked = eventToEdit.effects.win95Button || false;
+
+                    effectMoveHorizontally.checked = eventToEdit.effects.moveEffectHorizontally || false;
+                    effectMoveVertically.checked = eventToEdit.effects.moveEffectVertically || false;
+
+                    effectParticles.checked = eventToEdit.effects.particles || false;
+                    effectSnowFalling.checked = eventToEdit.effects.snowFalling || false;
+                    effectGlisteningStars.checked = eventToEdit.effects.glisteningStars || false;
+                    effectGradient.checked = eventToEdit.effects.gradientEffect || false;
+                    effectAnimatedStripes.checked = eventToEdit.effects.animatedStripes || false;
+                    effectAnimatedVerticalRainbow.checked = eventToEdit.effects.animatedVerticalRainbow || false;
+                }
+            } else {
+                modalTitle.textContent = 'Add New Event';
+                saveEventButton.textContent = 'Save Event';
+                if (editEventFooter) editEventFooter.style.display = 'none';
+                if (addEventFooter) addEventFooter.style.display = '';
+                deleteEventButton.classList.add('hidden');
+                eventDateInput.value = date;
+                eventDateInput.disabled = (date === 'holder');
+                initColorPalette();
+                initIconGrid();
+            }
                         effectStriped2.checked = eventToEdit.effects.striped2 || false;
                         effectThinStripes.checked = eventToEdit.effects.thinStripes || false;
                         effectDotted.checked = eventToEdit.effects.dotted || false;
@@ -4421,6 +5382,7 @@ const initColorPalette = () => {
                         effectZigzag.checked = eventToEdit.effects.zigzag || false;
                         effectWavyLines.checked = eventToEdit.effects.wavyLines || false;
                         effectEmbossed.checked = eventToEdit.effects.embossed || false;
+                        effectWin95Button.checked = eventToEdit.effects.win95Button || false;
 
                         effectMoveHorizontally.checked = eventToEdit.effects.moveEffectHorizontally || false;
                         effectMoveVertically.checked = eventToEdit.effects.moveEffectVertically || false;
@@ -4433,16 +5395,8 @@ const initColorPalette = () => {
                         effectAnimatedVerticalRainbow.checked = eventToEdit.effects.animatedVerticalRainbow || false;
 
                 }
-            } else {
-                modalTitle.textContent = 'Add New Event';
-                saveEventButton.textContent = 'Save Event';
-                deleteEventButton.classList.add('hidden');
-                eventDateInput.value = date;
-                eventDateInput.disabled = (date === 'holder'); 
-                initColorPalette();
-                initIconGrid();
-            }
-        };
+
+        
 
         const closeEventModal = () => {
             eventModal.classList.add('hidden');
@@ -4474,6 +5428,7 @@ const initColorPalette = () => {
             zigzag: effectZigzag.checked,
             wavyLines: effectWavyLines.checked,
             embossed: effectEmbossed.checked,
+            win95Button: effectWin95Button.checked,
             moveEffectHorizontally: effectMoveHorizontally.checked,
             moveEffectVertically: effectMoveVertically.checked,
             particles: effectParticles.checked,
@@ -5133,6 +6088,21 @@ const initColorPalette = () => {
 
 
         window.onload = async () => {
+            // Scroll to icon grid when eventIconDisplay is clicked
+            if (eventIconDisplay) {
+                eventIconDisplay.addEventListener('click', () => {
+                    const scrollable = document.querySelector('#event-modal .modal-content-scrollable');
+                    const iconGrid = document.getElementById('iconGrid');
+                    if (scrollable && iconGrid) {
+                        // Scroll so iconGrid is visible at the bottom
+                        const scrollableRect = scrollable.getBoundingClientRect();
+                        const iconGridRect = iconGrid.getBoundingClientRect();
+                        // Calculate offset relative to scrollable
+                        const offset = iconGridRect.top - scrollableRect.top + scrollable.scrollTop;
+                        scrollable.scrollTo({ top: offset, behavior: 'smooth' });
+                    }
+                });
+            }
             calendarEl = document.getElementById('calendar');
             currentMonthYearEl = document.getElementById('currentMonthYear');
             prevMonthButton = document.getElementById('prevMonth');
@@ -5208,7 +6178,16 @@ const initColorPalette = () => {
             eventBorderThicknessValueDisplay = document.getElementById('eventBorderThicknessValue');
             dayCellMinWidthInput = document.getElementById('dayCellMinWidth');
             dayCellMinWidthValueDisplay = document.getElementById('dayCellMinWidthValue');
+            const cancelEditBtn = document.getElementById('cancelEditEvent');
 
+            const updateBtn = document.getElementById('updateEvent'); // FINALLY THE CANCEL BUTTON AND UPDATE EVENTS BUTTON GOT FIXED, I FEEL LIKE CRYING AHHHHH (15JULY2025-1:12PM)
+
+            if (cancelEditBtn) {
+            cancelEditBtn.addEventListener('click', closeEventModal);
+            }
+            if (updateBtn) {
+            updateBtn.addEventListener('click', handleSaveEvent);
+            }
 
             themeBodyBgInput = document.getElementById('themeBodyBg');
             themeTextColorInput = document.getElementById('themeTextColor');
@@ -5281,6 +6260,55 @@ const initColorPalette = () => {
                     savedCustomThemes, disableSidebarAnimations, hideScrollbars, foldDayCellsEnabled, 
                     showHolderByDefault, use24HourFormat, holderSidebarWidth, hideAddEventButtonInHolder);
             });
+
+            // Duplicate Event Button logic
+            const duplicateEventBtn = document.getElementById('duplicateEventBtn');
+            if (duplicateEventBtn) {
+                duplicateEventBtn.onclick = async () => {
+                    if (!editingEventId) return;
+                    const eventToDuplicate = events.find(e => e.id === editingEventId) || holderEvents.find(e => e.id === editingEventId);
+                    if (eventToDuplicate) {
+                        const newEvent = { ...eventToDuplicate, id: generateUniqueId(), completed: false };
+                        if (newEvent.date === 'holder') {
+                            holderEvents.push(newEvent);
+                        } else {
+                            events.push(newEvent);
+                        }
+                        await saveEvents();
+                        renderCalendar();
+                        renderHolderEvents();
+                        closeEventModal();
+                    }
+                };
+            }
+
+            // Patch openEventModal to show/hide the duplicate button and scroll modal to top
+            if (window.openEventModal) {
+                const originalOpenEventModal = window.openEventModal;
+                window.openEventModal = function(eventId = null, date = null) {
+                    originalOpenEventModal.call(this, eventId, date);
+                    if (duplicateEventBtn) {
+                        if (editingEventId) {
+                            duplicateEventBtn.style.display = "";
+                        } else {
+                            duplicateEventBtn.style.display = "none";
+                        }
+                        }
+                    // Scroll modal-content-scrollable to top
+                    const scrollable = document.querySelector('#event-modal .modal-content-scrollable');
+                    if (scrollable) scrollable.scrollTop = 0;
+                };
+            }
+
+            // Also scroll to top when settings modal is opened
+            if (window.openSettingsModal) {
+                const originalOpenSettingsModal = window.openSettingsModal;
+                window.openSettingsModal = function() {
+                    originalOpenSettingsModal.call(this);
+                    const scrollable = document.querySelector('#settings-modal .modal-content-scrollable');
+                    if (scrollable) scrollable.scrollTop = 0;
+                };
+            }
 
             const loadedSettings = await loadSettings();
 
@@ -5431,18 +6459,7 @@ const initColorPalette = () => {
                 initIconGrid(e.target.value);
             });
 
-            eventIconDisplay.addEventListener('click', () => {
-                const iconSection = document.getElementById('iconSearchInput').closest('div');
-                if (iconSection) {
-                    const modalScrollableContent = eventModal.querySelector('.modal-content-scrollable');
-                    if (modalScrollableContent) {
-                        modalScrollableContent.scrollTo({
-                            top: iconSection.offsetTop - (modalScrollableContent.offsetTop || 0),
-                            behavior: 'smooth'
-                        });
-                    }
-                }
-            });
+
 
 
             uiRoundnessInput.addEventListener('input', (e) => {
@@ -5613,27 +6630,33 @@ const initColorPalette = () => {
                 }
             });
 
-            removeAllEventsButton.addEventListener('click', handleRemoveAllEvents);
-            removeAllCustomThemesButton.addEventListener('click', handleRemoveAllCustomThemes);
-            resetApplicationButton.addEventListener('click', handleResetApplication);
-            saveCustomThemeButton.addEventListener('click', handleSaveCustomTheme); 
+            // removeAllEventsButton.addEventListener('click', handleRemoveAllEvents);
+            if (removeAllCustomThemesButton) removeAllCustomThemesButton.addEventListener('click', handleRemoveAllCustomThemes);
+            if (resetApplicationButton) resetApplicationButton.addEventListener('click', handleResetApplication);
+            if (saveCustomThemeButton) saveCustomThemeButton.addEventListener('click', handleSaveCustomTheme); 
 
-            contextEditEventButton.addEventListener('click', () => {
-                eventContextMenu.style.display = 'none';
-                if (contextMenuEventId) {
-                    openEventModal(contextMenuEventId);
-                }
-            });
+            if (contextEditEventButton) {
+                contextEditEventButton.addEventListener('click', () => {
+                    eventContextMenu.style.display = 'none';
+                    if (contextMenuEventId) {
+                        openEventModal(contextMenuEventId);
+                    }
+                });
+            }
 
-            contextDuplicateEventButton.addEventListener('click', () => {
-                eventContextMenu.style.display = 'none';
-                handleDuplicateEvent();
-            });
+            if (contextDuplicateEventButton) {
+                contextDuplicateEventButton.addEventListener('click', () => {
+                    eventContextMenu.style.display = 'none';
+                    handleDuplicateEvent();
+                });
+            }
 
-            contextDeleteEventButton.addEventListener('click', () => {
-                eventContextMenu.style.display = 'none';
-                handleDeleteEvent();
-            });
+            if (contextDeleteEventButton) {
+                contextDeleteEventButton.addEventListener('click', () => {
+                    eventContextMenu.style.display = 'none';
+                    handleDeleteEvent();
+                });
+            }
 
             document.addEventListener('click', (e) => {
                 if (eventContextMenu.style.display === 'flex' && !eventContextMenu.contains(e.target)) {
@@ -5647,8 +6670,251 @@ const initColorPalette = () => {
                     eventContextMenu.style.display = 'none';
                     contextMenuEventId = null;
                 }
-            });
+            })
         };
     </script>
 </body>
+</html>
+<!-- Google API scripts and sync logic -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://apis.google.com/js/api.js"></script>
+<script>
+// --- Google API Integration ---
+
+// --- Google Sign-In State Persistence ---
+function persistGoogleSignInState(userObj, token) {
+    if (userObj && token) {
+        localStorage.setItem('googleUser', JSON.stringify(userObj));
+        localStorage.setItem('googleAccessToken', token);
+        localStorage.setItem('googleTokenTimestamp', Date.now().toString());
+    } else {
+        localStorage.removeItem('googleUser');
+        localStorage.removeItem('googleAccessToken');
+        localStorage.removeItem('googleTokenTimestamp');
+    }
+}
+
+function isGoogleTokenExpired() {
+    const timestamp = parseInt(localStorage.getItem('googleTokenTimestamp'), 10);
+    // Google tokens are usually valid for 1 hour (3600 seconds)
+    return !timestamp || (Date.now() - timestamp > 55 * 60 * 1000); // 55 minutes for safety
+}
+
+async function restoreGoogleSignInState() {
+    const userStr = localStorage.getItem('googleUser');
+    const token = localStorage.getItem('googleAccessToken');
+    if (userStr && token && !isGoogleTokenExpired()) {
+        try {
+            const userObj = JSON.parse(userStr);
+            googleUser = userObj;
+            googleAccessToken = token;
+            setGoogleSyncUI(true);
+            updateGoogleSyncStatus('Signed in as ' + (googleUser?.email || 'Google User'), 'green');
+            isDriveSyncEnabled = true;
+            await fetchGoogleUser(); // Optionally refresh user info
+        } catch (e) {}
+    } else {
+        setGoogleSyncUI(false);
+        updateGoogleSyncStatus('Not signed in', 'var(--accent-color)');
+        // Optionally, you can auto-trigger sign-in here if you want silent sign-in:
+        // handleGoogleSignIn();
+    }
+}
+
+// --- Calendar Sync Last Synced Text ---
+function setLastCalendarSyncTime() {
+    const now = Date.now();
+    localStorage.setItem('calendarLastSync', now.toString());
+    updateLastCalendarSyncText();
+}
+
+function getLastCalendarSyncTime() {
+    const t = localStorage.getItem('calendarLastSync');
+    return t ? parseInt(t, 10) : null;
+}
+
+function updateLastCalendarSyncText() {
+    const el = document.getElementById('calendarLastSyncText');
+    if (!el) return;
+    const last = getLastCalendarSyncTime();
+    if (!last) {
+        el.textContent = '';
+        return;
+    }
+    const mins = Math.floor((Date.now() - last) / 60000);
+    if (mins < 1) {
+        el.textContent = 'Calendar synced just now';
+    } else {
+        el.textContent = `Calendar synced ${mins} minute${mins === 1 ? '' : 's'} ago`;
+    }
+}
+
+setInterval(updateLastCalendarSyncText, 60000);
+document.addEventListener('DOMContentLoaded', updateLastCalendarSyncText);
+const GOOGLE_API_KEY = ''; // API KEY
+const GOOGLE_CLIENT_ID = '691191163739-gl9c95o911f9p306p5e0cql1j1e1a47a.apps.googleusercontent.com';
+const DRIVE_FILE_NAME = 'AidahsCalendarSync.json';
+let googleUser = null;
+let googleTokenClient = null;
+let googleAccessToken = null;
+let googleDriveFileId = null;
+let isDriveSyncEnabled = false;
+let isCalendarSyncEnabled = false;
+
+function updateGoogleSyncStatus(text, color) {
+    const status = document.getElementById('googleSyncStatus');
+    if (status) {
+        status.textContent = text;
+        if (color) status.style.color = color;
+    }
+}
+
+function setGoogleSyncUI(signedIn) {
+    document.getElementById('googleSignInBtn').style.display = signedIn ? 'none' : '';
+    document.getElementById('googleSignOutBtn').style.display = signedIn ? '' : 'none';
+    document.getElementById('googleCalendarSyncToggle').disabled = !signedIn;
+    if (signedIn) {
+        persistGoogleSignInState(googleUser, googleAccessToken);
+    } else {
+        persistGoogleSignInState(null, null);
+    }
+}
+
+function initGoogleSyncUI() {
+    document.getElementById('googleSignInBtn').addEventListener('click', handleGoogleSignIn);
+    document.getElementById('googleSignOutBtn').addEventListener('click', handleGoogleSignOut);
+    document.getElementById('googleCalendarSyncToggle').addEventListener('change', (e) => {
+        isCalendarSyncEnabled = e.target.checked;
+        if (isCalendarSyncEnabled && googleUser) {
+            syncEventsToGoogleCalendar();
+        }
+    });
+    setGoogleSyncUI(false);
+}
+
+function handleGoogleSignIn() {
+    google.accounts.oauth2.initTokenClient({
+        client_id: GOOGLE_CLIENT_ID,
+        scope: 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/calendar',
+        callback: async (tokenResponse) => {
+            googleAccessToken = tokenResponse.access_token;
+            await fetchGoogleUser();
+            setGoogleSyncUI(true);
+            updateGoogleSyncStatus('Signed in as ' + (googleUser?.email || 'Google User'), 'green');
+            isDriveSyncEnabled = true;
+            await syncFromDrive();
+        }
+    }).requestAccessToken();
+}
+
+function handleGoogleSignOut() {
+    googleUser = null;
+    googleAccessToken = null;
+    isDriveSyncEnabled = false;
+    setGoogleSyncUI(false);
+    updateGoogleSyncStatus('Not signed in', 'var(--accent-color)');
+    persistGoogleSignInState(null, null);
+}
+
+async function fetchGoogleUser() {
+    if (!googleAccessToken) return;
+    const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+        headers: { Authorization: 'Bearer ' + googleAccessToken }
+    });
+    if (res.ok) {
+        googleUser = await res.json();
+    }
+}
+
+// --- Drive Sync ---
+async function syncToDrive() {
+    if (!isDriveSyncEnabled || !googleAccessToken) return;
+    const data = {
+        events,
+        holderEvents,
+        theme: currentBaseThemeKey,
+        isDarkModeActive,
+        savedCustomThemes
+    };
+    // Find or create file
+    // Remove any previous listeners to avoid duplicate actions
+
+    // Create file
+    const createRes = await fetch('https://www.googleapis.com/drive/v3/files?uploadType=multipart', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + googleAccessToken },
+        body: createDriveMultipartBody(DRIVE_FILE_NAME, '{}')
+    });
+    if (createRes.ok) {
+        const file = await createRes.json();
+        return file.id;
+    }
+    return null;
+}
+
+function createDriveMultipartBody(filename, jsonString) {
+    const boundary = '-------314159265358979323846';
+    const delimiter = '\r\n--' + boundary + '\r\n';
+    const closeDelim = '\r\n--' + boundary + '--';
+    const contentType = 'application/json';
+    let body = delimiter +
+        'Content-Type: application/json; charset=UTF-8\r\n\r\n' +
+        JSON.stringify({ name: filename, parents: ['appDataFolder'] }) +
+        delimiter +
+        'Content-Type: ' + contentType + '\r\n\r\n' +
+        jsonString +
+        closeDelim;
+    return body;
+}
+
+// --- Google Calendar Sync ---
+async function syncEventsToGoogleCalendar() {
+    if (!isCalendarSyncEnabled || !googleAccessToken) return;
+    // For each event, create or update in Google Calendar (simple demo: only add new events)
+    for (const ev of events) {
+        if (!ev.date) continue;
+        const event = {
+            summary: ev.title || 'Event',
+            description: ev.description || '',
+            start: { date: ev.date },
+            end: { date: ev.date }
+        };
+        await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + googleAccessToken,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(event)
+        });
+    }
+    updateGoogleSyncStatus('Events synced to Google Calendar', 'green');
+    setLastCalendarSyncTime();
+}
+
+// --- Hook into saveEvents/saveSettings ---
+const origSaveEvents = saveEvents;
+saveEvents = async function() {
+    await origSaveEvents.apply(this, arguments);
+    if (isDriveSyncEnabled && googleAccessToken) {
+        await syncToDrive();
+    }
+    if (isCalendarSyncEnabled && googleAccessToken) {
+        await syncEventsToGoogleCalendar();
+    }
+};
+
+const origSaveSettings = saveSettings;
+saveSettings = async function(...args) {
+    await origSaveSettings.apply(this, args);
+    if (isDriveSyncEnabled && googleAccessToken) {
+        await syncToDrive();
+    }
+};
+
+window.addEventListener('DOMContentLoaded', () => {
+    initGoogleSyncUI();
+    restoreGoogleSignInState();
+});
+</script>
 </html>
