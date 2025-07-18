@@ -326,7 +326,7 @@
             transition: background 0.2s, border-color 0.2s;
             position: relative;
             transition: 0.3ms all ease;
-            right: 2.5px;
+            right: 3px;
         }
         .custom-checkbox .checkmark-svg {
             opacity: 0;
@@ -342,23 +342,6 @@
         .custom-checkbox.checked {
             background: var(--event-item-primary-color);
             transition: 0.3ms all ease;
-        }
-
-        /* EVENT TEXT STYLING */
-        .event-title.centered, .event-description.centered {
-            text-align: center !important;
-        }
-        .event-title.right, .event-description.right {
-            text-align: right !important;
-        }
-        .event-title.italic, .event-description.italic {
-            font-style: italic !important;
-        }
-        .event-title.serif, .event-description.serif {
-            font-family: 'Times New Roman', Times, serif !important;
-        }
-        .event-title.monospace, .event-description.monospace {
-            font-family: 'Courier New', Courier, monospace !important;
         }
 
 
@@ -522,34 +505,6 @@
   transition: all 0.1s ease-in-out;
   text-align: center;
 }
-
-        /* for the icon placement dropdown bc I forgot how I did the week start day one ugh */
-        .styled-dropdown {
-            background: var(--main-container-bg);
-            color: var(--text-color);
-            border: 3px solid var(--day-cell-border-color);
-            border-radius: var(--ui-roundness);
-            padding: 0.1em 2em;
-            font-size: 1em;
-            font-family: inherit;
-            font-weight: 600;
-            transition: all 0.2s;
-            outline: none;
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.04);
-            min-width: 120px;
-            text-align: center;
-        }
-        .styled-dropdown:focus {
-            border-color: var(--accent-color);
-            box-shadow: 0 0 0 2px rgba(var(--accent-color-rgb, 224,133,176), 0.2);
-        }
-        .styled-dropdown option {
-            background: var(--day-cell-bg);
-            color: var(--text-color);
-        }
 
 
 
@@ -1176,106 +1131,6 @@
         .icon-item:hover {
             background-color: var(--secondary-button-hover-bg);
             transform: scale(1.05);
-        }
-
-                /* Icon Placement: Right (default) */
-        body[data-icon-placement="right"] .event-item .main-content {
-            flex-direction: row;
-        }
-        body[data-icon-placement="right"] .event-item .event-icon-container {
-            order: 2;
-            margin-left: 0.5rem;
-            margin-right: 0;
-            position: static;
-        }
-        body[data-icon-placement="right"] .event-item .text-content {
-            order: 1;
-        }
-
-        /* Icon Placement: Left */
-        body[data-icon-placement="left"] .event-item .main-content {
-            display: flex !important;
-            align-items: center !important;
-            flex-direction: row !important;
-            justify-content: flex-start !important;
-        }
-        body[data-icon-placement="left"] .event-item .event-icon-container {
-            order: 1 !important;
-            margin-right: 0.5em !important;
-            margin-left: 0 !important;
-            position: static !important;
-        }
-        body[data-icon-placement="left"] .event-item .text-content {
-            order: 2 !important;
-        }
-
-        /* Icon Placement: Top */
-        body[data-icon-placement="top"] .event-item .main-content {
-            display: flex !important;
-            flex-direction: column !important;
-            align-items: center !important;
-            justify-content: center !important;
-        }
-        body[data-icon-placement="top"] .event-item .event-icon-container {
-            order: 1 !important;
-            margin-bottom: 0.25rem !important;
-            margin-right: 0 !important;
-            margin-left: 0 !important;
-            position: static !important;
-        }
-        body[data-icon-placement="top"] .event-item .text-content {
-            order: 2 !important;
-            width: 100% !important;
-            justify-content: center !important;
-        }
-
-        /* Icon Placement: Top Left :D */
-        body[data-icon-placement="top-left"] .event-item .main-content {
-            display: flex !important;
-            flex-direction: column !important;
-            align-items: flex-start !important;
-            justify-content: flex-start !important;
-        }
-        body[data-icon-placement="top-left"] .event-item .icon-top-left-iconrow {
-            width: 100% !important;
-            text-align: left !important;
-            display: block !important;
-            margin-bottom: 0.1em !important;
-        }
-        body[data-icon-placement="top-left"] .event-item .icon-top-left-textrow {
-            width: 100% !important;
-            text-align: left !important;
-            display: block !important;
-        }
-        body[data-icon-placement="top-left"] .event-item .event-icon-container {
-            margin-bottom: 0 !important;
-            margin-left: 0 !important;
-            margin-right: 0 !important;
-            order: 1 !important;
-            position: static !important;
-        }
-        body[data-icon-placement="top-left"] .event-item .text-content {
-            order: 2 !important;
-            width: 100% !important;
-        }
-
-        /* Icon Placement: Top Right */
-        body[data-icon-placement="top-right"] .event-item .main-content {
-            display: flex !important;
-            flex-direction: column !important;
-            align-items: flex-end !important;
-            justify-content: flex-start !important;
-        }
-        body[data-icon-placement="top-right"] .event-item .event-icon-container {
-            margin-bottom: 0 !important;
-            margin-left: 0 !important;
-            margin-right: 0 !important;
-            order: 1 !important;
-            position: static !important;
-        }
-        body[data-icon-placement="top-right"] .event-item .text-content {
-            order: 2 !important;
-            width: 100% !important;
         }
 
         .color-palette {
@@ -2232,7 +2087,6 @@
             border-color: var(--accent-color) !important;
             box-shadow: 0 0 0 1px var(--accent-color) !important;
         }
-    }
     </style>
 </head>
 <body>
@@ -2334,40 +2188,6 @@
                     <input type="hidden" id="eventColor">
                 </div>
 
-                <label class="block text-sm font-medium text-gray-700 mb-2" style="color: var(--text-color);">TEXT STYLING</label>
-                <div class="mb-4" id="textStylingToggles">
-                    <label class="toggle-container">
-                        <input type="checkbox" id="eventToggleTitleCenter">
-                        <span class="toggle-label">Title in Center</span>
-                    </label>
-                    <label class="toggle-container">
-                        <input type="checkbox" id="eventToggleDescriptionCenter">
-                        <span class="toggle-label">Description in Center</span>
-                    </label>
-                    <label class="toggle-container">
-                        <input type="checkbox" id="eventToggleTitleRight">
-                        <span class="toggle-label">Title on the Right</span>
-                    </label>
-                    <label class="toggle-container">
-                        <input type="checkbox" id="eventToggleDescriptionRight">
-                        <span class="toggle-label">Description on the Right</span>
-                    </label>
-                    <label class="toggle-container">
-                        <input type="checkbox" id="eventToggleItalicized">
-                        <span class="toggle-label">Italicized</span>
-                    </label>
-                    <label class="toggle-container">
-                        <input type="checkbox" id="eventToggleSerifFont">
-                        <span class="toggle-label">Serif Font</span>
-                    </label>
-                    <label class="toggle-container">
-                        <input type="checkbox" id="eventToggleMonospaceFont">
-                        <span class="toggle-label">Monospace Font</span>
-                    </label>
-                </div>
-
-
-                <!---- EFFECTS ---->
                 <div class="mb-6">
                 <label class="block text-sm font-medium text-gray-700 mb-2" style="color: var(--text-color);">EFFECTS</label>
                 <div class="flex flex-col space-y-2">
@@ -2530,19 +2350,6 @@
                 <!-- Event Styling -->
                 <div class="mb-6">
                     <h4 class="h4-settings"><i class="fas fa-edit"></i> <b>Event Styling</b></h4>
-
-                    <div class="dropdown-container" style="margin-top:0.75rem;">
-                        <label for="iconPlacementDropdown">Icon Placement:</label>
-                        <select id="iconPlacementDropdown" class="styled-dropdown">
-                            <option value="right">Right</option>
-                            <option value="left">Left</option>
-                            <option value="top">Top</option>
-                            <option value="top-left">Top Left</option>
-                            <option value="top-right">Top Right</option>
-                        </select>
-                    </div>
-
-
                     <div class="toggle-container"><input type="checkbox" id="customizationCheckboxDashedBorderToggle"><label for="customizationCheckboxDashedBorderToggle" class="toggle-label">Checkbox Dashed Border (When Checked)</label></div>
                     <div class="toggle-container"><input type="checkbox" id="customizationStrikethroughTextToggle"><label for="customizationStrikethroughTextToggle" class="toggle-label">Strikethrough Text (When Checked)</label></div>
                     <div class="toggle-container"><input type="checkbox" id="customizationBoldTitleToggle"><label for="customizationBoldTitleToggle" class="toggle-label">Bold Event Titles</label></div>
@@ -2607,6 +2414,32 @@
                         </div>
                       </div>
                     </div>
+    <script>
+    // Ensure global events array exists
+    if (!window.events) window.events = [];
+    // Accordion logic
+    document.addEventListener('DOMContentLoaded', function() {
+      var acc = document.getElementById('customThemeAccordion');
+      var header = document.getElementById('customThemeAccordionHeader');
+      if (header && acc) {
+        header.addEventListener('click', function() {
+          acc.classList.toggle('open');
+        });
+      }
+      // Show more special themes logic
+      var themeList = document.getElementById('specialThemeBoxes');
+      var showMoreBtn = document.getElementById('showMoreThemesBtn');
+      if (showMoreBtn && themeList) {
+        showMoreBtn.addEventListener('click', function() {
+          themeList.classList.remove('collapsed');
+          showMoreBtn.style.display = 'none';
+          var grad = themeList.querySelector('.special-theme-gradient');
+          if (grad) grad.style.display = 'none';
+        });
+      }
+    });
+    </script>
+                
                     <div><h4 class="h4-settings"><i class="fas fa-download" style="padding-right: 8px;"></i><b>Saved Custom Themes</b></h4><div id="savedThemePreviews" class="flex flex-wrap gap-2 mt-2 justify-center"></div></div>
                 </div>
                 <hr class="my-6" style="border: 2px solid var(--day-cell-border-color);">
@@ -3488,39 +3321,9 @@
 
         // Ensure modal elements are initialized after DOMContentLoaded
 
-        // --- Icon Placement Dropdown Logic ---
-        function saveIconPlacement(value) {
-            try {
-                localStorage.setItem('eventIconPlacement', value);
-            } catch (e) {}
-            applyIconPlacement(value);
-        }
-        function applyIconPlacement(value) {
-            document.body.setAttribute('data-icon-placement', value);
-        }
-        function setupIconPlacementDropdown() {
-            var dropdown = document.getElementById('iconPlacementDropdown');
-            if (!dropdown) return;
-            // Set value from storage or default
-            var saved = 'right';
-            try {
-                saved = localStorage.getItem('eventIconPlacement') || 'right';
-            } catch (e) {}
-            dropdown.value = saved;
-            applyIconPlacement(saved);
-            if (!dropdown._iconPlacementListener) {
-                dropdown.addEventListener('change', function() {
-                    saveIconPlacement(this.value);
-                });
-                dropdown._iconPlacementListener = true;
-            }
-        }
+// --- Robust Edit Event Modal Button Listeners ---
 
-        // Call setup on DOMContentLoaded and when settings modal is opened
-        document.addEventListener('DOMContentLoaded', function() {
-            setupIconPlacementDropdown();
-        });
-        // If you have a function that opens the settings modal, call setupIconPlacementDropdown() there too.
+        
 
         // --- Slider Value Live Update ---
 function setupSliderValueLiveUpdate() {
@@ -4892,6 +4695,10 @@ const initColorPalette = () => {
             const textColorRgba25 = hexToRgba(eventColorData.text, 0.25);
             eventItem.style.setProperty('--event-item-text-color-rgba-25', textColorRgba25);
 
+
+
+
+
             eventItem.classList.add('event-item');
             eventItem.dataset.id = event.id;
             eventItem.title = `${event.title} ${event.time ? '(' + event.time + ')' : ''}${event.description ? ' - ' + event.description : ''}`;
@@ -4900,7 +4707,6 @@ const initColorPalette = () => {
             if (event.completed) {
                 eventItem.classList.add('completed');
             }
-            
 
             if (event.effects) {
                 if (event.effects.glowing) eventItem.classList.add('glowing');
@@ -4939,11 +4745,8 @@ const initColorPalette = () => {
             
 
 
-
             const mainContentDiv = document.createElement('div');
             mainContentDiv.classList.add('main-content');
-            // Always clear content first!
-            mainContentDiv.innerHTML = '';
 
             // Add checkbox if enabled!!!
             if (event.effects && event.effects.showCheckbox) {
@@ -5020,31 +4823,6 @@ const initColorPalette = () => {
             titlePart.textContent = event.title;
             timeTitleWrapper.appendChild(titlePart);
 
-            if (event.textStyling) {
-        // Remove all previous text styling classes first
-        titlePart.classList.remove('text-center', 'text-right', 'w-full', 'block', 'italic', 'font-serif', 'font-mono');
-
-        // Center or right align title
-        if (event.textStyling.center) {
-            titlePart.classList.add('text-center', 'w-full', 'block');
-        } else if (event.textStyling.right) {
-            titlePart.classList.add('text-right', 'w-full', 'block');
-        }
-
-        // Italic
-        if (event.textStyling.italic) {
-            titlePart.classList.add('italic');
-        }
-        // Serif
-        if (event.textStyling.serif) {
-            titlePart.classList.add('font-serif');
-        }
-        // Monospace
-        if (event.textStyling.mono) {
-            titlePart.classList.add('font-mono');
-        }
-    }
-
             textContentSpan.appendChild(timeTitleWrapper);
             mainContentDiv.appendChild(textContentSpan);
 
@@ -5061,15 +4839,13 @@ const initColorPalette = () => {
             }
 
 
-            // Add icon (if any)
             if (event.icon) {
                 const iconContainer = document.createElement('span');
                 iconContainer.classList.add('event-icon-container');
                 iconContainer.innerHTML = `<i class="${event.icon}"></i> `;
-                mainContentDiv.appendChild(iconContainer);
+                eventItem.appendChild(iconContainer);
+            } else {
             }
-            // Add text content
-            mainContentDiv.appendChild(textContentSpan);
             eventItem.appendChild(mainContentDiv);
 
 
@@ -5078,21 +4854,8 @@ const initColorPalette = () => {
                 eventDescriptionEl.classList.add('event-description');
                 eventDescriptionEl.style.color = adjustColor(eventColorData.text, 0.15);
                 eventDescriptionEl.textContent = event.description;
-
-                // Remove all previous text styling classes first
-                eventDescriptionEl.classList.remove('italic', 'font-serif', 'font-mono', 'text-center', 'text-right', 'w-full', 'block');
-                if (event.textStyling) {
-                    if (event.textStyling.italic) eventDescriptionEl.classList.add('italic');
-                    if (event.textStyling.serif) eventDescriptionEl.classList.add('font-serif');
-                    if (event.textStyling.mono) eventDescriptionEl.classList.add('font-mono');
-                    if (event.textStyling.descriptionCenter) {
-                    eventDescriptionEl.classList.add('text-center', 'w-full', 'block');
-                    } else if (event.textStyling.descriptionRight) {
-                    eventDescriptionEl.classList.add('text-right', 'w-full', 'block');
-                    }
-                }
                 eventItem.appendChild(eventDescriptionEl);
-                }
+            }
 
             eventItem.addEventListener('click', (e) => {
                 // Only open modal if not clicking the checkbox...
@@ -5333,31 +5096,6 @@ const initColorPalette = () => {
                 titlePart.textContent = event.title;
                 timeTitleWrapper.appendChild(titlePart);
 
-                if (event.textStyling) {
-                // Center or right align title
-                if (event.textStyling.center) {
-                    titlePart.classList.add('text-center', 'w-full', 'block');
-                } else if (event.textStyling.right) {
-                    titlePart.classList.add('text-right', 'w-full', 'block');
-                }
-
-                // Italic
-                if (event.textStyling.italic) {
-                    titlePart.classList.add('italic');
-                    if (eventDescriptionEl) eventDescriptionEl.classList.add('italic');
-                }
-                // Serif
-                if (event.textStyling.serif) {
-                    titlePart.classList.add('font-serif');
-                    if (eventDescriptionEl) eventDescriptionEl.classList.add('font-serif');
-                }
-                // Monospace
-                if (event.textStyling.mono) {
-                    titlePart.classList.add('font-mono');
-                    if (eventDescriptionEl) eventDescriptionEl.classList.add('font-mono');
-                }
-            }
-
                 textContentSpan.appendChild(timeTitleWrapper);
                 mainContentDiv.appendChild(textContentSpan);
 
@@ -5374,36 +5112,12 @@ const initColorPalette = () => {
                 }
 
 
-                // Remove any previous icon/text-content from mainContentDiv
-                mainContentDiv.innerHTML = '';
-                // Add icon and text content in correct order for all placements
-                const iconPlacement = document.body.getAttribute('data-icon-placement') || 'right';
-                let iconContainer = null;
                 if (event.icon) {
-                    iconContainer = document.createElement('span');
+                    const iconContainer = document.createElement('span');
                     iconContainer.classList.add('event-icon-container');
                     iconContainer.innerHTML = `<i class="${event.icon}"></i> `;
-                }
-                if (iconPlacement === 'left') {
-                    if (iconContainer) mainContentDiv.appendChild(iconContainer);
-                    mainContentDiv.appendChild(textContentSpan);
-                } else if (iconPlacement === 'top') {
-                    if (iconContainer) mainContentDiv.appendChild(iconContainer);
-                    mainContentDiv.appendChild(textContentSpan);
-                } else if (iconPlacement === 'top-left') {
-                    // Icon above, left-aligned, title below
-                    const iconRow = document.createElement('div');
-                    iconRow.classList.add('icon-top-left-iconrow');
-                    if (iconContainer) iconRow.appendChild(iconContainer);
-                    mainContentDiv.appendChild(iconRow);
-                    const textRow = document.createElement('div');
-                    textRow.classList.add('icon-top-left-textrow');
-                    textRow.appendChild(textContentSpan);
-                    mainContentDiv.appendChild(textRow);
+                    eventItem.appendChild(iconContainer);
                 } else {
-                    // Default: right
-                    mainContentDiv.appendChild(textContentSpan);
-                    if (iconContainer) mainContentDiv.appendChild(iconContainer);
                 }
                 eventItem.appendChild(mainContentDiv);
 
@@ -5584,26 +5298,6 @@ const initColorPalette = () => {
                     eventDateInput.disabled = false;
                 }
 
-                if (eventToEdit) {
-                const styling = eventToEdit.textStyling || {};
-                document.getElementById('eventToggleTitleCenter').checked = !!styling.center;
-                document.getElementById('eventToggleTitleRight').checked = !!styling.right;
-                document.getElementById('eventToggleDescriptionCenter').checked = !!styling.descriptionCenter;
-                document.getElementById('eventToggleDescriptionRight').checked = !!styling.descriptionRight;
-                document.getElementById('eventToggleItalicized').checked = !!styling.italic;
-                document.getElementById('eventToggleSerifFont').checked = !!styling.serif;
-                document.getElementById('eventToggleMonospaceFont').checked = !!styling.mono;
-                } else {
-                    // Reset all text styling toggles to false when adding a new event
-                    document.getElementById('eventToggleTitleCenter').checked = false;
-                    document.getElementById('eventToggleDescriptionCenter').checked = false;
-                    document.getElementById('eventToggleTitleRight').checked = false;
-                    document.getElementById('eventToggleDescriptionRight').checked = false;
-                    document.getElementById('eventToggleItalicized').checked = false;
-                    document.getElementById('eventToggleSerifFont').checked = false;
-                    document.getElementById('eventToggleMonospaceFont').checked = false;
-                }
-
                 let selectedColorPrimary;
                 let selectedColorText;
                 try {
@@ -5731,17 +5425,7 @@ const initColorPalette = () => {
             const color = eventColorInput.value;
             const icon = eventIconInput.value;
 
-            const textStyling = {
-            center: document.getElementById('eventToggleTitleCenter').checked,
-            right: document.getElementById('eventToggleTitleRight').checked,
-            descriptionCenter: document.getElementById('eventToggleDescriptionCenter').checked,
-            descriptionRight: document.getElementById('eventToggleDescriptionRight').checked,
-            italic: document.getElementById('eventToggleItalicized').checked,
-            serif: document.getElementById('eventToggleSerifFont').checked,
-            mono: document.getElementById('eventToggleMonospaceFont').checked
-            };
-
-        const effects = {
+            const effects = {
             showCheckbox: effectShowCheckbox.checked,
             glowing: effectGlowing.checked,
             striped1: effectStriped1.checked,
@@ -5763,85 +5447,8 @@ const initColorPalette = () => {
             gradientEffect: effectGradient.checked,
             animatedStripes: effectAnimatedStripes.checked,
             animatedVerticalRainbow: effectAnimatedVerticalRainbow.checked
-        };
 
-
-if (editingEventId) {
-    let eventIndex = events.findIndex(e => e.id === editingEventId);
-    if (eventIndex !== -1) {
-        if (date === 'holder') {
-            const eventToMove = events.splice(eventIndex, 1)[0];
-            eventToMove.title = title;
-            eventToMove.time = time;
-            eventToMove.date = date;
-            eventToMove.description = description;
-            eventToMove.color = color;
-            eventToMove.icon = icon;
-            eventToMove.effects = effects;
-            eventToMove.textStyling = textStyling;
-            eventToMove.completed = eventToMove.completed || false;
-            holderEvents.push(eventToMove);
-        } else {
-            // Update the existing event object in-place
-            const eventObj = events[eventIndex];
-            eventObj.title = title;
-            eventObj.time = time;
-            eventObj.date = date;
-            eventObj.description = description;
-            eventObj.color = color;
-            eventObj.icon = icon;
-            eventObj.effects = effects;
-            eventObj.textStyling = textStyling;
-            // Do not overwrite completed unless needed
-        }
-    } else {
-        eventIndex = holderEvents.findIndex(e => e.id === editingEventId);
-        if (eventIndex !== -1) {
-            if (date === 'holder') {
-                // Update the existing holder event object in-place
-                const eventObj = holderEvents[eventIndex];
-                eventObj.title = title;
-                eventObj.time = time;
-                eventObj.date = date;
-                eventObj.description = description;
-                eventObj.color = color;
-                eventObj.icon = icon;
-                eventObj.effects = effects;
-                eventObj.textStyling = textStyling;
-            } else {
-                const eventToMove = holderEvents.splice(eventIndex, 1)[0];
-                eventToMove.title = title;
-                eventToMove.time = time;
-                eventToMove.date = date;
-                eventToMove.description = description;
-                eventToMove.color = color;
-                eventToMove.icon = icon;
-                eventToMove.effects = effects;
-                eventToMove.textStyling = textStyling;
-                eventToMove.completed = eventToMove.completed || false;
-                events.push(eventToMove);
-            }
-        }
-    }
-} else {
-    const newEvent = {
-        id: generateUniqueId(),
-        title,
-        time,
-        date,
-        description,
-        color,
-        icon,
-        effects,
-        textStyling,
-        completed: false
-    };
-    if (date === 'holder') {
-        holderEvents.push(newEvent);
-    } else {
-        events.push(newEvent);
-    }
-}
+            };
 
             if (eventDateInput.disabled && editingEventId) {
                 const existingEvent = holderEvents.find(e => e.id === editingEventId);
@@ -5867,7 +5474,48 @@ if (editingEventId) {
                 return;
             }
 
-            // ...existing code...
+            if (editingEventId) {
+                let eventIndex = events.findIndex(e => e.id === editingEventId);
+                if (eventIndex !== -1) {
+                    if (date === 'holder') {
+                        const eventToMove = events.splice(eventIndex, 1)[0];
+                        eventToMove.title = title; eventToMove.time = time; eventToMove.date = date;
+                        eventToMove.description = description; eventToMove.color = color; eventToMove.icon = icon;
+                        eventToMove.effects = effects;
+                        eventToMove.completed = eventToMove.completed || false; // Preserve or set to false
+                        holderEvents.push(eventToMove);
+                    } else {
+                        events[eventIndex] = {
+                            id: editingEventId, title, time, date, description, color, icon, effects, completed: events[eventIndex].completed || false
+                        };
+                    }
+                } else {
+                    eventIndex = holderEvents.findIndex(e => e.id === editingEventId);
+                    if (eventIndex !== -1) {
+                        if (date === 'holder') {
+                            holderEvents[eventIndex] = {
+                                id: editingEventId, title, time, date, description, color, icon, effects, completed: holderEvents[eventIndex].completed || false
+                            };
+                        } else {
+                            const eventToMove = holderEvents.splice(eventIndex, 1)[0];
+                            eventToMove.title = title; eventToMove.time = time; eventToMove.date = date;
+                            eventToMove.description = description; eventToMove.color = color; eventToMove.icon = icon;
+                            eventToMove.effects = effects;
+                            eventToMove.completed = eventToMove.completed || false; // Preserve or set to false
+                            events.push(eventToMove);
+                        }
+                    }
+                }
+            } else {
+                const newEvent = {
+                    id: generateUniqueId(), title, time, date, description, color, icon, effects, completed: false
+                };
+                if (date === 'holder') {
+                    holderEvents.push(newEvent);
+                } else {
+                    events.push(newEvent);
+                }
+            }
             await saveEvents();
             renderCalendar();
             renderHolderEvents();
@@ -5927,7 +5575,7 @@ if (editingEventId) {
             if (contextMenuEventId) {
                 let eventToDuplicate = events.find(e => e.id === contextMenuEventId) || holderEvents.find(e => e.id === contextMenuEventId);
                 if (eventToDuplicate) {
-                    const newEvent = { ...eventToDuplicate, id: generateUniqueId(), completed: false };
+                    const newEvent = { ...eventToDuplicate, id: generateUniqueId(), completed: false }; // Duplicated event is not completed by default
                     if (newEvent.date === 'holder') {
                         holderEvents.push(newEvent);
                     } else {
