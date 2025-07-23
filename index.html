@@ -54,19 +54,17 @@
             border-color: var(--main-text-color); 
             transition: 0.3ms all ease;
             }
+            
             .accordion-content {
-            max-height: 0;
+            display: block !important;
+            max-height: 0 !important;
             overflow: hidden;
+            padding: 1.2rem;
             transition: max-height 0.3s cubic-bezier(0.4,0,0.2,1);
-            background: var(--main-container-bg);
-            border-radius: 0 0 8px 8px;
-            padding: -10px 1.2rem;
-            transition: 0.3ms all ease;
             }
             .accordion.open .accordion-content {
-            max-height: 1000px;
             padding: 1.2rem;
-            transition: 0.3ms all ease;
+            max-height: 1000px !important;
             }
 
         /* Pretty select dropdown */
@@ -290,8 +288,8 @@
         }
 
         .day-cell.folded {
-            max-height: 140px; 
-            overflow: hidden;
+            max-height: var(--day-cell-max-height, 140px);
+            overflow-y: auto !important;
             position: relative;
         }
 
@@ -326,7 +324,7 @@
             transition: background 0.2s, border-color 0.2s;
             position: relative;
             transition: 0.3ms all ease;
-            right: 3px;
+            right: 2.5px;
         }
         .custom-checkbox .checkmark-svg {
             opacity: 0;
@@ -342,6 +340,23 @@
         .custom-checkbox.checked {
             background: var(--event-item-primary-color);
             transition: 0.3ms all ease;
+        }
+
+        /* EVENT TEXT STYLING */
+        .event-title.centered, .event-description.centered {
+            text-align: center !important;
+        }
+        .event-title.right, .event-description.right {
+            text-align: right !important;
+        }
+        .event-title.italic, .event-description.italic {
+            font-style: italic !important;
+        }
+        .event-title.serif, .event-description.serif {
+            font-family: 'Times New Roman', Times, serif !important;
+        }
+        .event-title.monospace, .event-description.monospace {
+            font-family: 'Courier New', Courier, monospace !important;
         }
 
 
@@ -505,6 +520,34 @@
   transition: all 0.1s ease-in-out;
   text-align: center;
 }
+
+        /* for the icon placement dropdown bc I forgot how I did the week start day one ugh */
+        .styled-dropdown {
+            background: var(--secondary-button-bg);
+            color: var(--secondary-button-text);
+            border: 3px solid var(--day-cell-border-color);
+            border-radius: var(--ui-roundness);
+            padding: 0.1em 2em;
+            font-size: 1em;
+            font-family: inherit;
+            font-weight: 600;
+            transition: all 0.2s;
+            outline: none;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+            min-width: 120px;
+            text-align: center;
+        }
+        .styled-dropdown:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(var(--accent-color-rgb, 224,133,176), 0.2);
+        }
+        .styled-dropdown option {
+            background: var(--day-cell-bg);
+            color: var(--text-color);
+        }
 
 
 
@@ -1131,6 +1174,106 @@
         .icon-item:hover {
             background-color: var(--secondary-button-hover-bg);
             transform: scale(1.05);
+        }
+
+                /* Icon Placement: Right (default) */
+        body[data-icon-placement="right"] .event-item .main-content {
+            flex-direction: row;
+        }
+        body[data-icon-placement="right"] .event-item .event-icon-container {
+            order: 2;
+            margin-left: 0.5rem;
+            margin-right: 0;
+            position: static;
+        }
+        body[data-icon-placement="right"] .event-item .text-content {
+            order: 1;
+        }
+
+        /* Icon Placement: Left */
+        body[data-icon-placement="left"] .event-item .main-content {
+            display: flex !important;
+            align-items: center !important;
+            flex-direction: row !important;
+            justify-content: flex-start !important;
+        }
+        body[data-icon-placement="left"] .event-item .event-icon-container {
+            order: 1 !important;
+            margin-right: 0.5em !important;
+            margin-left: 0 !important;
+            position: static !important;
+        }
+        body[data-icon-placement="left"] .event-item .text-content {
+            order: 2 !important;
+        }
+
+        /* Icon Placement: Top */
+        body[data-icon-placement="top"] .event-item .main-content {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+        body[data-icon-placement="top"] .event-item .event-icon-container {
+            order: 1 !important;
+            margin-bottom: 0.25rem !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+            position: static !important;
+        }
+        body[data-icon-placement="top"] .event-item .text-content {
+            order: 2 !important;
+            width: 100% !important;
+            justify-content: center !important;
+        }
+
+        /* Icon Placement: Top Left :D */
+        body[data-icon-placement="top-left"] .event-item .main-content {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            justify-content: flex-start !important;
+        }
+        body[data-icon-placement="top-left"] .event-item .icon-top-left-iconrow {
+            width: 100% !important;
+            text-align: left !important;
+            display: block !important;
+            margin-bottom: 0.1em !important;
+        }
+        body[data-icon-placement="top-left"] .event-item .icon-top-left-textrow {
+            width: 100% !important;
+            text-align: left !important;
+            display: block !important;
+        }
+        body[data-icon-placement="top-left"] .event-item .event-icon-container {
+            margin-bottom: 0 !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            order: 1 !important;
+            position: static !important;
+        }
+        body[data-icon-placement="top-left"] .event-item .text-content {
+            order: 2 !important;
+            width: 100% !important;
+        }
+
+        /* Icon Placement: Top Right */
+        body[data-icon-placement="top-right"] .event-item .main-content {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: flex-end !important;
+            justify-content: flex-start !important;
+        }
+        body[data-icon-placement="top-right"] .event-item .event-icon-container {
+            margin-bottom: 0 !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            order: 1 !important;
+            position: static !important;
+        }
+        body[data-icon-placement="top-right"] .event-item .text-content {
+            order: 2 !important;
+            width: 100% !important;
         }
 
         .color-palette {
@@ -2087,6 +2230,7 @@
             border-color: var(--accent-color) !important;
             box-shadow: 0 0 0 1px var(--accent-color) !important;
         }
+    }
     </style>
 </head>
 <body>
@@ -2161,7 +2305,7 @@
                             <i class="fas fa-plus"></i> 
                         </div>
                         <input type="text" id="eventTitle" class="w-full p-3 focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200 flex-grow" style="color: var(--text-color); background-color: var(--day-cell-bg); border: 3px solid var(--day-cell-border-color);"
-                               placeholder="Enter event title...">
+                               placeholder="Enter event title!">
                     </div>
                 </div>
 
@@ -2188,6 +2332,40 @@
                     <input type="hidden" id="eventColor">
                 </div>
 
+                <label class="block text-sm font-medium text-gray-700 mb-2" style="color: var(--text-color);">TEXT STYLING</label>
+                <div class="mb-4" id="textStylingToggles">
+                    <label class="toggle-container">
+                        <input type="checkbox" id="eventToggleTitleCenter">
+                        <span class="toggle-label">Title in Center</span>
+                    </label>
+                    <label class="toggle-container">
+                        <input type="checkbox" id="eventToggleDescriptionCenter">
+                        <span class="toggle-label">Description in Center</span>
+                    </label>
+                    <label class="toggle-container">
+                        <input type="checkbox" id="eventToggleTitleRight">
+                        <span class="toggle-label">Title on the Right</span>
+                    </label>
+                    <label class="toggle-container">
+                        <input type="checkbox" id="eventToggleDescriptionRight">
+                        <span class="toggle-label">Description on the Right</span>
+                    </label>
+                    <label class="toggle-container">
+                        <input type="checkbox" id="eventToggleItalicized">
+                        <span class="toggle-label">Italicized</span>
+                    </label>
+                    <label class="toggle-container">
+                        <input type="checkbox" id="eventToggleSerifFont">
+                        <span class="toggle-label">Serif Font</span>
+                    </label>
+                    <label class="toggle-container">
+                        <input type="checkbox" id="eventToggleMonospaceFont">
+                        <span class="toggle-label">Monospace Font</span>
+                    </label>
+                </div>
+
+
+                <!---- EFFECTS ---->
                 <div class="mb-6">
                 <label class="block text-sm font-medium text-gray-700 mb-2" style="color: var(--text-color);">EFFECTS</label>
                 <div class="flex flex-col space-y-2">
@@ -2335,6 +2513,10 @@
                     <div class="toggle-container"><input type="checkbox" id="hideScrollbarsToggle"><label for="hideScrollbarsToggle" class="toggle-label">Hide Scrollbars</label></div>
                     <div class="toggle-container"><input type="checkbox" id="noBackgroundToggle"><label for="noBackgroundToggle" class="toggle-label">No Background (Full Screen)</label></div>
                     <div class="toggle-container"><input type="checkbox" id="foldDayCellsToggle"><label for="foldDayCellsToggle" class="toggle-label">Fold Day Cells (Scrollable) </label></div>
+                    <div class="input-group" style="margin-top:0.5em;">
+                        <label for="dayCellMaxHeightInput" style="margin-right:0.5em;">Day Cell Max Height (px):</label>
+                        <input type="number" id="dayCellMaxHeightInput" min="50" max="500" value="120" style="width:80px; background-color: var(--secondary-button-bg); border: 3px solid var(--day-cell-border-color); color: var(--secondary-button-text); padding: 0.1em; border-radius: var(--ui-roundness); text-align: center; font-weight: bold; font-size: 0.9em;">
+                    </div>
                 </div>
                 <hr class="my-6" style="border: 2px solid var(--day-cell-border-color);">
                 <!-- UI Appearance -->
@@ -2350,6 +2532,19 @@
                 <!-- Event Styling -->
                 <div class="mb-6">
                     <h4 class="h4-settings"><i class="fas fa-edit"></i> <b>Event Styling</b></h4>
+
+                    <div class="dropdown-container" style="margin-top:0.75rem;">
+                        <label for="iconPlacementDropdown">Icon Placement:</label>
+                        <select id="iconPlacementDropdown" class="styled-dropdown">
+                            <option value="right">Right</option>
+                            <option value="left">Left</option>
+                            <option value="top">Top</option>
+                            <option value="top-left">Top Left</option>
+                            <option value="top-right">Top Right</option>
+                        </select>
+                    </div>
+
+
                     <div class="toggle-container"><input type="checkbox" id="customizationCheckboxDashedBorderToggle"><label for="customizationCheckboxDashedBorderToggle" class="toggle-label">Checkbox Dashed Border (When Checked)</label></div>
                     <div class="toggle-container"><input type="checkbox" id="customizationStrikethroughTextToggle"><label for="customizationStrikethroughTextToggle" class="toggle-label">Strikethrough Text (When Checked)</label></div>
                     <div class="toggle-container"><input type="checkbox" id="customizationBoldTitleToggle"><label for="customizationBoldTitleToggle" class="toggle-label">Bold Event Titles</label></div>
@@ -2391,9 +2586,11 @@
                     </div>
                     <hr class="my-6" style="border: 2px solid var(--day-cell-border-color);">
                     <div>
-                      <div class="accordion" id="customThemeAccordion">
-                        <div class="accordion-header" id="customThemeAccordionHeader">Custom Theming Options ></div>
-                        <div class="accordion-content" id="customThemeAccordionContent">
+                    <div class="accordion" id="customThemeAccordion">
+                    <div class="accordion-header" id="customThemeAccordionHeader">
+                        Custom Theming Options
+                    </div>
+                    <div class="accordion-content" id="customThemeAccordionContent">
                           <div id="customColorPickersContainer" class="relative">
                             <h4 class="h4-settings"><b>Custom Theming</b></h4>
                             <div class="color-input-group"><label for="themeBodyBg">Background Color</label><input type="color" id="themeBodyBg"></div>
@@ -2414,32 +2611,6 @@
                         </div>
                       </div>
                     </div>
-    <script>
-    // Ensure global events array exists
-    if (!window.events) window.events = [];
-    // Accordion logic
-    document.addEventListener('DOMContentLoaded', function() {
-      var acc = document.getElementById('customThemeAccordion');
-      var header = document.getElementById('customThemeAccordionHeader');
-      if (header && acc) {
-        header.addEventListener('click', function() {
-          acc.classList.toggle('open');
-        });
-      }
-      // Show more special themes logic
-      var themeList = document.getElementById('specialThemeBoxes');
-      var showMoreBtn = document.getElementById('showMoreThemesBtn');
-      if (showMoreBtn && themeList) {
-        showMoreBtn.addEventListener('click', function() {
-          themeList.classList.remove('collapsed');
-          showMoreBtn.style.display = 'none';
-          var grad = themeList.querySelector('.special-theme-gradient');
-          if (grad) grad.style.display = 'none';
-        });
-      }
-    });
-    </script>
-                
                     <div><h4 class="h4-settings"><i class="fas fa-download" style="padding-right: 8px;"></i><b>Saved Custom Themes</b></h4><div id="savedThemePreviews" class="flex flex-wrap gap-2 mt-2 justify-center"></div></div>
                 </div>
                 <hr class="my-6" style="border: 2px solid var(--day-cell-border-color);">
@@ -2785,10 +2956,10 @@
                     dayCellBg: '#281b0d',
                     dayCellHoverBg: '#170f08',
                     currentDayBg: '#22160a',
-                    primaryButtonBg: '#663a1c',
-                    primaryButtonText: '#c89406',
-                    secondaryButtonBg: '#391c0b',
-                    secondaryButtonText: '#e0a906',
+                    primaryButtonBg: '#391c0b',
+                    primaryButtonText: '#e0a906',
+                    secondaryButtonBg: '#1f180c',
+                    secondaryButtonText: '#c89406',
                     accentColor: '#c89406', 
                     dayCellBorder: '#50371b',
                     arrowButtonBg: 'transparent',
@@ -3272,6 +3443,7 @@
         };
 
         let saveSettings = async (fontName, fontData, baseThemeKey, isDarkMode, uiRoundness, fontSize, eventRoundness, eventBorderThickness, dayCellMinWidth, customThemeColors = null, unlockedSpecialThemes = [], holderIconEnabledState = false, noBackgroundModeState = false, savedThemes = [], disableSidebarAnimationsState = false, hideScrollbarsState = false, foldDayCellsEnabledState = false, showHolderByDefaultState = false, use24HourFormatState = false, currentHolderSidebarWidth = 250, hideAddEventButtonInHolderState = false) => {
+            const maxHeightInput = document.getElementById('dayCellMaxHeightInput');
             const settings = {
                 customFontName: fontName,
                 customFontData: fontData,
@@ -3294,7 +3466,8 @@
                 showHolderByDefault: showHolderByDefaultState,
                 use24HourFormat: use24HourFormatState,
                 holderSidebarWidth: currentHolderSidebarWidth,
-                hideAddEventButtonInHolder: hideAddEventButtonInHolderState 
+                hideAddEventButtonInHolder: hideAddEventButtonInHolderState,
+                dayCellMaxHeight: maxHeightInput ? parseInt(maxHeightInput.value, 10) || 120 : 120
             };
             await Preferences.set({ key: 'calendarSettings', value: JSON.stringify(settings) });
         };
@@ -3319,14 +3492,131 @@
             darkModeButton, foldDayCellsToggle, showHolderByDefaultToggle, use24HourFormatToggle, addHolderEventButton, hideAddEventButtonInHolderToggle,
             holderResizeHandle, premadeThemeBoxesContainer;
 
-        // Ensure modal elements are initialized after DOMContentLoaded
+        // --- Icon Placement Dropdown Logic ---
+        function saveIconPlacement(value) {
+            try {
+                localStorage.setItem('eventIconPlacement', value);
+            } catch (e) {}
+            applyIconPlacement(value);
+        }
+        function applyIconPlacement(value) {
+            document.body.setAttribute('data-icon-placement', value);
+        }
+        function setupIconPlacementDropdown() {
+            var dropdown = document.getElementById('iconPlacementDropdown');
+            if (!dropdown) return;
+            // Set value from storage or default
+            var saved = 'right';
+            try {
+                saved = localStorage.getItem('eventIconPlacement') || 'right';
+            } catch (e) {}
+            dropdown.value = saved;
+            applyIconPlacement(saved);
+            if (!dropdown._iconPlacementListener) {
+                dropdown.addEventListener('change', function() {
+                    saveIconPlacement(this.value);
+                });
+                dropdown._iconPlacementListener = true;
+            }
+        }
 
-// --- Robust Edit Event Modal Button Listeners ---
+document.addEventListener('DOMContentLoaded', function() {
+  // icon placement
+  setupIconPlacementDropdown();
 
-        
+  const header = document.getElementById('customThemeAccordionHeader');
+  const accordion = document.getElementById('customThemeAccordion');
+
+  if (header && accordion) {
+    header.addEventListener('click', () => {
+      if (accordion.classList.contains('open')) {
+        // close it
+        accordion.classList.remove('open');
+        const content = accordion.querySelector('.accordion-content');
+        content.style.maxHeight = '0';
+        content.style.padding = '0 1.2rem';
+      } else {
+        // open it
+        accordion.classList.add('open');
+        const content = accordion.querySelector('.accordion-content');
+        content.style.maxHeight = content.scrollHeight + 'px';
+        content.style.padding = '1.2rem';
+      }
+    });
+
+    // Initially close the accordion
+    const content = accordion.querySelector('.accordion-content');
+    content.style.maxHeight = '0';
+    content.style.padding = '0 1.2rem';
+    accordion.classList.remove('open');
+  }
+});
+
 
         // --- Slider Value Live Update ---
 function setupSliderValueLiveUpdate() {
+// --- Day Cell Max Height Control ---
+function setupDayCellMaxHeightControl() {
+    const maxHeightInput = document.getElementById('dayCellMaxHeightInput');
+    const foldToggle = document.getElementById('foldDayCellsToggle');
+    function applyMaxHeight(save = true) {
+        const maxHeight = parseInt(maxHeightInput.value, 10) || 120;
+        // Save to calendarSettings
+        if (save) {
+            Preferences.get({ key: 'calendarSettings' }).then(({ value }) => {
+                let settings = value ? JSON.parse(value) : {};
+                settings.dayCellMaxHeight = maxHeight;
+                Preferences.set({ key: 'calendarSettings', value: JSON.stringify(settings) });
+            });
+        }
+        // Set CSS variable for max height
+        document.documentElement.style.setProperty('--day-cell-max-height', maxHeight + 'px');
+        // Update ALL day cells
+        const allDayCells = document.querySelectorAll('.day-cell');
+        if (foldToggle && foldToggle.checked) {
+            allDayCells.forEach(cell => {
+                cell.classList.add('folded');
+                cell.style.maxHeight = maxHeight + 'px';
+                cell.style.overflowY = 'auto';
+                // Always force scrollability, even if there are 0-3 events. It does not work yet
+                let eventsList = cell.querySelector('.events-list');
+                if (eventsList) {
+                    eventsList.style.maxHeight = (maxHeight - 8) + 'px'; 
+                    eventsList.style.overflowY = 'auto';
+                }
+            });
+        } else {
+            allDayCells.forEach(cell => {
+                cell.classList.remove('folded');
+                cell.style.maxHeight = '';
+                cell.style.overflowY = '';
+                let eventsList = cell.querySelector('.events-list');
+                if (eventsList) {
+                    eventsList.style.maxHeight = '';
+                    eventsList.style.overflowY = '';
+                }
+            });
+        }
+    }
+    // Restore saved value on load from calendarSettings
+    if (maxHeightInput) {
+        Preferences.get({ key: 'calendarSettings' }).then(({ value }) => {
+            let settings = value ? JSON.parse(value) : {};
+            let maxHeight = settings.dayCellMaxHeight !== undefined ? settings.dayCellMaxHeight : 120;
+            maxHeightInput.value = maxHeight;
+            applyMaxHeight(false);
+        });
+    }
+    if (maxHeightInput) {
+        maxHeightInput.addEventListener('input', () => applyMaxHeight(true));
+        maxHeightInput.addEventListener('change', () => applyMaxHeight(true));
+    }
+    if (foldToggle) {
+        foldToggle.addEventListener('change', () => applyMaxHeight(false));
+    }
+    // Initial apply
+    setTimeout(() => applyMaxHeight(false), 0);
+}
   const sliders = document.querySelectorAll('.slider-group input[type="range"]');
   sliders.forEach(slider => {
     const valueDisplay = slider.nextElementSibling;
@@ -3434,6 +3724,27 @@ if (document.readyState === 'loading') {
                 loadedCustomThemeColors = settings.customThemeColors || null;
                 loadedUnlockedSpecialThemes = settings.unlockedSpecialThemes || [];
                 loadedSavedCustomThemes = settings.savedCustomThemes || [];
+
+                // Restore dayCellMaxHeight to input and CSS variable
+                const maxHeightInput = document.getElementById('dayCellMaxHeightInput');
+                const foldToggle = document.getElementById('foldDayCellsToggle');
+                let maxHeight = settings.dayCellMaxHeight !== undefined ? settings.dayCellMaxHeight : 120;
+                if (maxHeightInput) {
+                    maxHeightInput.value = maxHeight;
+                }
+                document.documentElement.style.setProperty('--day-cell-max-height', maxHeight + 'px');
+                // Update all day cells
+                document.querySelectorAll('.day-cell').forEach(cell => {
+                    if (foldToggle && foldToggle.checked) {
+                        cell.classList.add('folded');
+                        cell.style.maxHeight = 'var(--day-cell-max-height)';
+                        cell.style.overflowY = 'auto';
+                    } else {
+                        cell.classList.remove('folded');
+                        cell.style.maxHeight = '';
+                        cell.style.overflowY = '';
+                    }
+                });
             }
 
             if (loadedCustomFontData && loadedCustomFontName) {
@@ -4695,10 +5006,6 @@ const initColorPalette = () => {
             const textColorRgba25 = hexToRgba(eventColorData.text, 0.25);
             eventItem.style.setProperty('--event-item-text-color-rgba-25', textColorRgba25);
 
-
-
-
-
             eventItem.classList.add('event-item');
             eventItem.dataset.id = event.id;
             eventItem.title = `${event.title} ${event.time ? '(' + event.time + ')' : ''}${event.description ? ' - ' + event.description : ''}`;
@@ -4707,6 +5014,7 @@ const initColorPalette = () => {
             if (event.completed) {
                 eventItem.classList.add('completed');
             }
+            
 
             if (event.effects) {
                 if (event.effects.glowing) eventItem.classList.add('glowing');
@@ -4745,8 +5053,11 @@ const initColorPalette = () => {
             
 
 
+
             const mainContentDiv = document.createElement('div');
             mainContentDiv.classList.add('main-content');
+            // Always clear content first!
+            mainContentDiv.innerHTML = '';
 
             // Add checkbox if enabled!!!
             if (event.effects && event.effects.showCheckbox) {
@@ -4823,6 +5134,31 @@ const initColorPalette = () => {
             titlePart.textContent = event.title;
             timeTitleWrapper.appendChild(titlePart);
 
+            if (event.textStyling) {
+        // Remove all previous text styling classes first
+        titlePart.classList.remove('text-center', 'text-right', 'w-full', 'block', 'italic', 'font-serif', 'font-mono');
+
+        // Center or right align title
+        if (event.textStyling.center) {
+            titlePart.classList.add('text-center', 'w-full', 'block');
+        } else if (event.textStyling.right) {
+            titlePart.classList.add('text-right', 'w-full', 'block');
+        }
+
+        // Italic
+        if (event.textStyling.italic) {
+            titlePart.classList.add('italic');
+        }
+        // Serif
+        if (event.textStyling.serif) {
+            titlePart.classList.add('font-serif');
+        }
+        // Monospace
+        if (event.textStyling.mono) {
+            titlePart.classList.add('font-mono');
+        }
+    }
+
             textContentSpan.appendChild(timeTitleWrapper);
             mainContentDiv.appendChild(textContentSpan);
 
@@ -4839,13 +5175,15 @@ const initColorPalette = () => {
             }
 
 
+            // Add icon (if any)
             if (event.icon) {
                 const iconContainer = document.createElement('span');
                 iconContainer.classList.add('event-icon-container');
                 iconContainer.innerHTML = `<i class="${event.icon}"></i> `;
-                eventItem.appendChild(iconContainer);
-            } else {
+                mainContentDiv.appendChild(iconContainer);
             }
+            // Add text content
+            mainContentDiv.appendChild(textContentSpan);
             eventItem.appendChild(mainContentDiv);
 
 
@@ -4854,8 +5192,21 @@ const initColorPalette = () => {
                 eventDescriptionEl.classList.add('event-description');
                 eventDescriptionEl.style.color = adjustColor(eventColorData.text, 0.15);
                 eventDescriptionEl.textContent = event.description;
+
+                // Remove all previous text styling classes first
+                eventDescriptionEl.classList.remove('italic', 'font-serif', 'font-mono', 'text-center', 'text-right', 'w-full', 'block');
+                if (event.textStyling) {
+                    if (event.textStyling.italic) eventDescriptionEl.classList.add('italic');
+                    if (event.textStyling.serif) eventDescriptionEl.classList.add('font-serif');
+                    if (event.textStyling.mono) eventDescriptionEl.classList.add('font-mono');
+                    if (event.textStyling.descriptionCenter) {
+                    eventDescriptionEl.classList.add('text-center', 'w-full', 'block');
+                    } else if (event.textStyling.descriptionRight) {
+                    eventDescriptionEl.classList.add('text-right', 'w-full', 'block');
+                    }
+                }
                 eventItem.appendChild(eventDescriptionEl);
-            }
+                }
 
             eventItem.addEventListener('click', (e) => {
                 // Only open modal if not clicking the checkbox...
@@ -5096,6 +5447,31 @@ const initColorPalette = () => {
                 titlePart.textContent = event.title;
                 timeTitleWrapper.appendChild(titlePart);
 
+                if (event.textStyling) {
+                // Center or right align title
+                if (event.textStyling.center) {
+                    titlePart.classList.add('text-center', 'w-full', 'block');
+                } else if (event.textStyling.right) {
+                    titlePart.classList.add('text-right', 'w-full', 'block');
+                }
+
+                // Italic
+                if (event.textStyling.italic) {
+                    titlePart.classList.add('italic');
+                    if (eventDescriptionEl) eventDescriptionEl.classList.add('italic');
+                }
+                // Serif
+                if (event.textStyling.serif) {
+                    titlePart.classList.add('font-serif');
+                    if (eventDescriptionEl) eventDescriptionEl.classList.add('font-serif');
+                }
+                // Monospace
+                if (event.textStyling.mono) {
+                    titlePart.classList.add('font-mono');
+                    if (eventDescriptionEl) eventDescriptionEl.classList.add('font-mono');
+                }
+            }
+
                 textContentSpan.appendChild(timeTitleWrapper);
                 mainContentDiv.appendChild(textContentSpan);
 
@@ -5112,12 +5488,36 @@ const initColorPalette = () => {
                 }
 
 
+                // Remove any previous icon/text-content from mainContentDiv
+                mainContentDiv.innerHTML = '';
+                // Add icon and text content in correct order for all placements
+                const iconPlacement = document.body.getAttribute('data-icon-placement') || 'right';
+                let iconContainer = null;
                 if (event.icon) {
-                    const iconContainer = document.createElement('span');
+                    iconContainer = document.createElement('span');
                     iconContainer.classList.add('event-icon-container');
                     iconContainer.innerHTML = `<i class="${event.icon}"></i> `;
-                    eventItem.appendChild(iconContainer);
+                }
+                if (iconPlacement === 'left') {
+                    if (iconContainer) mainContentDiv.appendChild(iconContainer);
+                    mainContentDiv.appendChild(textContentSpan);
+                } else if (iconPlacement === 'top') {
+                    if (iconContainer) mainContentDiv.appendChild(iconContainer);
+                    mainContentDiv.appendChild(textContentSpan);
+                } else if (iconPlacement === 'top-left') {
+                    // Icon above, left-aligned, title below
+                    const iconRow = document.createElement('div');
+                    iconRow.classList.add('icon-top-left-iconrow');
+                    if (iconContainer) iconRow.appendChild(iconContainer);
+                    mainContentDiv.appendChild(iconRow);
+                    const textRow = document.createElement('div');
+                    textRow.classList.add('icon-top-left-textrow');
+                    textRow.appendChild(textContentSpan);
+                    mainContentDiv.appendChild(textRow);
                 } else {
+                    // Default: right
+                    mainContentDiv.appendChild(textContentSpan);
+                    if (iconContainer) mainContentDiv.appendChild(iconContainer);
                 }
                 eventItem.appendChild(mainContentDiv);
 
@@ -5298,6 +5698,26 @@ const initColorPalette = () => {
                     eventDateInput.disabled = false;
                 }
 
+                if (eventToEdit) {
+                const styling = eventToEdit.textStyling || {};
+                document.getElementById('eventToggleTitleCenter').checked = !!styling.center;
+                document.getElementById('eventToggleTitleRight').checked = !!styling.right;
+                document.getElementById('eventToggleDescriptionCenter').checked = !!styling.descriptionCenter;
+                document.getElementById('eventToggleDescriptionRight').checked = !!styling.descriptionRight;
+                document.getElementById('eventToggleItalicized').checked = !!styling.italic;
+                document.getElementById('eventToggleSerifFont').checked = !!styling.serif;
+                document.getElementById('eventToggleMonospaceFont').checked = !!styling.mono;
+                } else {
+                    // Reset all text styling toggles to false when adding a new event
+                    document.getElementById('eventToggleTitleCenter').checked = false;
+                    document.getElementById('eventToggleDescriptionCenter').checked = false;
+                    document.getElementById('eventToggleTitleRight').checked = false;
+                    document.getElementById('eventToggleDescriptionRight').checked = false;
+                    document.getElementById('eventToggleItalicized').checked = false;
+                    document.getElementById('eventToggleSerifFont').checked = false;
+                    document.getElementById('eventToggleMonospaceFont').checked = false;
+                }
+
                 let selectedColorPrimary;
                 let selectedColorText;
                 try {
@@ -5425,7 +5845,17 @@ const initColorPalette = () => {
             const color = eventColorInput.value;
             const icon = eventIconInput.value;
 
-            const effects = {
+            const textStyling = {
+            center: document.getElementById('eventToggleTitleCenter').checked,
+            right: document.getElementById('eventToggleTitleRight').checked,
+            descriptionCenter: document.getElementById('eventToggleDescriptionCenter').checked,
+            descriptionRight: document.getElementById('eventToggleDescriptionRight').checked,
+            italic: document.getElementById('eventToggleItalicized').checked,
+            serif: document.getElementById('eventToggleSerifFont').checked,
+            mono: document.getElementById('eventToggleMonospaceFont').checked
+            };
+
+        const effects = {
             showCheckbox: effectShowCheckbox.checked,
             glowing: effectGlowing.checked,
             striped1: effectStriped1.checked,
@@ -5447,8 +5877,85 @@ const initColorPalette = () => {
             gradientEffect: effectGradient.checked,
             animatedStripes: effectAnimatedStripes.checked,
             animatedVerticalRainbow: effectAnimatedVerticalRainbow.checked
+        };
 
-            };
+
+if (editingEventId) {
+    let eventIndex = events.findIndex(e => e.id === editingEventId);
+    if (eventIndex !== -1) {
+        if (date === 'holder') {
+            const eventToMove = events.splice(eventIndex, 1)[0];
+            eventToMove.title = title;
+            eventToMove.time = time;
+            eventToMove.date = date;
+            eventToMove.description = description;
+            eventToMove.color = color;
+            eventToMove.icon = icon;
+            eventToMove.effects = effects;
+            eventToMove.textStyling = textStyling;
+            eventToMove.completed = eventToMove.completed || false;
+            holderEvents.push(eventToMove);
+        } else {
+            // Update the existing event object in-place
+            const eventObj = events[eventIndex];
+            eventObj.title = title;
+            eventObj.time = time;
+            eventObj.date = date;
+            eventObj.description = description;
+            eventObj.color = color;
+            eventObj.icon = icon;
+            eventObj.effects = effects;
+            eventObj.textStyling = textStyling;
+            // Do not overwrite completed unless needed
+        }
+    } else {
+        eventIndex = holderEvents.findIndex(e => e.id === editingEventId);
+        if (eventIndex !== -1) {
+            if (date === 'holder') {
+                // Update the existing holder event object in-place
+                const eventObj = holderEvents[eventIndex];
+                eventObj.title = title;
+                eventObj.time = time;
+                eventObj.date = date;
+                eventObj.description = description;
+                eventObj.color = color;
+                eventObj.icon = icon;
+                eventObj.effects = effects;
+                eventObj.textStyling = textStyling;
+            } else {
+                const eventToMove = holderEvents.splice(eventIndex, 1)[0];
+                eventToMove.title = title;
+                eventToMove.time = time;
+                eventToMove.date = date;
+                eventToMove.description = description;
+                eventToMove.color = color;
+                eventToMove.icon = icon;
+                eventToMove.effects = effects;
+                eventToMove.textStyling = textStyling;
+                eventToMove.completed = eventToMove.completed || false;
+                events.push(eventToMove);
+            }
+        }
+    }
+} else {
+    const newEvent = {
+        id: generateUniqueId(),
+        title,
+        time,
+        date,
+        description,
+        color,
+        icon,
+        effects,
+        textStyling,
+        completed: false
+    };
+    if (date === 'holder') {
+        holderEvents.push(newEvent);
+    } else {
+        events.push(newEvent);
+    }
+}
 
             if (eventDateInput.disabled && editingEventId) {
                 const existingEvent = holderEvents.find(e => e.id === editingEventId);
@@ -5472,49 +5979,6 @@ const initColorPalette = () => {
                 `;
                 document.body.appendChild(messageBox);
                 return;
-            }
-
-            if (editingEventId) {
-                let eventIndex = events.findIndex(e => e.id === editingEventId);
-                if (eventIndex !== -1) {
-                    if (date === 'holder') {
-                        const eventToMove = events.splice(eventIndex, 1)[0];
-                        eventToMove.title = title; eventToMove.time = time; eventToMove.date = date;
-                        eventToMove.description = description; eventToMove.color = color; eventToMove.icon = icon;
-                        eventToMove.effects = effects;
-                        eventToMove.completed = eventToMove.completed || false; // Preserve or set to false
-                        holderEvents.push(eventToMove);
-                    } else {
-                        events[eventIndex] = {
-                            id: editingEventId, title, time, date, description, color, icon, effects, completed: events[eventIndex].completed || false
-                        };
-                    }
-                } else {
-                    eventIndex = holderEvents.findIndex(e => e.id === editingEventId);
-                    if (eventIndex !== -1) {
-                        if (date === 'holder') {
-                            holderEvents[eventIndex] = {
-                                id: editingEventId, title, time, date, description, color, icon, effects, completed: holderEvents[eventIndex].completed || false
-                            };
-                        } else {
-                            const eventToMove = holderEvents.splice(eventIndex, 1)[0];
-                            eventToMove.title = title; eventToMove.time = time; eventToMove.date = date;
-                            eventToMove.description = description; eventToMove.color = color; eventToMove.icon = icon;
-                            eventToMove.effects = effects;
-                            eventToMove.completed = eventToMove.completed || false; // Preserve or set to false
-                            events.push(eventToMove);
-                        }
-                    }
-                }
-            } else {
-                const newEvent = {
-                    id: generateUniqueId(), title, time, date, description, color, icon, effects, completed: false
-                };
-                if (date === 'holder') {
-                    holderEvents.push(newEvent);
-                } else {
-                    events.push(newEvent);
-                }
             }
             await saveEvents();
             renderCalendar();
@@ -5575,7 +6039,7 @@ const initColorPalette = () => {
             if (contextMenuEventId) {
                 let eventToDuplicate = events.find(e => e.id === contextMenuEventId) || holderEvents.find(e => e.id === contextMenuEventId);
                 if (eventToDuplicate) {
-                    const newEvent = { ...eventToDuplicate, id: generateUniqueId(), completed: false }; // Duplicated event is not completed by default
+                    const newEvent = { ...eventToDuplicate, id: generateUniqueId(), completed: false };
                     if (newEvent.date === 'holder') {
                         holderEvents.push(newEvent);
                     } else {
@@ -6718,16 +7182,17 @@ async function restoreGoogleSignInState() {
             const userObj = JSON.parse(userStr);
             googleUser = userObj;
             googleAccessToken = token;
-            setGoogleSyncUI(true);
-            updateGoogleSyncStatus('Signed in as ' + (googleUser?.email || 'Google User'), 'green');
-            isDriveSyncEnabled = true;
-            await fetchGoogleUser(); // Optionally refresh user info
-        } catch (e) {}
+            // Try silent sign-in to refresh token
+            handleGoogleSilentSignInWithFallback();
+        } catch (e) {
+            persistGoogleSignInState(null, null);
+            setGoogleSyncUI(false);
+            updateGoogleSyncStatus('Not signed in', 'var(--accent-color)');
+        }
     } else {
+        persistGoogleSignInState(null, null);
         setGoogleSyncUI(false);
         updateGoogleSyncStatus('Not signed in', 'var(--accent-color)');
-        // Optionally, you can auto-trigger sign-in here if you want silent sign-in:
-        // handleGoogleSignIn();
     }
 }
 
@@ -6761,7 +7226,7 @@ function updateLastCalendarSyncText() {
 
 setInterval(updateLastCalendarSyncText, 60000);
 document.addEventListener('DOMContentLoaded', updateLastCalendarSyncText);
-const GOOGLE_API_KEY = ''; // API KEY
+const GOOGLE_API_KEY = 'AIzaSyBSPy6P2LkaKk6r4Al-UMPI6gMnyNvtB0E'; // API KEY
 const GOOGLE_CLIENT_ID = '691191163739-gl9c95o911f9p306p5e0cql1j1e1a47a.apps.googleusercontent.com';
 const DRIVE_FILE_NAME = 'AidahsCalendarSync.json';
 let googleUser = null;
@@ -6803,7 +7268,7 @@ function initGoogleSyncUI() {
 }
 
 function handleGoogleSignIn() {
-    google.accounts.oauth2.initTokenClient({
+    googleTokenClient = google.accounts.oauth2.initTokenClient({
         client_id: GOOGLE_CLIENT_ID,
         scope: 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/calendar',
         callback: async (tokenResponse) => {
@@ -6814,7 +7279,66 @@ function handleGoogleSignIn() {
             isDriveSyncEnabled = true;
             await syncFromDrive();
         }
-    }).requestAccessToken();
+    });
+    googleTokenClient.requestAccessToken();
+}
+
+function handleGoogleSilentSignIn() {
+    if (!googleTokenClient) {
+        googleTokenClient = google.accounts.oauth2.initTokenClient({
+            client_id: GOOGLE_CLIENT_ID,
+            scope: 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/calendar',
+            callback: async (tokenResponse) => {
+                googleAccessToken = tokenResponse.access_token;
+                await fetchGoogleUser();
+                setGoogleSyncUI(true);
+                updateGoogleSyncStatus('Signed in as ' + (googleUser?.email || 'Google User'), 'green');
+                isDriveSyncEnabled = true;
+                await syncFromDrive();
+            }
+        });
+    }
+    // Try silent sign-in (no prompt)
+    googleTokenClient.requestAccessToken({ prompt: 'none' });
+}
+
+// Silent sign-in with fallback to interactive sign-in if it fails
+function handleGoogleSilentSignInWithFallback() {
+    let silentSignInCompleted = false;
+    if (!googleTokenClient) {
+        googleTokenClient = google.accounts.oauth2.initTokenClient({
+            client_id: GOOGLE_CLIENT_ID,
+            scope: 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/calendar',
+            callback: async (tokenResponse) => {
+                if (tokenResponse && tokenResponse.access_token) {
+                    silentSignInCompleted = true;
+                    googleAccessToken = tokenResponse.access_token;
+                    await fetchGoogleUser();
+                    setGoogleSyncUI(true);
+                    updateGoogleSyncStatus('Signed in as ' + (googleUser?.email || 'Google User'), 'green');
+                    isDriveSyncEnabled = true;
+                    persistGoogleSignInState(googleUser, googleAccessToken);
+                    await syncFromDrive();
+                } else {
+                    persistGoogleSignInState(null, null);
+                    setGoogleSyncUI(false);
+                    updateGoogleSyncStatus('Not signed in', 'var(--accent-color)');
+                }
+            }
+        });
+    }
+    // Try silent sign-in (no prompt)
+    googleTokenClient.requestAccessToken({ prompt: 'none' });
+    // Fallback: after a short delay, if silent sign-in did not succeed, prompt user
+    setTimeout(() => {
+        if (!googleAccessToken) {
+            persistGoogleSignInState(null, null);
+            setGoogleSyncUI(false);
+            updateGoogleSyncStatus('Not signed in', 'var(--accent-color)');
+            // Silent sign-in failed, prompt user
+            handleGoogleSignIn();
+        }
+    }, 1500);
 }
 
 function handleGoogleSignOut() {
@@ -6846,18 +7370,43 @@ async function syncToDrive() {
         isDarkModeActive,
         savedCustomThemes
     };
-    // Find or create file
-    // Remove any previous listeners to avoid duplicate actions
-
-    // Create file
-    const createRes = await fetch('https://www.googleapis.com/drive/v3/files?uploadType=multipart', {
-        method: 'POST',
-        headers: { 'Authorization': 'Bearer ' + googleAccessToken },
-        body: createDriveMultipartBody(DRIVE_FILE_NAME, '{}')
-    });
-    if (createRes.ok) {
-        const file = await createRes.json();
-        return file.id;
+    // Find file by name
+    let fileId = googleDriveFileId;
+    if (!fileId) {
+        const searchRes = await fetch('https://www.googleapis.com/drive/v3/files?q=name%3D%27' + encodeURIComponent(DRIVE_FILE_NAME) + '%27 and trashed=false and parents in (appDataFolder)', {
+            headers: { 'Authorization': 'Bearer ' + googleAccessToken }
+        });
+        if (searchRes.ok) {
+            const result = await searchRes.json();
+            if (result.files && result.files.length > 0) {
+                fileId = result.files[0].id;
+                googleDriveFileId = fileId;
+            }
+        }
+    }
+    if (fileId) {
+        // Update file
+        await fetch('https://www.googleapis.com/upload/drive/v3/files/' + fileId + '?uploadType=media', {
+            method: 'PATCH',
+            headers: {
+                'Authorization': 'Bearer ' + googleAccessToken,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        return fileId;
+    } else {
+        // Create file
+        const createRes = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + googleAccessToken },
+            body: createDriveMultipartBody(DRIVE_FILE_NAME, JSON.stringify(data))
+        });
+        if (createRes.ok) {
+            const file = await createRes.json();
+            googleDriveFileId = file.id;
+            return file.id;
+        }
     }
     return null;
 }
@@ -6880,9 +7429,26 @@ function createDriveMultipartBody(filename, jsonString) {
 // --- Google Calendar Sync ---
 async function syncEventsToGoogleCalendar() {
     if (!isCalendarSyncEnabled || !googleAccessToken) return;
-    // For each event, create or update in Google Calendar (simple demo: only add new events)
+    // Get existing events from Google Calendar (only those created by this app)
+    const existingRes = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events?maxResults=2500', {
+        headers: { 'Authorization': 'Bearer ' + googleAccessToken }
+    });
+    let existingEvents = [];
+    if (existingRes.ok) {
+        const result = await existingRes.json();
+        existingEvents = result.items || [];
+    }
+    // Map by summary and date
+    const existingMap = {};
+    for (const ev of existingEvents) {
+        if (ev.summary && ev.start && ev.start.date) {
+            existingMap[ev.summary + '_' + ev.start.date] = ev.id;
+        }
+    }
     for (const ev of events) {
         if (!ev.date) continue;
+        const key = (ev.title || 'Event') + '_' + ev.date;
+        if (existingMap[key]) continue; // Already exists, skip
         const event = {
             summary: ev.title || 'Event',
             description: ev.description || '',
