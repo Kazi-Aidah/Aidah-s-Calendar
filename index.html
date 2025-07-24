@@ -2509,6 +2509,30 @@
                 <div class="mb-6">
                     <h4 class="h4-settings"><i class="fas fa-sliders-h"></i> <b>Application Settings</b></h4>
                     <div class="dropdown-container"><label for="weekStartDropdown">Week Start Day</label><select id="weekStartDropdown"><option value="0">Sunday</option><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option></select></div>
+                    <div class="toggle-container" id="colorWeekendsSettingsRow" style="display:flex;align-items:center;margin-top:8px;margin-bottom:8px;gap:12px;">
+                        <input type="checkbox" id="colorWeekendsToggle">
+                        <label for="colorWeekendsToggle" class="toggle-label" style="margin-bottom:0;">Color Weekends</label>
+                    </div>
+                    <div id="weekendTintControls" style="display:none;margin-top:2px;margin-bottom:6px;align-items:center;gap:8px;">
+                        <label for="weekendTintColorPicker" style="margin:0;">> Weekends Tinting</label>
+                        <input type="color" id="weekendTintColorPicker" value="#ffe4e1">
+                    </div>
+    <style>
+    .weekend-tint {
+        position: relative;
+        overflow: hidden;
+    }
+    .weekend-tint::after {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        pointer-events: none;
+        background: var(--weekend-tint-color, #ffe4e1);
+        opacity: 0.7;
+        mix-blend-mode: multiply;
+        z-index: 1;
+    }
+    </style>
                     <div class="toggle-container"><input type="checkbox" id="use24HourFormatToggle"><label for="use24HourFormatToggle" class="toggle-label">Use 24-Hour Format</label></div>
                     <div class="toggle-container"><input type="checkbox" id="hideScrollbarsToggle"><label for="hideScrollbarsToggle" class="toggle-label">Hide Scrollbars</label></div>
                     <div class="toggle-container"><input type="checkbox" id="noBackgroundToggle"><label for="noBackgroundToggle" class="toggle-label">No Background (Full Screen)</label></div>
@@ -2689,6 +2713,64 @@
         <button id="contextDeleteEvent"><i class="fas fa-trash"></i> Delete Event</button>
     </div>
     <script>
+
+
+// --- Unified Weekend Coloring Settings Logic ---
+function updateWeekendTintControlsVisibility() {
+    var colorWeekendsToggle = document.getElementById('colorWeekendsToggle');
+    var weekendTintControls = document.getElementById('weekendTintControls');
+    if (colorWeekendsToggle && weekendTintControls) {
+        weekendTintControls.style.display = colorWeekendsToggle.checked ? 'flex' : 'none';
+    }
+    var weekendTintColorPicker = document.getElementById('weekendTintColorPicker');
+    if (weekendTintColorPicker) {
+        weekendTintColorPicker.disabled = !colorWeekendsToggle.checked;
+    }
+}
+
+function syncWeekendSettingsUI() {
+    var colorWeekendsToggle = document.getElementById('colorWeekendsToggle');
+    var weekendTintColorPicker = document.getElementById('weekendTintColorPicker');
+    var colorWeekends = localStorage.getItem('settingsColorWeekends') === '1';
+    var weekendTintColor = localStorage.getItem('settingsWeekendTintColor') || '#ffe4e1';
+    if (colorWeekendsToggle) colorWeekendsToggle.checked = colorWeekends;
+    if (weekendTintColorPicker) weekendTintColorPicker.value = weekendTintColor;
+    document.documentElement.style.setProperty('--weekend-tint-color', weekendTintColor);
+    updateWeekendTintControlsVisibility();
+}
+
+function saveWeekendSettings() {
+    var colorWeekendsToggle = document.getElementById('colorWeekendsToggle');
+    var weekendTintColorPicker = document.getElementById('weekendTintColorPicker');
+    localStorage.setItem('settingsColorWeekends', colorWeekendsToggle && colorWeekendsToggle.checked ? '1' : '');
+    if (weekendTintColorPicker) {
+        localStorage.setItem('settingsWeekendTintColor', weekendTintColorPicker.value);
+        document.documentElement.style.setProperty('--weekend-tint-color', weekendTintColorPicker.value);
+    }
+}
+
+function setupWeekendSettingsListeners() {
+    var colorWeekendsToggle = document.getElementById('colorWeekendsToggle');
+    var weekendTintColorPicker = document.getElementById('weekendTintColorPicker');
+    if (colorWeekendsToggle) {
+        colorWeekendsToggle.addEventListener('change', function() {
+            saveWeekendSettings();
+            updateWeekendTintControlsVisibility();
+            if (typeof renderCalendar === 'function') renderCalendar();
+        });
+    }
+    if (weekendTintColorPicker) {
+        weekendTintColorPicker.addEventListener('input', function() {
+            saveWeekendSettings();
+            if (typeof renderCalendar === 'function') renderCalendar();
+        });
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    syncWeekendSettingsUI();
+    setupWeekendSettingsListeners();
+});
         let currentDate = new Date();
         let events = [];
         let holderEvents = [];
@@ -4858,10 +4940,15 @@ const initColorPalette = () => {
     const headerRow = document.createElement('div');
     headerRow.className = 'calendar-grid text-center font-bold text-sm uppercase tracking-wide mb-2 mt-4';
     headerRow.style.color = 'var(--text-color)';
+    // Weekend coloring settings
+    let colorWeekends = localStorage.getItem('settingsColorWeekends') === '1';
+    let weekendTintColor = localStorage.getItem('settingsWeekendTintColor') || '#ffe4e1';
+    document.documentElement.style.setProperty('--weekend-tint-color', weekendTintColor);
     for (let i = 0; i < 7; i++) {
         const dayHeader = document.createElement('div');
         dayHeader.className = 'p-2';
         dayHeader.textContent = orderedWeekDays[i];
+        // Do NOT apply .weekend-tint to weekday headers
         headerRow.appendChild(dayHeader);
     }
     // Remove any existing header row
@@ -4888,6 +4975,48 @@ const initColorPalette = () => {
         dayCell.classList.add('day-cell', 'p-2');
         const fullDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         dayCell.dataset.date = fullDate;
+
+        // Tint Friday/Saturday columns if enabled
+        if (colorWeekends) {
+            const dateObj = new Date(year, month, day);
+            let weekdayIdx = (dateObj.getDay() - weekStart + 7) % 7;
+            const weekdayName = orderedWeekDays[weekdayIdx];
+            if (weekdayName === 'Fri' || weekdayName === 'Sat') {
+                dayCell.classList.add('weekend-tint');
+            }
+        }
+    // --- Weekend Coloring Settings Logic ---
+    function initWeekendColoringSettings() {
+        const colorWeekendsToggle = document.getElementById('colorWeekendsToggle');
+        const weekendTintColorPicker = document.getElementById('weekendTintColorPicker');
+        if (!colorWeekendsToggle || !weekendTintColorPicker) return;
+        // Restore from localStorage
+        let colorWeekends = localStorage.getItem('settingsColorWeekends') === '1';
+        let weekendTintColor = localStorage.getItem('settingsWeekendTintColor') || '#ffe4e1';
+        colorWeekendsToggle.checked = colorWeekends;
+        weekendTintColorPicker.value = weekendTintColor;
+        weekendTintColorPicker.disabled = !colorWeekends;
+        colorWeekendsToggle.addEventListener('change', function() {
+            colorWeekends = colorWeekendsToggle.checked;
+            weekendTintColorPicker.disabled = !colorWeekends;
+            localStorage.setItem('settingsColorWeekends', colorWeekends ? '1' : '');
+            renderCalendar();
+        });
+        weekendTintColorPicker.addEventListener('input', function() {
+            weekendTintColor = weekendTintColorPicker.value;
+            localStorage.setItem('settingsWeekendTintColor', weekendTintColor);
+            document.documentElement.style.setProperty('--weekend-tint-color', weekendTintColor);
+            renderCalendar();
+        });
+    }
+    document.addEventListener('DOMContentLoaded', initWeekendColoringSettings);
+    if (typeof window.openSettingsModal === 'function') {
+        const origOpenSettingsModal = window.openSettingsModal;
+        window.openSettingsModal = function() {
+            origOpenSettingsModal();
+            setTimeout(initWeekendColoringSettings, 0);
+        };
+    }
 
         const dayNumber = document.createElement('div');
         dayNumber.classList.add('text-left', 'font-bold', 'text-lg', 'mb-2');
@@ -5630,6 +5759,11 @@ const initColorPalette = () => {
         };
 
         const openEventModal = (eventId = null, date = null) => {
+            // If modal is opened from holder sidebar, force date = 'holder'
+            if (window._creatingHolderEvent) {
+                date = 'holder';
+                window._creatingHolderEvent = false;
+            }
             eventModal.classList.remove('hidden');
             editingEventId = eventId;
 
@@ -5841,7 +5975,11 @@ const initColorPalette = () => {
             const title = eventTitleInput.value.trim();
             const time = eventTimeInput.value.trim();
             const description = eventDescriptionInput.value.trim();
-            let date = eventDateInput.value; 
+            let date = eventDateInput.value;
+            if (!editingEventId && window._creatingHolderEvent) {
+                date = 'holder';
+            }
+            window._creatingHolderEvent = false;
             const color = eventColorInput.value;
             const icon = eventIconInput.value;
 
@@ -5879,11 +6017,37 @@ const initColorPalette = () => {
             animatedVerticalRainbow: effectAnimatedVerticalRainbow.checked
         };
 
+            // --- Ensure correct event placement ---
+            if (!editingEventId) {
+                const newEvent = {
+                    id: generateUniqueId(),
+                    title,
+                    time,
+                    description,
+                    date,
+                    color,
+                    icon,
+                    textStyling,
+                    effects,
+                    completed: false
+                };
+                if (date === 'holder') {
+                    holderEvents.push(newEvent);
+                } else {
+                    events.push(newEvent);
+                }
+                await saveEvents();
+                renderCalendar();
+                renderHolderEvents();
+                closeEventModal();
+                return;
+            }
 
 if (editingEventId) {
     let eventIndex = events.findIndex(e => e.id === editingEventId);
     if (eventIndex !== -1) {
         if (date === 'holder') {
+            // Move from events to holderEvents
             const eventToMove = events.splice(eventIndex, 1)[0];
             eventToMove.title = title;
             eventToMove.time = time;
@@ -5896,7 +6060,7 @@ if (editingEventId) {
             eventToMove.completed = eventToMove.completed || false;
             holderEvents.push(eventToMove);
         } else {
-            // Update the existing event object in-place
+            // Update event in events array
             const eventObj = events[eventIndex];
             eventObj.title = title;
             eventObj.time = time;
@@ -5906,13 +6070,12 @@ if (editingEventId) {
             eventObj.icon = icon;
             eventObj.effects = effects;
             eventObj.textStyling = textStyling;
-            // Do not overwrite completed unless needed
         }
     } else {
         eventIndex = holderEvents.findIndex(e => e.id === editingEventId);
         if (eventIndex !== -1) {
             if (date === 'holder') {
-                // Update the existing holder event object in-place
+                // Update event in holderEvents
                 const eventObj = holderEvents[eventIndex];
                 eventObj.title = title;
                 eventObj.time = time;
@@ -5923,6 +6086,7 @@ if (editingEventId) {
                 eventObj.effects = effects;
                 eventObj.textStyling = textStyling;
             } else {
+                // Move from holderEvents to events
                 const eventToMove = holderEvents.splice(eventIndex, 1)[0];
                 eventToMove.title = title;
                 eventToMove.time = time;
@@ -5937,24 +6101,10 @@ if (editingEventId) {
             }
         }
     }
-} else {
-    const newEvent = {
-        id: generateUniqueId(),
-        title,
-        time,
-        date,
-        description,
-        color,
-        icon,
-        effects,
-        textStyling,
-        completed: false
-    };
-    if (date === 'holder') {
-        holderEvents.push(newEvent);
-    } else {
-        events.push(newEvent);
-    }
+    await saveEvents();
+    renderCalendar();
+    renderHolderEvents();
+    closeEventModal();
 }
 
             if (eventDateInput.disabled && editingEventId) {
@@ -5981,8 +6131,13 @@ if (editingEventId) {
                 return;
             }
             await saveEvents();
-            renderCalendar();
-            renderHolderEvents();
+            // Only re-render the relevant section
+            if (date === 'holder') {
+                renderHolderEvents();
+            } else {
+                renderCalendar();
+                renderHolderEvents();
+            }
             closeEventModal();
         };
 
@@ -7034,6 +7189,7 @@ if (editingEventId) {
             hamburgerIcon.addEventListener('click', toggleHolderSidebar);
             holderSidebarCloseButton.addEventListener('click', toggleHolderSidebar);
             addHolderEventButton.addEventListener('click', () => {
+                window._creatingHolderEvent = true;
                 openEventModal(null, 'holder');
             });
 
@@ -7226,7 +7382,7 @@ function updateLastCalendarSyncText() {
 
 setInterval(updateLastCalendarSyncText, 60000);
 document.addEventListener('DOMContentLoaded', updateLastCalendarSyncText);
-const GOOGLE_API_KEY = 'AIzaSyBSPy6P2LkaKk6r4Al-UMPI6gMnyNvtB0E'; // API KEY
+const GOOGLE_API_KEY = ''; // API KEY
 const GOOGLE_CLIENT_ID = '691191163739-gl9c95o911f9p306p5e0cql1j1e1a47a.apps.googleusercontent.com';
 const DRIVE_FILE_NAME = 'AidahsCalendarSync.json';
 let googleUser = null;
