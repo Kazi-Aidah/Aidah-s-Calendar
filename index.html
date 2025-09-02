@@ -9,6 +9,27 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Roboto:wght@400;500&family=Open+Sans:wght@400;600&family=Lato:wght@400;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="favicon.png">
     <style>
+    /* Multi-day event spanning style */
+    .event-item.long-event {
+        position: absolute;
+        left: 0;
+        top: 2.2em; /* below day number */
+        height: 2.2em;
+        display: flex;
+        align-items: center;
+        z-index: 2;
+        width: 100%;
+        min-width: 0;
+        border-radius: var(--event-item-roundness);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        font-size: 0.95em;
+        padding: 0.2em 0.8em;
+        margin-bottom: 0.2em;
+        overflow: hidden;
+        /* grid-column is set inline by JS */
+    }
+    .day-cell { position: relative; }
+    .event-container { position: relative; min-height: 2.2em; }
         :root {
         --select-bg: var(--secondary-button-bg);
         --select-text: var(--secondary-button-text);
@@ -2840,6 +2861,7 @@ function setupWeekendSettingsListeners() {
 document.addEventListener('DOMContentLoaded', function() {
     syncWeekendSettingsUI();
     setupWeekendSettingsListeners();
+    if (typeof renderCalendar === 'function') renderCalendar();
 });
     let currentDate = new Date();
     let events = [];
@@ -4446,42 +4468,50 @@ const eventColors = [
             // Helper to attach click listeners robustly
            // ...existing code...
 window.openEditEventModal = function(eventId) {
-    const editEventModal = document.getElementById('edit-event-modal');
-    if (!editEventModal) {
-        console.error('Edit event modal not found');
+    // Reuse openEventModal to ensure all fields (including long event fields) are populated correctly.
+    // Find the event in either events or holderEvents
+    let ev = null;
+    if (window.events) ev = window.events.find(e => String(e.id) === String(eventId));
+    if (!ev && window.holderEvents) ev = window.holderEvents.find(e => String(e.id) === String(eventId));
+    if (!ev) {
+        console.error('Event not found for edit:', eventId);
         return;
     }
 
-    // Clear previous event ID and set new one
-    editEventModal.dataset.eventId = eventId;
-
-    // Find the event by ID
-    const event = window.events.find(ev => String(ev.id) === String(eventId));
-    if (!event) {
-        console.error('Event not found:', eventId);
-        return;
+    const dateParam = ev.date || ev.startDate || null;
+    const endParam = (ev.startDate && ev.endDate && ev.startDate !== ev.endDate) ? ev.endDate : null;
+    // Call the main openEventModal to show the modal and populate fields
+    if (typeof openEventModal === 'function') {
+        openEventModal(eventId, dateParam, endParam);
+    } else {
+        console.error('openEventModal not available when opening edit modal');
     }
 
-    // Delete button (edit mode)
-    const deleteBtn = editEventModal.querySelector('#deleteEvent, #deleteEventButton');
-    if (deleteBtn) {
-        deleteBtn.onclick = async () => {
-            const eventId = editEventModal.dataset.eventId;
-            const eventIndex = window.events.findIndex(ev => String(ev.id) === String(eventId));
-            if (eventIndex !== -1) {
-                window.events.splice(eventIndex, 1);
+    // Wire up delete button inside event modal if present
+    const eventModal = document.getElementById('event-modal');
+    if (eventModal) {
+        const deleteBtn = eventModal.querySelector('#deleteEvent, #deleteEventButton');
+        if (deleteBtn) {
+            deleteBtn.onclick = async () => {
+                const id = editingEventId || eventId;
+                const idx = window.events.findIndex(ev => String(ev.id) === String(id));
+                if (idx !== -1) {
+                    window.events.splice(idx, 1);
+                } else {
+                    const hidx = window.holderEvents.findIndex(ev => String(ev.id) === String(id));
+                    if (hidx !== -1) window.holderEvents.splice(hidx, 1);
+                }
                 try {
                     await saveEvents();
                     renderCalendar();
-                    editEventModal.classList.add('hidden');
-                    editEventModal.style.display = 'none';
-                } catch (error) {
-                    console.error('Failed to delete event:', error);
+                    renderHolderEvents();
+                    if (eventModal) { eventModal.classList.add('hidden'); eventModal.style.display = 'none'; }
+                } catch (err) {
+                    console.error('Failed to delete event from edit modal:', err);
                 }
-            }
-        };
+            };
+        }
     }
-
 }
             // If you have a function that opens the modal, call attachEditModalListeners() after opening
                 const removeAllEventsButton = document.getElementById('removeAllEventsButton');
@@ -5021,6 +5051,8 @@ const initColorPalette = () => {
 
         const renderCalendar = () => {
     calendarEl.innerHTML = '';
+    // We'll collect multi-day events to render after day cells
+    const multiDayEventsToRender = [];
 
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
@@ -5097,31 +5129,26 @@ const initColorPalette = () => {
             dayCell.classList.add('current-day');
         }
 
+        // Only render single-day events in the cell
         const dayEvents = events.filter(event => {
-            const eventDate = new Date(event.date);
-            return eventDate.getDate() === day &&
-                   eventDate.getMonth() === month &&
-                   eventDate.getFullYear() === year &&
-                   event.date !== 'holder';
+            if (event.startDate && event.endDate) return false; // skip multi-day events here
+            if (event.date) {
+                return event.date === fullDate;
+            }
+            return false;
         });
 
         const eventContainer = document.createElement('div');
         eventContainer.classList.add('event-container');
+        // If this cell is the start of a long event, add margin-top to push normal events down
+        if (events.some(ev => ev.startDate === fullDate && ev.endDate && ev.startDate !== ev.endDate)) {
+            eventContainer.style.marginTop = '2.4em'; // slightly more than long event bar height
+        }
         dayCell.appendChild(eventContainer);
 
-        if (foldDayCellsEnabled && dayEvents.length > MAX_VISIBLE_EVENTS_FOLDED) {
-            dayCell.classList.add('folded');
-            if (hideScrollbars) {
-                dayCell.classList.add('hide-scrollbars');
-            }
-            dayEvents.forEach(event => {
-                eventContainer.appendChild(createEventItem(event));
-            });
-        } else {
-            dayEvents.forEach(event => {
-                eventContainer.appendChild(createEventItem(event));
-            });
-        }
+        dayEvents.forEach(event => {
+            eventContainer.appendChild(createEventItem(event));
+        });
 
         dayCell.addEventListener('click', (e) => {
             // Only open modal if not clicking an event inside the day cell
@@ -5156,13 +5183,32 @@ const initColorPalette = () => {
 
                 let eventIndex = events.findIndex(event => event.id === droppedEventId);
                 if (eventIndex !== -1) {
-                    events[eventIndex].date = newDate;
+                    // If this is a multi-day event, update startDate and endDate accordingly
+                    if (events[eventIndex].startDate && events[eventIndex].endDate) {
+                        const span = Math.floor((new Date(events[eventIndex].endDate) - new Date(events[eventIndex].startDate)) / (1000*60*60*24));
+                        events[eventIndex].startDate = newDate;
+                        const newStart = new Date(newDate);
+                        const newEnd = new Date(newStart);
+                        newEnd.setDate(newStart.getDate() + span);
+                        events[eventIndex].endDate = `${newEnd.getFullYear()}-${String(newEnd.getMonth()+1).padStart(2,'0')}-${String(newEnd.getDate()).padStart(2,'0')}`;
+                    } else {
+                        events[eventIndex].date = newDate;
+                    }
                     eventFound = true;
                 } else {
                     eventIndex = holderEvents.findIndex(event => event.id === droppedEventId);
                     if (eventIndex !== -1) {
                         const eventToMove = holderEvents.splice(eventIndex, 1)[0];
-                        eventToMove.date = newDate;
+                        if (eventToMove.startDate && eventToMove.endDate) {
+                            const span = Math.floor((new Date(eventToMove.endDate) - new Date(eventToMove.startDate)) / (1000*60*60*24));
+                            eventToMove.startDate = newDate;
+                            const newStart = new Date(newDate);
+                            const newEnd = new Date(newStart);
+                            newEnd.setDate(newStart.getDate() + span);
+                            eventToMove.endDate = `${newEnd.getFullYear()}-${String(newEnd.getMonth()+1).padStart(2,'0')}-${String(newEnd.getDate()).padStart(2,'0')}`;
+                        } else {
+                            eventToMove.date = newDate;
+                        }
                         events.push(eventToMove);
                         eventFound = true;
                     }
@@ -5178,6 +5224,75 @@ const initColorPalette = () => {
 
         calendarEl.appendChild(dayCell);
     }
+
+    // Now render multi-day events as direct children of the grid
+    // Get all day cells (skip header row)
+    const allDayCells = Array.from(calendarEl.children);
+    // Render long events as direct children of the grid, absolutely positioned to span across the correct cells
+    calendarEl.style.position = 'relative';
+    events.forEach(event => {
+        if (event.startDate && event.endDate && event.startDate !== event.endDate) {
+            // Find the start cell index (0-based)
+            const startIdx = allDayCells.findIndex(cell => cell.dataset && cell.dataset.date === event.startDate);
+            if (startIdx !== -1) {
+                // Find all long events that overlap this event's start day
+                const eventStart = new Date(event.startDate);
+                const eventEnd = new Date(event.endDate);
+                const overlappingLongEvents = events.filter(ev => {
+                    if (!(ev.startDate && ev.endDate && ev.startDate !== ev.endDate)) return false;
+                    const evStart = new Date(ev.startDate);
+                    const evEnd = new Date(ev.endDate);
+                    // Overlaps if ev's range includes event.startDate
+                    return evStart <= eventStart && evEnd >= eventStart;
+                }).sort((a, b) => (a.id > b.id ? 1 : -1));
+                const stackIndex = overlappingLongEvents.findIndex(ev => ev.id === event.id);
+                const barHeight = 36; // px, adjust if needed (2.2em ~ 35px)
+                const barSpacing = 4; // px between bars
+
+                const span = Math.floor((eventEnd - eventStart) / (1000*60*60*24)) + 1;
+                const firstCell = allDayCells[startIdx];
+                const lastCell = allDayCells[startIdx + span - 1];
+                if (firstCell && lastCell) {
+                    const calendarRect = calendarEl.getBoundingClientRect();
+                    const firstRect = firstCell.getBoundingClientRect();
+                    const lastRect = lastCell.getBoundingClientRect();
+                    // Calculate the height of the day number element and its margin
+                    let dayNumHeight = 0;
+                    let dayNumMargin = 0;
+                    const dayNum = firstCell.querySelector('.text-left.font-bold.text-lg');
+                    if (dayNum) {
+                        const dayNumRect = dayNum.getBoundingClientRect();
+                        dayNumHeight = dayNumRect.height;
+                        // Get computed margin-bottom (usually where normal events start)
+                        const style = window.getComputedStyle(dayNum);
+                        dayNumMargin = parseFloat(style.marginBottom) || 0;
+                    } else {
+                        dayNumHeight = 24;
+                        dayNumMargin = 2;
+                    }
+                    // Calculate left/top/width relative to calendarEl
+                    const left = firstRect.left - calendarRect.left + calendarEl.scrollLeft - 4;
+                    // Stack bars vertically by index
+                    const top = firstRect.top - calendarRect.top + calendarEl.scrollTop + dayNumHeight + dayNumMargin + 9 + (stackIndex * (barHeight + barSpacing));
+                    const width = (lastRect.right - firstRect.left) + 8;
+                    const eventDiv = createEventItem(event);
+                    eventDiv.classList.add('long-event');
+                    eventDiv.style.position = 'absolute';
+                    eventDiv.style.left = left + 'px';
+                    eventDiv.style.top = top + 'px';
+                    eventDiv.style.width = width + 'px';
+                    eventDiv.style.height = '2.2em';
+                    eventDiv.style.zIndex = 10;
+                    // Add click handler to open edit modal with long event fields
+                    eventDiv.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        openEventModal(event.id, event.startDate, event.endDate);
+                    });
+                    calendarEl.appendChild(eventDiv);
+                }
+            }
+        }
+    });
     applyAnimationsState();
 };
 
@@ -5930,6 +6045,24 @@ document.addEventListener('selectstart', (e) => {
                 longFields.style.display = '';
                 document.getElementById('longEventStartDate').value = date;
                 document.getElementById('longEventEndDate').value = endDate;
+            } else if (eventId && events && events.find(ev => ev.id === eventId && ev.startDate && ev.endDate && ev.startDate !== ev.endDate)) {
+                // Always show long event fields for multi-day events
+                singleFields.style.display = 'none';
+                longFields.style.display = '';
+                const ev = events.find(ev => ev.id === eventId);
+                if (ev) {
+                    document.getElementById('longEventStartDate').value = ev.startDate;
+                    document.getElementById('longEventEndDate').value = ev.endDate;
+                }
+            } else if (eventId && holderEvents && holderEvents.find(ev => ev.id === eventId && ev.startDate && ev.endDate && ev.startDate !== ev.endDate)) {
+                // Also check holderEvents for long events
+                singleFields.style.display = 'none';
+                longFields.style.display = '';
+                const ev = holderEvents.find(ev => ev.id === eventId);
+                if (ev) {
+                    document.getElementById('longEventStartDate').value = ev.startDate;
+                    document.getElementById('longEventEndDate').value = ev.endDate;
+                }
             } else {
                 singleFields.style.display = '';
                 longFields.style.display = 'none';
@@ -6190,18 +6323,49 @@ document.addEventListener('selectstart', (e) => {
                     // Show error modal or feedback for empty title
                     return;
                 }
-                const newEvent = {
-                    id: generateUniqueId(),
-                    title,
-                    time,
-                    description,
-                    date,
-                    color,
-                    icon,
-                    textStyling,
-                    effects,
-                    completed: false
-                };
+                // Multi-day event support
+                let startDate = null, endDate = null;
+                const longEventFields = document.getElementById('longEventFields');
+                const longEventStartDateInput = document.getElementById('longEventStartDate');
+                const longEventEndDateInput = document.getElementById('longEventEndDate');
+                if (
+                    longEventFields &&
+                    longEventFields.style.display !== 'none' &&
+                    longEventStartDateInput && longEventEndDateInput &&
+                    longEventStartDateInput.value && longEventEndDateInput.value
+                ) {
+                    startDate = longEventStartDateInput.value;
+                    endDate = longEventEndDateInput.value;
+                }
+                let newEvent;
+                if (startDate && endDate && startDate !== endDate) {
+                    newEvent = {
+                        id: generateUniqueId(),
+                        title,
+                        time,
+                        description,
+                        startDate,
+                        endDate,
+                        color,
+                        icon,
+                        textStyling,
+                        effects,
+                        completed: false
+                    };
+                } else {
+                    newEvent = {
+                        id: generateUniqueId(),
+                        title,
+                        time,
+                        description,
+                        date,
+                        color,
+                        icon,
+                        textStyling,
+                        effects,
+                        completed: false
+                    };
+                }
                 if (date === 'holder') {
                     holderEvents.push(newEvent);
                     await saveEvents();
@@ -6221,6 +6385,28 @@ document.addEventListener('selectstart', (e) => {
             }
 
 if (editingEventId) {
+    // Defensive: Don't allow update if user tries to blank out long event fields
+    const longEventFields = document.getElementById('longEventFields');
+    const longEventStartDateInput = document.getElementById('longEventStartDate');
+    const longEventEndDateInput = document.getElementById('longEventEndDate');
+    if (
+        longEventFields &&
+        longEventFields.style.display !== 'none' &&
+        (!longEventStartDateInput.value || !longEventEndDateInput.value)
+    ) {
+        // Show error and do not proceed
+        const messageBox = document.createElement('div');
+        messageBox.innerHTML = `
+            <div class="fixed inset-0" style="background-color: var(--modal-overlay-bg); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+                <div class="p-6 rounded-lg shadow-xl text-center" style="border-radius: var(--ui-roundness-lg); background-color: var(--main-container-bg); color: var(--text-color);">
+                    <p class="text-lg font-semibold mb-4" style="color: var(--text-color);">Please enter both a start and end date for multi-day events.</p>
+                    <button class="px-4 py-2 themed-button" onclick="this.parentNode.parentNode.remove()">OK</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(messageBox);
+        return;
+    }
     let eventIndex = events.findIndex(e => e.id === editingEventId);
     if (eventIndex !== -1) {
         if (date === 'holder') {
@@ -6235,18 +6421,58 @@ if (editingEventId) {
             eventToMove.effects = effects;
             eventToMove.textStyling = textStyling;
             eventToMove.completed = eventToMove.completed || false;
+            // Remove long event fields if moving to holder
+            delete eventToMove.startDate;
+            delete eventToMove.endDate;
             holderEvents.push(eventToMove);
         } else {
             // Update event in events array
             const eventObj = events[eventIndex];
             eventObj.title = title;
             eventObj.time = time;
-            eventObj.date = date;
             eventObj.description = description;
             eventObj.color = color;
             eventObj.icon = icon;
             eventObj.effects = effects;
             eventObj.textStyling = textStyling;
+
+            if (
+                longEventFields &&
+                longEventFields.style.display !== 'none' &&
+                longEventStartDateInput && longEventEndDateInput &&
+                longEventStartDateInput.value && longEventEndDateInput.value
+            ) {
+                // Update as long event (multi-day)
+                eventObj.startDate = longEventStartDateInput.value;
+                eventObj.endDate = longEventEndDateInput.value;
+                delete eventObj.date;
+            } else if (
+                eventObj.startDate && eventObj.endDate &&
+                eventObj.startDate !== eventObj.endDate
+            ) {
+                // Already a long event, and user didn't change the long event fields: PRESERVE startDate/endDate
+                // Do nothing, keep as is
+            } else if (
+                eventObj.startDate && eventObj.endDate && eventObj.startDate === eventObj.endDate
+            ) {
+                // Edge case: start and end date are the same, treat as single-day
+                eventObj.date = eventObj.startDate;
+                delete eventObj.startDate;
+                delete eventObj.endDate;
+            } else if (
+                longEventFields &&
+                longEventFields.style.display !== 'none' &&
+                (!longEventStartDateInput.value || !longEventEndDateInput.value) &&
+                eventObj.startDate && eventObj.endDate && eventObj.startDate !== eventObj.endDate
+            ) {
+                // User left long event fields blank, but event is already a long event: PRESERVE startDate/endDate
+                // Do nothing, keep as is
+            } else {
+                // Single-day event
+                eventObj.date = date;
+                delete eventObj.startDate;
+                delete eventObj.endDate;
+            }
         }
     } else {
         eventIndex = holderEvents.findIndex(e => e.id === editingEventId);
@@ -6279,6 +6505,21 @@ if (editingEventId) {
         }
     }
     await saveEvents();
+    // DEBUG: log event state before re-render to trace long-event loss
+    try {
+        console.debug('handleSaveEvent: editingEventId=', editingEventId);
+        if (editingEventId) {
+            const eInEvents = events.find(e => String(e.id) === String(editingEventId));
+            const eInHolder = holderEvents.find(e => String(e.id) === String(editingEventId));
+            console.debug('event in events:', JSON.parse(JSON.stringify(eInEvents || null)));
+            console.debug('event in holderEvents:', JSON.parse(JSON.stringify(eInHolder || null)));
+        }
+        const longStart = document.getElementById('longEventStartDate')?.value;
+        const longEnd = document.getElementById('longEventEndDate')?.value;
+        console.debug('longEventFields values:', { longStart, longEnd });
+    } catch (logErr) {
+        console.debug('handleSaveEvent: logging failed', logErr);
+    }
     renderCalendar();
     renderHolderEvents();
     closeEventModal();
@@ -7479,5 +7720,6 @@ if (editingEventId) {
                 }
             })
         };
+
 </script>
 </html>
