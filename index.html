@@ -2861,7 +2861,9 @@ function setupWeekendSettingsListeners() {
 document.addEventListener('DOMContentLoaded', function() {
     syncWeekendSettingsUI();
     setupWeekendSettingsListeners();
-    if (typeof renderCalendar === 'function') renderCalendar();
+    // Ensure calendarEl is initialized before calling renderCalendar
+    window.calendarEl = document.getElementById('calendar');
+    if (window.calendarEl && typeof renderCalendar === 'function') renderCalendar();
 });
     let currentDate = new Date();
     let events = [];
@@ -5050,6 +5052,13 @@ const initColorPalette = () => {
 
 
         const renderCalendar = () => {
+    if (!calendarEl) {
+        calendarEl = document.getElementById('calendar');
+        if (!calendarEl) {
+            console.error('renderCalendar: calendarEl is not defined.');
+            return;
+        }
+    }
     calendarEl.innerHTML = '';
     // We'll collect multi-day events to render after day cells
     const multiDayEventsToRender = [];
@@ -6409,8 +6418,8 @@ if (editingEventId) {
     }
     let eventIndex = events.findIndex(e => e.id === editingEventId);
     if (eventIndex !== -1) {
-        if (date === 'holder') {
-            // Move from events to holderEvents
+        if (date === 'holder' && !(longEventStartDateInput && longEventEndDateInput && longEventStartDateInput.value && longEventEndDateInput.value)) {
+            // Move from events to holderEvents ONLY if not a valid long event
             const eventToMove = events.splice(eventIndex, 1)[0];
             eventToMove.title = title;
             eventToMove.time = time;
