@@ -2771,16 +2771,16 @@ document.addEventListener('DOMContentLoaded', function() {
     syncWeekendSettingsUI();
     setupWeekendSettingsListeners();
 });
-        let currentDate = new Date();
-        let events = [];
-        let holderEvents = [];
-        let editingEventId = null;
-        let currentCustomFontName = null;
-        let draggedEventId = null;
-        let contextMenuEventId = null;
-        let isResizingHolder = false;
-        let initialHolderWidth;
-        let initialMouseX;
+    let currentDate = new Date();
+    let events = [];
+    let holderEvents = [];
+    let editingEventId = null;
+    let currentCustomFontName = null;
+    let draggedEventId = null;
+    let contextMenuEventId = null;
+    let isResizingHolder = false;
+    let initialHolderWidth;
+    let initialMouseX;
 
         const MAX_SAVED_THEMES = 5;
         const MAX_VISIBLE_EVENTS_FOLDED = 3;
@@ -5825,7 +5825,7 @@ const initColorPalette = () => {
                 eventDescriptionInput.value = eventToEdit.description || '';
 
                 if (eventToEdit.date === 'holder') {
-                    eventDateInput.value = '';
+                    eventDateInput.value = 'holder';
                     eventDateInput.disabled = true;
                 } else {
                     eventDateInput.value = eventToEdit.date;
@@ -5932,8 +5932,13 @@ const initColorPalette = () => {
                 if (editEventFooter) editEventFooter.style.display = 'none';
                 if (addEventFooter) addEventFooter.style.display = '';
                 deleteEventButton.classList.add('hidden');
-                eventDateInput.value = date;
-                eventDateInput.disabled = (date === 'holder');
+                if (date === 'holder') {
+                    eventDateInput.value = 'holder';
+                    eventDateInput.disabled = true;
+                } else {
+                    eventDateInput.value = date;
+                    eventDateInput.disabled = false;
+                }
                 initColorPalette();
                 initIconGrid();
             }
@@ -5976,7 +5981,8 @@ const initColorPalette = () => {
             const time = eventTimeInput.value.trim();
             const description = eventDescriptionInput.value.trim();
             let date = eventDateInput.value;
-            if (!editingEventId && window._creatingHolderEvent) {
+            // Always force date to 'holder' if creating from holder button or if date is 'holder'
+            if (window._creatingHolderEvent || date === 'holder') {
                 date = 'holder';
             }
             window._creatingHolderEvent = false;
@@ -6033,12 +6039,13 @@ const initColorPalette = () => {
                 };
                 if (date === 'holder') {
                     holderEvents.push(newEvent);
+                    await saveEvents();
+                    renderHolderEvents();
                 } else {
                     events.push(newEvent);
+                    await saveEvents();
+                    renderCalendar();
                 }
-                await saveEvents();
-                renderCalendar();
-                renderHolderEvents();
                 closeEventModal();
                 return;
             }
@@ -7382,7 +7389,7 @@ function updateLastCalendarSyncText() {
 
 setInterval(updateLastCalendarSyncText, 60000);
 document.addEventListener('DOMContentLoaded', updateLastCalendarSyncText);
-const GOOGLE_API_KEY = ''; // API KEY
+const GOOGLE_API_KEY = 'AIzaSyBSPy6P2LkaKk6r4Al-UMPI6gMnyNvtB0E'; // API KEY
 const GOOGLE_CLIENT_ID = '691191163739-gl9c95o911f9p306p5e0cql1j1e1a47a.apps.googleusercontent.com';
 const DRIVE_FILE_NAME = 'AidahsCalendarSync.json';
 let googleUser = null;
