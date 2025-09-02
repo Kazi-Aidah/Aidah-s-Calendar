@@ -2231,6 +2231,54 @@
             box-shadow: 0 0 0 1px var(--accent-color) !important;
         }
     }
+
+            .selected-range {
+                background-color: var(--current-day-bg) !important;
+                border: 3px solid var(--current-day-border-color) !important;
+                box-shadow: 0 0 0 2px var(--current-day-border-color, #ffb6d5);
+                transition: background 0.15s, border 0.15s;
+            }
+            .selected-range .text-left,
+            .selected-range .font-bold,
+            .selected-range .text-lg {
+                user-select: none !important;
+                -webkit-user-select: none !important;
+                -moz-user-select: none !important;
+                -ms-user-select: none !important;
+            }
+
+        body.noselect-drag .day-cell, body.noselect-drag .day-cell * {
+            user-select: none !important;
+            -webkit-user-select: none !important;
+            -moz-user-select: none !important;
+            -ms-user-select: none !important;
+        }
+
+        #longEventFields {
+            margin-left: 0 !important;
+            padding-left: 0 !important;
+            width: 100%;
+        }
+        #event-modal .modal-content-scrollable {
+            overflow-x: hidden !important;
+        }
+
+        #eventTime {
+            width: 200px;
+        }
+
+        #eventDate {
+            width: 200px;
+        }
+
+        #longEventStartDate {
+            width: 200px;
+        }
+
+        #longEventEndDate {
+            width: 200px;
+        }
+
     </style>
 </head>
 <body>
@@ -2310,13 +2358,37 @@
                 </div>
 
                 <div class="mb-4 flex space-x-4">
-                    <div class="w-1/2">
-                        <label for="eventTime" class="block text-sm font-medium text-gray-700 mb-1" style="color: var(--text-color);">Time (Optional)</label>
-                        <input type="time" id="eventTime" class="w-full p-3 focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200">
+                    <div class="mb-4 flex space-x-2" id="singleEventFields">
+                        <div class="w-1/2">
+                            <label for="eventTime" class="block text-sm font-medium text-gray-700 mb-1" style="color: var(--text-color);">Time (Optional)</label>
+                            <input type="time" id="eventTime" class="w-full p-3 focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200">
+                        </div>
+                        <div class="w-1/2">
+                            <label for="eventDate" class="block text-sm font-medium text-gray-700 mb-1" style="color: var(--text-color);">Date</label>
+                            <input type="date" id="eventDate" class="w-full p-3 focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200">
+                        </div>
                     </div>
-                    <div class="w-1/2">
-                        <label for="eventDate" class="block text-sm font-medium text-gray-700 mb-1" style="color: var(--text-color);">Date</label>
-                        <input type="date" id="eventDate" class="w-full p-3 focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200">
+                    <div id="longEventFields" style="display:none; margin-left:0; padding-left:0;">
+                        <div class="flex gap-2">
+                            <div class="w-1/2">
+                                <label for="longEventStartDate" class="block text-sm font-medium text-gray-700 mb-1" style="color: var(--text-color);">Start Date</label>
+                                <input type="date" id="longEventStartDate" class="w-full p-3 focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200">
+                            </div>
+                            <div class="w-1/2">
+                                <label for="longEventEndDate" class="block text-sm font-medium text-gray-700 mb-1" style="color: var(--text-color);">End Date</label>
+                                <input type="date" id="longEventEndDate" class="w-full p-3 focus:ring-2 focus:ring-blue-400 focus-border-transparent transition duration-200">
+                            </div>
+                        </div>
+                        <div class="flex gap-2 mt-2">
+                            <div class="w-1/2">
+                                <label for="longEventStartTime" class="block text-sm font-medium text-gray-700 mb-1" style="color: var(--text-color);">Start Time</label>
+                                <input type="time" id="longEventStartTime" class="w-full p-3 focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200">
+                            </div>
+                            <div class="w-1/2">
+                                <label for="longEventEndTime" class="block text-sm font-medium text-gray-700 mb-1" style="color: var(--text-color);">End Time</label>
+                                <input type="time" id="longEventEndTime" class="w-full p-3 focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200">
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -2712,15 +2784,13 @@
         <button id="contextDuplicateEvent"><i class="fas fa-copy"></i> Duplicate Event</button>
         <button id="contextDeleteEvent"><i class="fas fa-trash"></i> Delete Event</button>
     </div>
-    <script>
-
-
-// --- Unified Weekend Coloring Settings Logic ---
+<script>
+    // --- Unified Weekend Coloring Settings Logic ---
 function updateWeekendTintControlsVisibility() {
     var colorWeekendsToggle = document.getElementById('colorWeekendsToggle');
     var weekendTintControls = document.getElementById('weekendTintControls');
     if (colorWeekendsToggle && weekendTintControls) {
-        weekendTintControls.style.display = colorWeekendsToggle.checked ? 'flex' : 'none';
+    weekendTintControls.style.display = colorWeekendsToggle.checked ? 'block' : 'none';
     }
     var weekendTintColorPicker = document.getElementById('weekendTintColorPicker');
     if (weekendTintColorPicker) {
@@ -3573,6 +3643,36 @@ document.addEventListener('DOMContentLoaded', function() {
             hideScrollbarsToggle, holderSidebarCloseButton,
             darkModeButton, foldDayCellsToggle, showHolderByDefaultToggle, use24HourFormatToggle, addHolderEventButton, hideAddEventButtonInHolderToggle,
             holderResizeHandle, premadeThemeBoxesContainer;
+
+// Ensure modal-related DOM elements are initialized on page load
+document.addEventListener('DOMContentLoaded', function() {
+    eventModal = document.getElementById('event-modal');
+    modalTitle = document.getElementById('modalTitle');
+    eventTitleInput = document.getElementById('eventTitle');
+    eventTimeInput = document.getElementById('eventTime');
+    eventDateInput = document.getElementById('eventDate');
+    eventDescriptionInput = document.getElementById('eventDescription');
+    eventColorInput = document.getElementById('eventColor');
+    eventIconInput = document.getElementById('eventIcon');
+    colorPaletteEl = document.getElementById('colorPalette');
+    iconGridEl = document.getElementById('iconGrid');
+    saveEventButton = document.getElementById('saveEventButton');
+    deleteEventButton = document.getElementById('deleteEventButton');
+    cancelEventButton = document.getElementById('cancelEventButton');
+    iconSearchInput = document.getElementById('iconSearchInput');
+    effectShowCheckbox = document.getElementById('effectShowCheckbox');
+    effectGlowing = document.getElementById('effectGlowing');
+    effectStriped = document.getElementById('effectStriped');
+    effectDotted = document.getElementById('effectDotted');
+    effectParticles = document.getElementById('effectParticles');
+    effectSnowFalling = document.getElementById('effectSnowFalling');
+    effectGlisteningStars = document.getElementById('effectGlisteningStars');
+    effectGradient = document.getElementById('effectGradient');
+    effectAnimatedStripes = document.getElementById('effectAnimatedStripes');
+    effectAnimatedVerticalRainbow = document.getElementById('effectAnimatedVerticalRainbow');
+    eventIconDisplay = document.getElementById('eventIconDisplay');
+    // Add any other modal-related elements as needed
+});
 
         // --- Icon Placement Dropdown Logic ---
         function saveIconPlacement(value) {
@@ -4985,38 +5085,6 @@ const initColorPalette = () => {
                 dayCell.classList.add('weekend-tint');
             }
         }
-    // --- Weekend Coloring Settings Logic ---
-    function initWeekendColoringSettings() {
-        const colorWeekendsToggle = document.getElementById('colorWeekendsToggle');
-        const weekendTintColorPicker = document.getElementById('weekendTintColorPicker');
-        if (!colorWeekendsToggle || !weekendTintColorPicker) return;
-        // Restore from localStorage
-        let colorWeekends = localStorage.getItem('settingsColorWeekends') === '1';
-        let weekendTintColor = localStorage.getItem('settingsWeekendTintColor') || '#ffe4e1';
-        colorWeekendsToggle.checked = colorWeekends;
-        weekendTintColorPicker.value = weekendTintColor;
-        weekendTintColorPicker.disabled = !colorWeekends;
-        colorWeekendsToggle.addEventListener('change', function() {
-            colorWeekends = colorWeekendsToggle.checked;
-            weekendTintColorPicker.disabled = !colorWeekends;
-            localStorage.setItem('settingsColorWeekends', colorWeekends ? '1' : '');
-            renderCalendar();
-        });
-        weekendTintColorPicker.addEventListener('input', function() {
-            weekendTintColor = weekendTintColorPicker.value;
-            localStorage.setItem('settingsWeekendTintColor', weekendTintColor);
-            document.documentElement.style.setProperty('--weekend-tint-color', weekendTintColor);
-            renderCalendar();
-        });
-    }
-    document.addEventListener('DOMContentLoaded', initWeekendColoringSettings);
-    if (typeof window.openSettingsModal === 'function') {
-        const origOpenSettingsModal = window.openSettingsModal;
-        window.openSettingsModal = function() {
-            origOpenSettingsModal();
-            setTimeout(initWeekendColoringSettings, 0);
-        };
-    }
 
         const dayNumber = document.createElement('div');
         dayNumber.classList.add('text-left', 'font-bold', 'text-lg', 'mb-2');
@@ -5041,76 +5109,77 @@ const initColorPalette = () => {
         eventContainer.classList.add('event-container');
         dayCell.appendChild(eventContainer);
 
-                if (foldDayCellsEnabled && dayEvents.length > MAX_VISIBLE_EVENTS_FOLDED) {
-                    dayCell.classList.add('folded');
-                    if (hideScrollbars) {
-                        dayCell.classList.add('hide-scrollbars');
-                    }
-                    dayEvents.forEach(event => {
-                        eventContainer.appendChild(createEventItem(event));
-                    });
+        if (foldDayCellsEnabled && dayEvents.length > MAX_VISIBLE_EVENTS_FOLDED) {
+            dayCell.classList.add('folded');
+            if (hideScrollbars) {
+                dayCell.classList.add('hide-scrollbars');
+            }
+            dayEvents.forEach(event => {
+                eventContainer.appendChild(createEventItem(event));
+            });
+        } else {
+            dayEvents.forEach(event => {
+                eventContainer.appendChild(createEventItem(event));
+            });
+        }
+
+        dayCell.addEventListener('click', (e) => {
+            // Only open modal if not clicking an event inside the day cell
+            if (!e.target.closest('.event-item')) {
+                openEventModal(null, fullDate);
+            }
+        });
+
+        dayCell.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dayCell.classList.add('drag-over');
+        });
+
+        dayCell.addEventListener('dragleave', () => {
+            dayCell.classList.remove('drag-over');
+        });
+
+        dayCell.addEventListener('drop', async (e) => {
+            e.preventDefault();
+            if (e.target.classList.contains('event-item') || e.target.closest('.event-item')) {
+                dayCell.classList.remove('drag-over');
+                return;
+            }
+
+            dayCell.classList.remove('drag-over');
+
+            const droppedEventId = e.dataTransfer.getData('text/plain');
+            const newDate = dayCell.dataset.date;
+
+            if (droppedEventId) {
+                let eventFound = false;
+
+                let eventIndex = events.findIndex(event => event.id === droppedEventId);
+                if (eventIndex !== -1) {
+                    events[eventIndex].date = newDate;
+                    eventFound = true;
                 } else {
-                    dayEvents.forEach(event => {
-                        eventContainer.appendChild(createEventItem(event));
-                    });
+                    eventIndex = holderEvents.findIndex(event => event.id === droppedEventId);
+                    if (eventIndex !== -1) {
+                        const eventToMove = holderEvents.splice(eventIndex, 1)[0];
+                        eventToMove.date = newDate;
+                        events.push(eventToMove);
+                        eventFound = true;
+                    }
                 }
 
-                dayCell.addEventListener('click', (e) => {
-                    if (!e.target.closest('.event-item')) {
-                        openEventModal(null, dayCell.dataset.date);
-                    }
-                });
-
-                dayCell.addEventListener('dragover', (e) => {
-                    e.preventDefault();
-                    dayCell.classList.add('drag-over');
-                });
-
-                dayCell.addEventListener('dragleave', () => {
-                    dayCell.classList.remove('drag-over');
-                });
-
-                dayCell.addEventListener('drop', async (e) => {
-                    e.preventDefault();
-                    if (e.target.classList.contains('event-item') || e.target.closest('.event-item')) {
-                        dayCell.classList.remove('drag-over');
-                        return;
-                    }
-
-                    dayCell.classList.remove('drag-over');
-
-                    const droppedEventId = e.dataTransfer.getData('text/plain');
-                    const newDate = dayCell.dataset.date;
-
-                    if (droppedEventId) {
-                        let eventFound = false;
-
-                        let eventIndex = events.findIndex(event => event.id === droppedEventId);
-                        if (eventIndex !== -1) {
-                            events[eventIndex].date = newDate;
-                            eventFound = true;
-                        } else {
-                            eventIndex = holderEvents.findIndex(event => event.id === droppedEventId);
-                            if (eventIndex !== -1) {
-                                const eventToMove = holderEvents.splice(eventIndex, 1)[0];
-                                eventToMove.date = newDate;
-                                events.push(eventToMove);
-                                eventFound = true;
-                            }
-                        }
-
-                        if (eventFound) {
-                            await saveEvents();
-                            renderCalendar();
-                            renderHolderEvents();
-                        }
-                    }
-                });
-
-                calendarEl.appendChild(dayCell);
+                if (eventFound) {
+                    await saveEvents();
+                    renderCalendar();
+                    renderHolderEvents();
+                }
             }
-            applyAnimationsState();
-        };
+        });
+
+        calendarEl.appendChild(dayCell);
+    }
+    applyAnimationsState();
+};
 
         const createEventItem = (event) => {
             const eventItem = document.createElement('div');
@@ -5758,7 +5827,80 @@ const initColorPalette = () => {
             applyAddEventButtonVisibility();
         };
 
-        const openEventModal = (eventId = null, date = null) => {
+    const openEventModal = (eventId = null, date = null, endDate = null) => {
+// --- Multi-day selection logic (global, after calendar is rendered) ---
+let isSelecting = false;
+let selectionStartCell = null;
+let selectionEndCell = null;
+let selectedCells = [];
+
+function clearCellSelection() {
+    selectedCells.forEach(cell => {
+        cell.classList.remove('selected-range');
+        // Restore user-select on date number
+        const dateNum = cell.querySelector('.text-left.font-bold.text-lg');
+        if (dateNum) dateNum.style.userSelect = '';
+    });
+    selectedCells = [];
+}
+
+document.addEventListener('mousedown', (e) => {
+    const dayCell = e.target.closest('.day-cell');
+    if (!dayCell || e.button !== 0 || e.target.closest('.event-item')) return;
+    isSelecting = true;
+    document.body.classList.add('noselect-drag');
+    selectionStartCell = dayCell;
+    selectionEndCell = dayCell;
+    clearCellSelection();
+    dayCell.classList.add('selected-range');
+    // Prevent text selection on date number
+    const dateNum = dayCell.querySelector('.text-left.font-bold.text-lg');
+    if (dateNum) dateNum.style.userSelect = 'none';
+    selectedCells = [dayCell];
+    document.body.style.userSelect = 'none';
+});
+
+document.addEventListener('mouseover', (e) => {
+    if (!isSelecting) return;
+    const dayCell = e.target.closest('.day-cell');
+    if (!dayCell) return;
+    selectionEndCell = dayCell;
+    clearCellSelection();
+    const allCells = Array.from(document.querySelectorAll('.day-cell'));
+    const startIdx = allCells.indexOf(selectionStartCell);
+    const endIdx = allCells.indexOf(selectionEndCell);
+    if (startIdx !== -1 && endIdx !== -1) {
+        const [min, max] = [Math.min(startIdx, endIdx), Math.max(startIdx, endIdx)];
+        selectedCells = allCells.slice(min, max + 1);
+        selectedCells.forEach(cell => {
+            cell.classList.add('selected-range');
+            // Prevent text selection on date number
+            const dateNum = cell.querySelector('.text-left.font-bold.text-lg');
+            if (dateNum) dateNum.style.userSelect = 'none';
+        });
+    }
+});
+
+document.addEventListener('mouseup', (e) => {
+    if (!isSelecting) return;
+    isSelecting = false;
+    document.body.style.userSelect = '';
+    document.body.classList.remove('noselect-drag');
+    if (selectedCells.length > 1) {
+        const startDate = selectedCells[0].dataset.date;
+        const endDate = selectedCells[selectedCells.length - 1].dataset.date;
+        openEventModal(null, startDate, endDate);
+    } else if (selectedCells.length === 1) {
+        openEventModal(null, selectedCells[0].dataset.date);
+    }
+    setTimeout(() => {
+        clearCellSelection();
+    }, 200);
+});
+
+document.addEventListener('selectstart', (e) => {
+    if (isSelecting && e.target.closest('.day-cell')) e.preventDefault();
+});
             // If modal is opened from holder sidebar, force date = 'holder'
             if (window._creatingHolderEvent) {
                 date = 'holder';
@@ -5775,6 +5917,24 @@ const initColorPalette = () => {
             eventIconInput.value = '';
             iconSearchInput.value = '';
             effectShowCheckbox.checked = false;
+            // Long event fields
+            if (document.getElementById('longEventStartDate')) document.getElementById('longEventStartDate').value = '';
+            if (document.getElementById('longEventEndDate')) document.getElementById('longEventEndDate').value = '';
+            if (document.getElementById('longEventStartTime')) document.getElementById('longEventStartTime').value = '';
+            if (document.getElementById('longEventEndTime')) document.getElementById('longEventEndTime').value = '';
+            // Show/hide long event fields
+            const singleFields = document.getElementById('singleEventFields');
+            const longFields = document.getElementById('longEventFields');
+            if (endDate && endDate !== date) {
+                singleFields.style.display = 'none';
+                longFields.style.display = '';
+                document.getElementById('longEventStartDate').value = date;
+                document.getElementById('longEventEndDate').value = endDate;
+            } else {
+                singleFields.style.display = '';
+                longFields.style.display = 'none';
+                if (date) document.getElementById('eventDate').value = date;
+            }
         // Always focus and select the event title input when modal opens
         setTimeout(function() {
             if (eventTitleInput) {
@@ -5963,7 +6123,9 @@ const initColorPalette = () => {
                         effectAnimatedStripes.checked = eventToEdit.effects.animatedStripes || false;
                         effectAnimatedVerticalRainbow.checked = eventToEdit.effects.animatedVerticalRainbow || false;
 
-                }
+        }
+        
+        window.openEventModal = openEventModal;
 
         
 
@@ -5982,10 +6144,9 @@ const initColorPalette = () => {
             const description = eventDescriptionInput.value.trim();
             let date = eventDateInput.value;
             // Always force date to 'holder' if creating from holder button or if date is 'holder'
-            if (window._creatingHolderEvent || date === 'holder') {
+            if (window._creatingHolderEvent || date === 'holder' || !date) {
                 date = 'holder';
             }
-            window._creatingHolderEvent = false;
             const color = eventColorInput.value;
             const icon = eventIconInput.value;
 
@@ -6025,6 +6186,10 @@ const initColorPalette = () => {
 
             // --- Ensure correct event placement ---
             if (!editingEventId) {
+                if (!title) {
+                    // Show error modal or feedback for empty title
+                    return;
+                }
                 const newEvent = {
                     id: generateUniqueId(),
                     title,
@@ -6047,6 +6212,11 @@ const initColorPalette = () => {
                     renderCalendar();
                 }
                 closeEventModal();
+                window._creatingHolderEvent = false;
+                // Always re-initialize modal logic after adding event
+                if (!eventModal) {
+                    eventModal = document.getElementById('event-modal');
+                }
                 return;
             }
 
@@ -7309,351 +7479,5 @@ if (editingEventId) {
                 }
             })
         };
-    </script>
-</body>
-</html>
-<!-- Google API scripts and sync logic -->
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-<script src="https://apis.google.com/js/api.js"></script>
-<script>
-// --- Google API Integration ---
-
-// --- Google Sign-In State Persistence ---
-function persistGoogleSignInState(userObj, token) {
-    if (userObj && token) {
-        localStorage.setItem('googleUser', JSON.stringify(userObj));
-        localStorage.setItem('googleAccessToken', token);
-        localStorage.setItem('googleTokenTimestamp', Date.now().toString());
-    } else {
-        localStorage.removeItem('googleUser');
-        localStorage.removeItem('googleAccessToken');
-        localStorage.removeItem('googleTokenTimestamp');
-    }
-}
-
-function isGoogleTokenExpired() {
-    const timestamp = parseInt(localStorage.getItem('googleTokenTimestamp'), 10);
-    // Google tokens are usually valid for 1 hour (3600 seconds)
-    return !timestamp || (Date.now() - timestamp > 55 * 60 * 1000); // 55 minutes for safety
-}
-
-async function restoreGoogleSignInState() {
-    const userStr = localStorage.getItem('googleUser');
-    const token = localStorage.getItem('googleAccessToken');
-    if (userStr && token && !isGoogleTokenExpired()) {
-        try {
-            const userObj = JSON.parse(userStr);
-            googleUser = userObj;
-            googleAccessToken = token;
-            // Try silent sign-in to refresh token
-            handleGoogleSilentSignInWithFallback();
-        } catch (e) {
-            persistGoogleSignInState(null, null);
-            setGoogleSyncUI(false);
-            updateGoogleSyncStatus('Not signed in', 'var(--accent-color)');
-        }
-    } else {
-        persistGoogleSignInState(null, null);
-        setGoogleSyncUI(false);
-        updateGoogleSyncStatus('Not signed in', 'var(--accent-color)');
-    }
-}
-
-// --- Calendar Sync Last Synced Text ---
-function setLastCalendarSyncTime() {
-    const now = Date.now();
-    localStorage.setItem('calendarLastSync', now.toString());
-    updateLastCalendarSyncText();
-}
-
-function getLastCalendarSyncTime() {
-    const t = localStorage.getItem('calendarLastSync');
-    return t ? parseInt(t, 10) : null;
-}
-
-function updateLastCalendarSyncText() {
-    const el = document.getElementById('calendarLastSyncText');
-    if (!el) return;
-    const last = getLastCalendarSyncTime();
-    if (!last) {
-        el.textContent = '';
-        return;
-    }
-    const mins = Math.floor((Date.now() - last) / 60000);
-    if (mins < 1) {
-        el.textContent = 'Calendar synced just now';
-    } else {
-        el.textContent = `Calendar synced ${mins} minute${mins === 1 ? '' : 's'} ago`;
-    }
-}
-
-setInterval(updateLastCalendarSyncText, 60000);
-document.addEventListener('DOMContentLoaded', updateLastCalendarSyncText);
-const GOOGLE_API_KEY = 'AIzaSyBSPy6P2LkaKk6r4Al-UMPI6gMnyNvtB0E'; // API KEY
-const GOOGLE_CLIENT_ID = '691191163739-gl9c95o911f9p306p5e0cql1j1e1a47a.apps.googleusercontent.com';
-const DRIVE_FILE_NAME = 'AidahsCalendarSync.json';
-let googleUser = null;
-let googleTokenClient = null;
-let googleAccessToken = null;
-let googleDriveFileId = null;
-let isDriveSyncEnabled = false;
-let isCalendarSyncEnabled = false;
-
-function updateGoogleSyncStatus(text, color) {
-    const status = document.getElementById('googleSyncStatus');
-    if (status) {
-        status.textContent = text;
-        if (color) status.style.color = color;
-    }
-}
-
-function setGoogleSyncUI(signedIn) {
-    document.getElementById('googleSignInBtn').style.display = signedIn ? 'none' : '';
-    document.getElementById('googleSignOutBtn').style.display = signedIn ? '' : 'none';
-    document.getElementById('googleCalendarSyncToggle').disabled = !signedIn;
-    if (signedIn) {
-        persistGoogleSignInState(googleUser, googleAccessToken);
-    } else {
-        persistGoogleSignInState(null, null);
-    }
-}
-
-function initGoogleSyncUI() {
-    document.getElementById('googleSignInBtn').addEventListener('click', handleGoogleSignIn);
-    document.getElementById('googleSignOutBtn').addEventListener('click', handleGoogleSignOut);
-    document.getElementById('googleCalendarSyncToggle').addEventListener('change', (e) => {
-        isCalendarSyncEnabled = e.target.checked;
-        if (isCalendarSyncEnabled && googleUser) {
-            syncEventsToGoogleCalendar();
-        }
-    });
-    setGoogleSyncUI(false);
-}
-
-function handleGoogleSignIn() {
-    googleTokenClient = google.accounts.oauth2.initTokenClient({
-        client_id: GOOGLE_CLIENT_ID,
-        scope: 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/calendar',
-        callback: async (tokenResponse) => {
-            googleAccessToken = tokenResponse.access_token;
-            await fetchGoogleUser();
-            setGoogleSyncUI(true);
-            updateGoogleSyncStatus('Signed in as ' + (googleUser?.email || 'Google User'), 'green');
-            isDriveSyncEnabled = true;
-            await syncFromDrive();
-        }
-    });
-    googleTokenClient.requestAccessToken();
-}
-
-function handleGoogleSilentSignIn() {
-    if (!googleTokenClient) {
-        googleTokenClient = google.accounts.oauth2.initTokenClient({
-            client_id: GOOGLE_CLIENT_ID,
-            scope: 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/calendar',
-            callback: async (tokenResponse) => {
-                googleAccessToken = tokenResponse.access_token;
-                await fetchGoogleUser();
-                setGoogleSyncUI(true);
-                updateGoogleSyncStatus('Signed in as ' + (googleUser?.email || 'Google User'), 'green');
-                isDriveSyncEnabled = true;
-                await syncFromDrive();
-            }
-        });
-    }
-    // Try silent sign-in (no prompt)
-    googleTokenClient.requestAccessToken({ prompt: 'none' });
-}
-
-// Silent sign-in with fallback to interactive sign-in if it fails
-function handleGoogleSilentSignInWithFallback() {
-    let silentSignInCompleted = false;
-    if (!googleTokenClient) {
-        googleTokenClient = google.accounts.oauth2.initTokenClient({
-            client_id: GOOGLE_CLIENT_ID,
-            scope: 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/calendar',
-            callback: async (tokenResponse) => {
-                if (tokenResponse && tokenResponse.access_token) {
-                    silentSignInCompleted = true;
-                    googleAccessToken = tokenResponse.access_token;
-                    await fetchGoogleUser();
-                    setGoogleSyncUI(true);
-                    updateGoogleSyncStatus('Signed in as ' + (googleUser?.email || 'Google User'), 'green');
-                    isDriveSyncEnabled = true;
-                    persistGoogleSignInState(googleUser, googleAccessToken);
-                    await syncFromDrive();
-                } else {
-                    persistGoogleSignInState(null, null);
-                    setGoogleSyncUI(false);
-                    updateGoogleSyncStatus('Not signed in', 'var(--accent-color)');
-                }
-            }
-        });
-    }
-    // Try silent sign-in (no prompt)
-    googleTokenClient.requestAccessToken({ prompt: 'none' });
-    // Fallback: after a short delay, if silent sign-in did not succeed, prompt user
-    setTimeout(() => {
-        if (!googleAccessToken) {
-            persistGoogleSignInState(null, null);
-            setGoogleSyncUI(false);
-            updateGoogleSyncStatus('Not signed in', 'var(--accent-color)');
-            // Silent sign-in failed, prompt user
-            handleGoogleSignIn();
-        }
-    }, 1500);
-}
-
-function handleGoogleSignOut() {
-    googleUser = null;
-    googleAccessToken = null;
-    isDriveSyncEnabled = false;
-    setGoogleSyncUI(false);
-    updateGoogleSyncStatus('Not signed in', 'var(--accent-color)');
-    persistGoogleSignInState(null, null);
-}
-
-async function fetchGoogleUser() {
-    if (!googleAccessToken) return;
-    const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-        headers: { Authorization: 'Bearer ' + googleAccessToken }
-    });
-    if (res.ok) {
-        googleUser = await res.json();
-    }
-}
-
-// --- Drive Sync ---
-async function syncToDrive() {
-    if (!isDriveSyncEnabled || !googleAccessToken) return;
-    const data = {
-        events,
-        holderEvents,
-        theme: currentBaseThemeKey,
-        isDarkModeActive,
-        savedCustomThemes
-    };
-    // Find file by name
-    let fileId = googleDriveFileId;
-    if (!fileId) {
-        const searchRes = await fetch('https://www.googleapis.com/drive/v3/files?q=name%3D%27' + encodeURIComponent(DRIVE_FILE_NAME) + '%27 and trashed=false and parents in (appDataFolder)', {
-            headers: { 'Authorization': 'Bearer ' + googleAccessToken }
-        });
-        if (searchRes.ok) {
-            const result = await searchRes.json();
-            if (result.files && result.files.length > 0) {
-                fileId = result.files[0].id;
-                googleDriveFileId = fileId;
-            }
-        }
-    }
-    if (fileId) {
-        // Update file
-        await fetch('https://www.googleapis.com/upload/drive/v3/files/' + fileId + '?uploadType=media', {
-            method: 'PATCH',
-            headers: {
-                'Authorization': 'Bearer ' + googleAccessToken,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
-        return fileId;
-    } else {
-        // Create file
-        const createRes = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
-            method: 'POST',
-            headers: { 'Authorization': 'Bearer ' + googleAccessToken },
-            body: createDriveMultipartBody(DRIVE_FILE_NAME, JSON.stringify(data))
-        });
-        if (createRes.ok) {
-            const file = await createRes.json();
-            googleDriveFileId = file.id;
-            return file.id;
-        }
-    }
-    return null;
-}
-
-function createDriveMultipartBody(filename, jsonString) {
-    const boundary = '-------314159265358979323846';
-    const delimiter = '\r\n--' + boundary + '\r\n';
-    const closeDelim = '\r\n--' + boundary + '--';
-    const contentType = 'application/json';
-    let body = delimiter +
-        'Content-Type: application/json; charset=UTF-8\r\n\r\n' +
-        JSON.stringify({ name: filename, parents: ['appDataFolder'] }) +
-        delimiter +
-        'Content-Type: ' + contentType + '\r\n\r\n' +
-        jsonString +
-        closeDelim;
-    return body;
-}
-
-// --- Google Calendar Sync ---
-async function syncEventsToGoogleCalendar() {
-    if (!isCalendarSyncEnabled || !googleAccessToken) return;
-    // Get existing events from Google Calendar (only those created by this app)
-    const existingRes = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events?maxResults=2500', {
-        headers: { 'Authorization': 'Bearer ' + googleAccessToken }
-    });
-    let existingEvents = [];
-    if (existingRes.ok) {
-        const result = await existingRes.json();
-        existingEvents = result.items || [];
-    }
-    // Map by summary and date
-    const existingMap = {};
-    for (const ev of existingEvents) {
-        if (ev.summary && ev.start && ev.start.date) {
-            existingMap[ev.summary + '_' + ev.start.date] = ev.id;
-        }
-    }
-    for (const ev of events) {
-        if (!ev.date) continue;
-        const key = (ev.title || 'Event') + '_' + ev.date;
-        if (existingMap[key]) continue; // Already exists, skip
-        const event = {
-            summary: ev.title || 'Event',
-            description: ev.description || '',
-            start: { date: ev.date },
-            end: { date: ev.date }
-        };
-        await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
-            method: 'POST',
-            headers: {
-                'Authorization': 'Bearer ' + googleAccessToken,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(event)
-        });
-    }
-    updateGoogleSyncStatus('Events synced to Google Calendar', 'green');
-    setLastCalendarSyncTime();
-}
-
-// --- Hook into saveEvents/saveSettings ---
-const origSaveEvents = saveEvents;
-saveEvents = async function() {
-    await origSaveEvents.apply(this, arguments);
-    if (isDriveSyncEnabled && googleAccessToken) {
-        await syncToDrive();
-    }
-    if (isCalendarSyncEnabled && googleAccessToken) {
-        await syncEventsToGoogleCalendar();
-    }
-};
-
-const origSaveSettings = saveSettings;
-saveSettings = async function(...args) {
-    await origSaveSettings.apply(this, args);
-    if (isDriveSyncEnabled && googleAccessToken) {
-        await syncToDrive();
-    }
-};
-
-window.addEventListener('DOMContentLoaded', () => {
-    initGoogleSyncUI();
-    restoreGoogleSignInState();
-});
 </script>
 </html>
